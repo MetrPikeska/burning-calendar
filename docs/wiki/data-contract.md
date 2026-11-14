@@ -1,7 +1,7 @@
 ---
 title: Data contract (pipeline to web)
 updated: 2026-11-14
-verified_by: uv run python pipeline/build.py --country GR, then read web/public/data/v1/gr/
+verified_by: uv run python pipeline/build.py --country GR, then read web/public/data/v1/gr/; uv run pytest tests/test_export.py
 sources: [decisions.md, harmonization.md, calendar-and-anomalies.md, ../../pipeline/build.py, ../../pipeline/export.py]
 ---
 
@@ -14,7 +14,10 @@ The Python pipeline writes static files under `web/public/data/v1/{gr,ar}/` and 
 | `index.json` | One per country. Header plus a list of regions with summary metrics and `mode`. Enough to draw the map. |
 | `regions/{id}.json` | Monthly series, per-season-year metrics and fitted factors for one region, loaded on click. |
 | `regions.geojson` | Region geometry for the map, GeoJSON FeatureCollection (EPSG:4326, coordinates rounded to 0.001°), properties `id` and `name`. `id` equals the region key in `index.json`: NUTS code for Greece, IGN `in1` for Argentina. Greece: GISCO NUTS 2024 1:20M, 15 kB. |
+| `regions/{id}.csv` | The `months` records of `regions/{id}.json` as CSV with leading `region_id` and `mode` columns; empty cell = null, booleans `true`/`false`. |
 | `validation.json` | Per-country validation: static filter and assignment counts, and per region the LOYO, time split, fit window gap, ratio trend, mode and mode reasons. |
+
+Shared files: `data/v1/schema/index.schema.json` and `data/v1/schema/region.schema.json` (JSON Schema 2020-12, checked against every file by `tests/test_export.py`), `/llms.txt` at the site root.
 
 `{id}` is the NUTS code or IGN id. Lower-level units (NUTS3, departments) have their own file and carry the factor of their parent unit. The country itself is also a region: `id` = country code (`GR`), `level` = `country`, `parent` = null, fitted on national counts. Fitting-level regions (NUTS2) have `parent` = country code.
 
@@ -58,4 +61,4 @@ Per-season-year record (`years`): `season_year` (the calendar year holding most 
 
 `factors`: one row per calendar month × day/night × kind: `month`, `dn`, `f`, `level`, `den_total` (denominator count in the fit window), `kind` (`viirs_over_modis` on 2012-2019, `modis_over_terra` on 2003-2011), `window`.
 
-The web recomputes anomalies in JS only for a range the user picks. CSV export is generated in JS from the monthly records.
+The web recomputes anomalies in JS only for a range the user picks. CSV export of a user-picked range is generated in JS from the monthly records; the full series is precomputed as `regions/{id}.csv`.

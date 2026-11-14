@@ -1,5 +1,6 @@
-"""Write web/public/data/v1/{country}/index.json and regions/{id}.json (see docs/wiki/data-contract.md)."""
+"""Write web/public/data/v1/{country}/index.json, regions/{id}.json and regions/{id}.csv (see docs/wiki/data-contract.md)."""
 
+import csv
 import json
 import math
 from datetime import datetime, timezone
@@ -29,6 +30,21 @@ def write_json(path: Path, obj) -> None:
     path.write_text(json.dumps(_clean(obj), separators=(",", ":"), ensure_ascii=False))
 
 
+CSV_FIELDS = ["ym", "modis", "viirs", "harm", "harm_lo", "harm_hi", "src", "fit_level",
+              "anom_pct", "anom", "outage_days", "outage"]
+
+
+def write_csv(path: Path, region_id: str, mode: str, months: list[dict]) -> None:
+    """Monthly records as CSV, one row per month; empty cell = null in the JSON."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f, lineterminator="\n")
+        w.writerow(["region_id", "mode", *CSV_FIELDS])
+        for m in _clean(months):
+            w.writerow([region_id, mode, *("" if m.get(k) is None else str(m[k]).lower() if isinstance(m[k], bool)
+                                            else m[k] for k in CSV_FIELDS)])
+
+
 def export_country(country: str, country_name: str, regions: list[dict], meta: dict) -> Path:
     """regions: list of {'entry': index entry, 'detail': regions/{id}.json body}."""
     out = WEB_DATA / country.lower()
@@ -47,4 +63,6 @@ def export_country(country: str, country_name: str, regions: list[dict], meta: d
     for r in regions:
         body = {"schema_version": SCHEMA_VERSION, "generated_at": generated, "units": UNITS, **r["detail"]}
         write_json(out / "regions" / f"{r['entry']['id']}.json", body)
+        write_csv(out / "regions" / f"{r['entry']['id']}.csv", r["entry"]["id"], r["entry"]["mode"],
+                  r["detail"]["months"])
     return out

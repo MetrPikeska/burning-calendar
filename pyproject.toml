@@ -17,5 +17,7 @@ package = false
 
 [dependency-groups]
 dev = [
+    "jsonschema>=4.26.0",
     "pytest>=9.2.0",
+    "referencing>=0.37.0",
 ]

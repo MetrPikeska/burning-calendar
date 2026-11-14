@@ -1,0 +1,42 @@
+# Burning Calendar: harmonized MODIS + VIIRS fire activity, Greece and Argentina
+
+> Monthly active fire detection counts from NASA FIRMS for Greece (13 NUTS2 regions) and Argentina (24 provinces), November 2000 to December 2025, on one scale: VIIRS S-NPP 375 m equivalent detections. VIIRS counts are used as observed from 2012; earlier months are MODIS counts times a factor fitted per region, calendar month and day/night on 2012-2019. Each region also has a fire season calendar (peak month, onset, end, season length) and monthly anomalies against the preceding 10 years. Static JSON and CSV, no API key, CORS open.
+
+Read before using the numbers:
+
+- A region with `mode: "relative"` failed validation (leave-one-year-out annual error above 25 %, or the harmonized series missed the VIIRS peak month in at least two more held-out season years than raw MODIS). Its `harm` is null and its calendar and anomalies come from MODIS counts alone. Do not compare its counts with harmonized regions.
+- Months with `src` `backcast` or `backcast_terra` (before 2012) are modelled, not observed. Quote them with the `harm_lo` to `harm_hi` range (10th to 90th percentile of out-of-sample errors).
+- Counts are detections, not fires and not burned area. One fire can produce many detections.
+- `outage: true` marks months with at least 3 days of known satellite data gaps.
+- National validation: leave-one-year-out median absolute error of annual totals 5.4 % for Greece and 1.5 % for Argentina. The VIIRS/MODIS night ratio in Greece falls 3.3 % per year over 2012-2025, so back-cast night counts carry extra uncertainty.
+
+## Data
+
+- [Greece index](/data/v1/gr/index.json): all Greek regions with mode, climatology and validation summary
+- [Argentina index](/data/v1/ar/index.json): all Argentine provinces, same fields
+- [Region detail, JSON](/data/v1/gr/regions/EL52.json): pattern `/data/v1/{gr|ar}/regions/{id}.json`, monthly series, season years, factors, band, validation
+- [Region detail, CSV](/data/v1/ar/regions/30.csv): pattern `/data/v1/{gr|ar}/regions/{id}.csv`, one row per month
+- [Greece geometry](/data/v1/gr/regions.geojson): GeoJSON, property `id` matches the index
+- [Argentina geometry](/data/v1/ar/regions.geojson): GeoJSON, IGN province id `in1` as `id`
+- [Validation, Greece](/data/v1/gr/validation.json) and [Validation, Argentina](/data/v1/ar/validation.json): per-region LOYO, time split, ratio trend, mode reasons
+
+## Web app and deep links
+
+- [Map and calendar](/): interactive map, year x month heatmap, series toggle
+- [Deep link example, Paraná Delta 2019-2020](/?country=ar&region=30&from=2019-12&to=2020-11): pattern `/?country=gr|ar&region={id}&from=YYYY-MM&to=YYYY-MM&series=harm|modis|viirs`; `series` defaults to `harm` and can be left out
+- MCP server (Streamable HTTP, read-only, no auth): `https://burning-calendar.vercel.app/api/mcp`
+
+## Schemas
+
+- [index.json schema](/data/v1/schema/index.schema.json): JSON Schema 2020-12
+- [regions/{id}.json schema](/data/v1/schema/region.schema.json): JSON Schema 2020-12, field descriptions included
+
+## Region ids
+
+- Greece: `GR` (whole country), NUTS 2024 codes `EL30`, `EL41` to `EL43`, `EL51` to `EL54`, `EL61` to `EL65`
+- Argentina: `AR` (whole country), IGN province codes, for example `06` Buenos Aires, `14` Córdoba, `18` Corrientes, `30` Entre Ríos (Paraná Delta)
+
+## Optional
+
+- Source data: NASA FIRMS standard processing archive, MODIS Collection 6.1 (Terra and Aqua) and VIIRS S-NPP 375 m, `type == 0` (presumed vegetation fire), cells with 16 or more detection days a year removed as static sources
+- Boundaries: GISCO NUTS 2024 (Eurostat), IGN Argentina `ign:provincia`

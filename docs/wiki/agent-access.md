@@ -1,7 +1,7 @@
 ---
 title: Agent access (MCP, llms.txt, deep links)
-updated: 2026-11-13
-verified_by: npm registry mcp-handler 2.4.0 (published 12 Nov 2026, `next` optional peer); modelcontextprotocol.io/specification/versioning.md (current 2026-07-28); ext-apps client-matrix.mdx on GitHub (13 Nov 2026)
+updated: 2026-11-14
+verified_by: smoke test on https://burning-calendar.vercel.app/api/mcp (14 Nov 2026); npm registry mcp-handler 2.4.0 (published 12 Nov 2026, `next` optional peer); modelcontextprotocol.io/specification/versioning.md (current 2026-07-28); ext-apps client-matrix.mdx on GitHub (13 Nov 2026)
 sources: [sources/2026-11-13-research-agent-access.md, https://modelcontextprotocol.io/specification/2026-07-28/changelog.md, https://github.com/vercel-labs/mcp-handler, https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/extensions/client-matrix.mdx]
 ---
 
@@ -11,7 +11,7 @@ How AI agents can use the burning calendar. Architecture, priority, language and
 
 - One Vercel Function `api/mcp.ts` in the same project as the static site: `mcp-handler` 2.4.0 (pin exact, published 12 Nov 2026), `@modelcontextprotocol/server` ^2 (2.4.0), `zod` ^4, Node 20+.
 - The function reads the same static JSON, bundled with `functions."api/mcp.ts".includeFiles: "public/data/**"` in `vercel.json`. Stateless, read-only, no auth, no secrets. The map works without it.
-- Risk: no doc shows `mcp-handler` in a plain `/api` function outside Next.js. `next` is an optional peer and the handler is a Web `Request => Response`, so it should work. Test in hour 1; fallback is a Hono route.
+- Smoke test passed 14 Nov 2026: `web/api/mcp.ts` exports the handler as `GET` and `POST` in a plain Vercel function (framework `vite`, no Next.js); `initialize` and `tools/call` answer 200 over SSE on the production URL, and the tool reads `public/data/v1/**` bundled by `includeFiles`. Pinned: `mcp-handler` 2.4.0, `@modelcontextprotocol/server` 2.4.0, `zod` 4.6.7. A 2026-07-28 request without the per-request `_meta` envelope gets HTTP 400 (the SDK requires it); 2025-era clients work. Hono fallback not needed.
 - Effort: 4 to 6 h for 6 tools plus a MCP Inspector test (our estimate). Hobby plan: 1,000,000 invocations and 4 h Active CPU a month included.
 - Any computation beyond reading JSON (custom-range anomalies) has to be TypeScript. Share one TS module between the web and the function.
 
