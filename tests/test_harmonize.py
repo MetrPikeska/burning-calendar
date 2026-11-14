@@ -128,3 +128,52 @@ def test_quality_note_flags_large_held_out_errors_without_changing_mode():
     assert ok["level"] == "ok" and ok["reasons"] == []
     assert quality(res("harmonized", {2018: 5.0}, {2023: 5.0}, 30.0))["reasons"] == ["time_split_mdape 30.0 > 25.0"]
     assert quality(res("relative", {2018: 99.0}, {}, None)) is None
+
+
+def _toy(ratio=3.0, modis_jul=10, start=2002, end=2025, extra=()):
+    """July MODIS every year, VIIRS = ratio x MODIS from 2012; extra rows appended."""
+    rows = []
+    for y in range(start, end + 1):
+        rows += [("modis", "Aqua", f"{y}-07", "D", modis_jul), ("modis", "Aqua", f"{y}-02", "D", 2)]
+        if y >= 2012:
+            rows += [("viirs", "N", f"{y}-07", "D", int(ratio * modis_jul)), ("viirs", "N", f"{y}-02", "D", int(ratio * 2))]
+    return monthly_counts(detections(rows + list(extra)))
+
+
+def test_validation_season_window_ignores_validation_years():
+    """Audit BC3-002: the validation start month comes from MODIS up to 2011 only."""
+    from validate import validation_start_month
+
+    base = _toy()
+    spiky = _toy(extra=[("modis", "Aqua", f"{y}-02", "D", 400) for y in (2016, 2017, 2018)])
+    assert validation_start_month(base) == validation_start_month(spiky)
+
+
+def test_zero_prediction_months_get_an_upper_bound():
+    """Audit BC3-004: MODIS = 0 but VIIRS > 0 in held-out months gives zero_hi > 0, used as harm_hi."""
+    from harmonize import fit, series
+    from validate import band, loyo
+
+    rows = []
+    for y in range(2002, 2020):
+        rows += [("modis", "Aqua", f"{y}-07", "D", 10)]
+        if y >= 2012:
+            rows += [("viirs", "N", f"{y}-07", "D", 30), ("viirs", "N", f"{y}-12", "D", 4)]  # Dec: VIIRS only
+    m = monthly_counts(detections(rows))
+    b = band(loyo(m, None))
+    assert b.set_index("month").loc[12, "zero_hi"] > 0
+    F, G = fit(m)
+    rec = series(m, F, G, b)
+    assert rec.loc["2005-12", "harm"] == 0
+    assert rec.loc["2005-12", "harm_hi"] > 0
+    assert rec.loc["2005-07", "harm_hi"] >= rec.loc["2005-07", "harm"]
+
+
+def test_baselines_recover_a_constant_ratio():
+    """Audit BC3-006: the ablation's constant ratio k is sum(VIIRS) / sum(MODIS) on Feb 2012 - 2019."""
+    from validate import baselines
+
+    b = baselines(_toy(ratio=3.0))
+    assert b["constant_ratio"]["k"] == 3.0
+    assert b["constant_ratio"]["time_split_mdape_pct"] == 0.0
+    assert b["month_ratio"]["loyo_mdape_pct"] == 0.0

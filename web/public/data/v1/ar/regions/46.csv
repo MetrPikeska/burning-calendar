@@ -2,10 +2,10 @@ region_id,mode,ym,modis,viirs,harm,harm_lo,harm_hi,src,fit_level,anom_pct,anom,o
 46,harmonized,2000-11,5,,34.3,23.9,78.0,backcast_terra,region_month_dn,30.0,false,0,false,69.3,511.1,2002-2011,3,,0,false,false
 46,harmonized,2000-12,1,,8.0,5.0,18.5,backcast_terra,region_dn,0.0,false,0,false,30.6,203.5,2002-2011,1,,0,false,false
 46,harmonized,2001-01,2,,9.5,6.0,22.2,backcast_terra,region_dn,0.0,false,0,false,36.3,49.4,2002-2011,2,,0,false,false
-46,harmonized,2001-02,0,,0.0,0.0,0.0,backcast_terra,region_dn,5.0,false,0,false,23.7,55.9,2002-2011,0,,0,false,false
-46,harmonized,2001-03,0,,0.0,0.0,0.0,backcast_terra,region_dn,0.0,false,0,false,16.1,25.7,2002-2011,0,,0,false,false
-46,harmonized,2001-04,0,,0.0,0.0,0.0,backcast_terra,region_dn,0.0,false,0,false,13.9,29.5,2002-2011,0,,0,false,false
-46,harmonized,2001-05,0,,0.0,0.0,0.0,backcast_terra,region_dn,0.0,false,0,false,19.4,47.8,2002-2011,0,,0,false,false
+46,harmonized,2001-02,0,,0.0,0.0,16.2,backcast_terra,region_dn,5.0,false,0,false,23.7,55.9,2002-2011,0,,0,false,false
+46,harmonized,2001-03,0,,0.0,0.0,16.2,backcast_terra,region_dn,0.0,false,0,false,16.1,25.7,2002-2011,0,,0,false,false
+46,harmonized,2001-04,0,,0.0,0.0,16.2,backcast_terra,region_dn,0.0,false,0,false,13.9,29.5,2002-2011,0,,0,false,false
+46,harmonized,2001-05,0,,0.0,0.0,16.2,backcast_terra,region_dn,0.0,false,0,false,19.4,47.8,2002-2011,0,,0,false,false
 46,harmonized,2001-06,1,,6.1,4.4,12.2,backcast_terra,region_season_dn,0.0,false,15,true,43.2,110.2,2002-2011,1,,0,false,false
 46,harmonized,2001-07,54,,369.8,268.1,741.1,backcast_terra,region_season_dn,90.0,true,3,true,78.8,321.0,2002-2011,7,,0,false,false
 46,harmonized,2001-08,136,,1048.4,760.1,2101.0,backcast_terra,region_month_dn,90.0,true,0,false,98.0,624.7,2002-2011,18,,0,false,false
@@ -38,7 +38,7 @@ region_id,mode,ym,modis,viirs,harm,harm_lo,harm_hi,src,fit_level,anom_pct,anom,o
 46,harmonized,2003-11,158,,644.7,450.0,1465.3,backcast,region_month_dn,100.0,true,0,false,52.3,438.9,2002-2011 without 2003,22,,0,false,false
 46,harmonized,2003-12,44,,202.2,128.2,471.0,backcast,region_dn,88.9,true,8,true,24.4,82.9,2002-2011 without 2003,15,,0,false,false
 46,harmonized,2004-01,11,,37.3,23.7,87.0,backcast,region_dn,55.6,false,0,false,35.3,49.8,2002-2011 without 2004,7,,0,false,false
-46,harmonized,2004-02,0,,0.0,0.0,0.0,backcast,region_dn,0.0,false,0,false,31.6,57.9,2002-2011 without 2004,0,,0,false,false
+46,harmonized,2004-02,0,,0.0,0.0,16.2,backcast,region_dn,0.0,false,0,false,31.6,57.9,2002-2011 without 2004,0,,0,false,false
 46,harmonized,2004-03,5,,11.7,8.7,31.0,backcast,region_dn,33.3,false,0,false,18.7,25.7,2002-2011 without 2004,3,,0,false,false
 46,harmonized,2004-04,2,,4.3,3.2,11.3,backcast,region_dn,11.1,false,0,false,14.9,29.8,2002-2011 without 2004,2,,0,false,false
 46,harmonized,2004-05,3,,6.5,4.8,17.1,backcast,region_dn,0.0,false,0,false,19.4,48.3,2002-2011 without 2004,2,,0,false,false

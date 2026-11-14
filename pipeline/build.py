@@ -19,7 +19,7 @@ from filters import drop_static
 from harmonize import CLIM_END, END, START, detection_days, fit, monthly_counts, series
 from load import COUNTRIES, load
 from regions import assign, region_areas, region_table
-from validate import raw_start_month, validate
+from validate import raw_start_month, validate, validation_start_month
 
 OUTAGE_MIN_DAYS = 3
 LEVEL = {"GR": "nuts2", "AR": "province"}
@@ -28,8 +28,8 @@ LEVEL = {"GR": "nuts2", "AR": "province"}
 def build_region(rid: str, name: str, level: str, parent: str | None, m: pd.DataFrame,
                  national: pd.DataFrame | None, outages: pd.DataFrame, area_km2: float,
                  days: pd.DataFrame, provisional_from: str | None = None) -> dict:
-    start = raw_start_month(m)
-    val, band = validate(m, national, start)
+    start = raw_start_month(m)  # the published calendar: climatology to 2025
+    val, band = validate(m, national, validation_start_month(m))  # validation: climatology to 2011 only
     mode = val["mode"]
     F, G = fit(m, national)
     rec = series(m, F, G, band, mode)

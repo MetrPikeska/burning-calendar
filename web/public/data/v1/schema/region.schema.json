@@ -109,6 +109,13 @@
               "null"
             ],
             "minimum": 0
+          },
+          "zero_hi": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
           }
         }
       }

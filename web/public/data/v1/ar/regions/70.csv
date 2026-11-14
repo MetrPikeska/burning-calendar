@@ -16,7 +16,7 @@ region_id,mode,ym,modis,viirs,harm,harm_lo,harm_hi,src,fit_level,anom_pct,anom,o
 70,harmonized,2002-01,7,,75.0,37.0,197.3,backcast_terra,region_month_dn,66.7,false,0,false,61.6,418.6,2002-2011 without 2002,4,,0,false,false
 70,harmonized,2002-02,8,,78.8,38.9,207.5,backcast_terra,region_season_dn,88.9,false,0,false,16.1,151.5,2002-2011 without 2002,3,,0,false,false
 70,harmonized,2002-03,2,,27.1,21.4,63.4,backcast_terra,region_dn,77.8,false,9,true,19.5,41.7,2002-2011 without 2002,1,,0,false,false
-70,harmonized,2002-04,0,,0.0,0.0,0.0,backcast_terra,region_dn,0.0,false,0,false,23.4,59.4,2002-2011 without 2002,0,,0,false,false
+70,harmonized,2002-04,0,,0.0,0.0,11.0,backcast_terra,region_dn,0.0,false,0,false,23.4,59.4,2002-2011 without 2002,0,,0,false,false
 70,harmonized,2002-05,2,,19.8,15.6,46.2,backcast_terra,region_dn,0.0,false,0,false,45.6,95.0,2002-2011 without 2002,1,,0,false,false
 70,harmonized,2002-06,8,,136.2,105.7,187.1,backcast_terra,region_season_dn,77.8,false,0,false,92.1,243.7,2002-2011 without 2002,5,,0,false,false
 70,harmonized,2002-07,67,,167.0,129.6,229.2,backcast,region_season_dn,22.2,false,2,false,245.6,335.2,2002-2011 without 2002,16,,0,false,false
@@ -110,7 +110,7 @@ region_id,mode,ym,modis,viirs,harm,harm_lo,harm_hi,src,fit_level,anom_pct,anom,o
 70,harmonized,2009-11,34,,142.9,86.9,211.3,backcast,region_month_dn,44.4,false,0,false,172.0,677.1,2002-2011 without 2009,10,,0,false,false
 70,harmonized,2009-12,12,,44.1,21.8,116.1,backcast,region_month_dn,11.1,false,0,false,84.1,297.3,2002-2011 without 2009,5,,0,false,false
 70,harmonized,2010-01,20,,94.3,46.6,248.3,backcast,region_month_dn,77.8,false,0,false,61.6,418.6,2002-2011 without 2010,9,,0,false,false
-70,harmonized,2010-02,0,,0.0,0.0,0.0,backcast,region_season_dn,0.0,false,0,false,39.4,155.6,2002-2011 without 2010,0,,0,false,false
+70,harmonized,2010-02,0,,0.0,0.0,11.0,backcast,region_season_dn,0.0,false,0,false,39.4,155.6,2002-2011 without 2010,0,,0,false,false
 70,harmonized,2010-03,3,,14.8,11.7,34.7,backcast,region_dn,22.2,false,0,false,19.5,41.7,2002-2011 without 2010,3,,0,false,false
 70,harmonized,2010-04,15,,58.6,46.2,136.8,backcast,region_dn,88.9,true,0,false,15.6,43.7,2002-2011 without 2010,8,,0,false,false
 70,harmonized,2010-05,10,,28.5,22.5,66.5,backcast,region_dn,44.4,false,0,false,45.6,95.0,2002-2011 without 2010,6,,0,false,false

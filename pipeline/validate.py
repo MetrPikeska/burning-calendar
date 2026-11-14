@@ -20,6 +20,11 @@ PEAK_MARGIN = 1  # season years
 # Quality note on harmonized regions (does not change the mode): "limited" when the held-out 2020-2025 test has a
 # median annual error above MDAPE_MAX, or any held-out year (LOYO or 2020-2025) misses VIIRS by more than this.
 YEAR_ERR_MAX = 50.0
+# Season window for the validation: MODIS climatology up to 2011, before the first VIIRS validation year, so no
+# held-out year (LOYO 2012-2019, time split 2020-2025) shapes the season years it is scored on (audit BC3-002).
+VALIDATION_CLIM_END = "2011-12"
+BAND_NOMINAL_PCT = 80
+COUNT_CLASSES = (("0", 0, 0), ("1-19", 1, 19), ("20-99", 20, 99), ("100+", 100, np.inf))
 
 
 def quality(res: dict) -> dict | None:
@@ -72,16 +77,79 @@ def time_split(m: pd.DataFrame, national: pd.DataFrame | None) -> pd.DataFrame:
 
 
 def band(lo: pd.DataFrame) -> pd.DataFrame:
-    """Multiplicative 10/90 % band per calendar month from LOYO obs/pred, pooled by season."""
+    """Multiplicative 10/90 % band per calendar month from LOYO obs/pred, pooled by season.
+    zero_hi: upper bound (90th percentile of observed VIIRS) for months whose prediction is 0, where a
+    multiplicative band collapses to [0, 0] although VIIRS can see fire (audit BC3-004)."""
     d = lo[lo["pred"] > 0].assign(r=lambda x: x["obs"] / x["pred"], season=lambda x: x["month"].map(SEASON))
+    z = lo[lo["pred"] == 0].assign(season=lambda x: x["month"].map(SEASON))
     rows = []
     for mo in range(1, 13):
         r = d.loc[d["season"] == SEASON[mo], "r"]
         if len(r) < 6:
             r = d["r"]
         q_lo, q_hi = (np.percentile(r, [10, 90]) if len(r) else (np.nan, np.nan))
-        rows.append({"month": mo, "q_lo": round(float(q_lo), 3), "q_hi": round(float(q_hi), 3)})
+        zo = z.loc[z["season"] == SEASON[mo], "obs"]
+        if len(zo) < 6:
+            zo = z["obs"]
+        zero_hi = round(float(np.percentile(zo, 90)), 1) if len(zo) else 0.0
+        rows.append({"month": mo, "q_lo": round(float(q_lo), 3), "q_hi": round(float(q_hi), 3), "zero_hi": zero_hi})
     return pd.DataFrame(rows)
+
+
+def band_coverage(ts: pd.DataFrame, b: pd.DataFrame) -> dict:
+    """Share of held-out 2020-2025 months whose observed VIIRS lies inside the band, overall and by count class."""
+    bb = b.set_index("month")
+    lo = ts["month"].map(bb["q_lo"]) * ts["pred"]
+    hi = np.where(ts["pred"] > 0, ts["month"].map(bb["q_hi"]) * ts["pred"], ts["month"].map(bb["zero_hi"]))
+    inside = (ts["obs"] >= lo.fillna(0) - 1e-9) & (ts["obs"] <= hi + 1e-9)
+    ok = ts["obs"].notna()
+
+    def share(mask) -> dict:
+        n = int((mask & ok).sum())
+        return {"pct": round(float(100 * inside[mask & ok].mean()), 1) if n else None, "n": n}
+
+    return {
+        "nominal_pct": BAND_NOMINAL_PCT, "test": "2020-2025", "band_from": "LOYO 2012-2019",
+        **share(pd.Series(True, index=ts.index)),
+        "by_observed_count": {name: share((ts["obs"] >= a) & (ts["obs"] <= z)) for name, a, z in COUNT_CLASSES},
+        "zero_prediction": share(ts["pred"] == 0),
+    }
+
+
+def _baseline_preds(m: pd.DataFrame, train_years, sel, by_month: bool) -> pd.Series:
+    """VIIRS predicted from MODIS with one ratio (by_month False) or one ratio per calendar month, fitted on the
+    complete VIIRS months of train_years. A month without MODIS in training falls back to the constant ratio."""
+    w = m[m["year"].isin(list(train_years)) & (m.index >= VIIRS_START)]
+    obs, mod = _obs(w), (w["modis_D"] + w["modis_N"]).astype(float)
+    k = obs.sum() / mod.sum() if mod.sum() > 0 else np.nan
+    modis = (m["modis_D"] + m["modis_N"]).astype(float)[sel]
+    if not by_month:
+        return modis * k
+    km = (obs.groupby(w["month"]).sum() / mod.groupby(w["month"]).sum()).replace([np.inf], np.nan)
+    return modis * m.loc[sel, "month"].map(km).fillna(k)
+
+
+def baselines(m: pd.DataFrame) -> dict:
+    """Ablation (audit BC3-006): the same LOYO and 2020-2025 tests for a constant ratio and a per-month ratio."""
+    def mdape(df):
+        a = _annual(df)["err_pct"].abs()
+        return round(float(np.nanmedian(a)), 1) if a.notna().any() else None
+
+    out = {}
+    for name, by_month in (("constant_ratio", False), ("month_ratio", True)):
+        parts = []
+        for y in FIT_YEARS:
+            sel = (m["year"] == y) & (m.index >= VIIRS_START)
+            parts.append(pd.DataFrame({"pred": _baseline_preds(m, [x for x in FIT_YEARS if x != y], sel, by_month),
+                                       "obs": _obs(m)[sel], "modis": (m["modis_D"] + m["modis_N"])[sel], "year": y}))
+        sel = (m["year"] >= 2020) & (m["year"] <= FULL_YEARS[-1])
+        ts = pd.DataFrame({"pred": _baseline_preds(m, FIT_YEARS, sel, by_month), "obs": _obs(m)[sel],
+                           "modis": (m["modis_D"] + m["modis_N"])[sel], "year": m.loc[sel, "year"]})
+        out[name] = {"loyo_mdape_pct": mdape(pd.concat(parts)), "time_split_mdape_pct": mdape(ts)}
+    w = m[m["year"].isin(list(FIT_YEARS)) & (m.index >= VIIRS_START)]
+    mod = (w["modis_D"] + w["modis_N"]).sum()
+    out["constant_ratio"]["k"] = round(float(_obs(w).sum() / mod), 3) if mod > 0 else None
+    return out
 
 
 def _annual(df: pd.DataFrame) -> pd.DataFrame:
@@ -178,7 +246,9 @@ def validate(m: pd.DataFrame, national: pd.DataFrame | None, start_month: int) -
         reasons.append(f"peak hits {harm_hits}/{n_seasons} vs raw MODIS {raw_hits}/{n_seasons}, "
                        f"more than {PEAK_MARGIN} season year worse")
     gap = fit_window_gap(m, national)
+    b = band(lo)
     res = {
+        "season_start_month_validation": start_month,
         "loyo": {
             "years": list(FIT_YEARS),
             "annual_mdape_pct": round(mdape, 1) if not np.isnan(mdape) else None,
@@ -199,12 +269,21 @@ def validate(m: pd.DataFrame, national: pd.DataFrame | None, start_month: int) -
         "ratio_trend": trend(m),
         "mode": "relative" if reasons else "harmonized",
         "mode_reasons": reasons,
+        "band_coverage": band_coverage(ts, b),
     }
+    res["baselines"] = baselines(m)
+    res["baselines"]["full_model"] = {"loyo_mdape_pct": res["loyo"]["annual_mdape_pct"],
+                                      "time_split_mdape_pct": res["time_split"]["annual_mdape_pct"]}
     res["quality"] = quality(res)
-    return res, band(lo)
+    return res, b
 
 
-def raw_start_month(m: pd.DataFrame) -> int:
-    """Climatological minimum month of the MODIS series (scale-free; used before harm exists)."""
+def raw_start_month(m: pd.DataFrame, clim_end: str = CLIM_END) -> int:
+    """Climatological minimum month of the MODIS series up to clim_end (scale-free; used before harm exists)."""
     s = (m["modis_D"] + m["modis_N"]).astype(float)
-    return int(np.nanargmin(climatology(s[s.index <= CLIM_END]))) + 1
+    return int(np.nanargmin(climatology(s[s.index <= clim_end]))) + 1
+
+
+def validation_start_month(m: pd.DataFrame) -> int:
+    """Season start for the validation: MODIS climatology up to 2011, before any VIIRS validation year."""
+    return raw_start_month(m, VALIDATION_CLIM_END)

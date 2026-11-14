@@ -137,6 +137,9 @@ def series(m: pd.DataFrame, F: pd.DataFrame, G: pd.DataFrame, band: pd.DataFrame
         hi = m["month"].map(b["q_hi"]).to_numpy() * mod["model"]
         rec["harm_lo"] = np.where(observed, np.nan, lo.round(1))
         rec["harm_hi"] = np.where(observed, np.nan, hi.round(1))
+        if "zero_hi" in b:  # a zero estimate still has an upper bound (audit BC3-004)
+            zero = ~observed & (mod["model"].to_numpy() == 0)
+            rec.loc[zero, "harm_hi"] = m.loc[zero, "month"].map(b["zero_hi"]).to_numpy()
     else:
         rec["harm_lo"] = np.nan
         rec["harm_hi"] = np.nan
