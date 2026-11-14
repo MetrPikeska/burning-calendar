@@ -187,7 +187,8 @@ const handler = createMcpHandler(
         title: "Monthly anomalies vs the preceding 10 years",
         description:
           "For each month of a calendar year: value, percentile rank among the same month of the preceding 10 years, " +
-          "baseline median and 90th percentile, ratio to the median, and whether it is flagged as an anomaly.",
+          "baseline median and 90th percentile, ratio to the median, whether it is flagged as an anomaly, and baseline_kind " +
+          "(retrospective, or fixed_2002_2011 before 2012). units names the scale of every number.",
         inputSchema: z.object({ caveats: caveatMode, region_id: regionId, year }),
         annotations: RO,
       },
@@ -205,9 +206,10 @@ const handler = createMcpHandler(
       {
         title: "Compare regions",
         description:
-          "Compare 2 to 10 regions on one metric. Count metrics (annual_mean, density_per_1000km2, season_total) are ranked only when all regions are harmonized; " +
-          "otherwise ranking_allowed is false and you must not rank them. season_total needs a year; rows with back-cast months carry value_lo..value_hi, " +
-          "and a region without a complete season year gets incomplete_season instead of a value (ranking_allowed false).",
+          "Compare 2 to 10 regions on one metric. Count metrics (annual_mean, density_per_1000km2, season_total, year_total) are ranked only when all regions are harmonized; " +
+          "otherwise ranking_allowed is false and you must not rank them. season_total (each region's own season year) and year_total " +
+          "(January to December, the same window for every region) need a year; rows with back-cast months carry value_lo..value_hi, " +
+          "and a region without a complete window gets incomplete_season / incomplete_year instead of a value (ranking_allowed false). units names the scale of value and value_modis.",
         inputSchema: z.object({ caveats: caveatMode,
           region_ids: z.array(regionId).min(2).max(10),
           metric: z.enum(COMPARE_METRICS),
@@ -265,7 +267,8 @@ const handler = createMcpHandler(
         description:
           "Rank all regions (or one country / level) by a metric, e.g. 'where were the most fires'. Prefer density_per_1000km2 " +
           "(detections per 1000 km2 per year) over annual_mean, which favours large regions. Count metrics rank harmonized regions only; " +
-          "relative-mode regions are returned apart in excluded_relative. season_total needs a year; regions without a complete season year are listed in incomplete_season, " +
+          "relative-mode regions are returned apart in excluded_relative. season_total and year_total (January to December for every region) need a year; " +
+          "regions without a complete window are listed in incomplete_season / incomplete_year, " +
           "rows with back-cast months carry value_lo..value_hi. Country-level rows are left out unless level is 'country'.",
         inputSchema: z.object({ caveats: caveatMode,
           metric: z.enum(RANK_METRICS),
@@ -284,7 +287,7 @@ const handler = createMcpHandler(
             if (country && country.toLowerCase() !== c) continue;
             for (const entry of (await loadIndex(c)).regions) {
               if (level ? entry.level !== level : entry.level === "country") continue;
-              items.push({ country: c, entry, region: metric === "season_total" ? await loadRegion(entry.id) : undefined });
+              items.push({ country: c, entry, region: metric === "season_total" || metric === "year_total" ? await loadRegion(entry.id) : undefined });
             }
           }
           return await ok(rankRegions(items, metric, { year: y, top, order }), caveats);
@@ -364,7 +367,7 @@ const handler = createMcpHandler(
     registerCalendar(server, { ok, fail, loadRegion, period, regionId, ym, caveatMode, annotations: RO });
     registerLiveTools(server);
   },
-  { serverInfo: { name: "burning-calendar", version: "0.5.0" } },
+  { serverInfo: { name: "burning-calendar", version: "0.6.0" } },
 );
 
 // Origin allowlist in front of the handler (web/api/_lib/origin.ts); requests without Origin pass.

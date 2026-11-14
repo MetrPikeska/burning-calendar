@@ -9,6 +9,7 @@ import { FIRMS, recentDetections } from "./firms.ts";
 import { findRegion, type LiveRegion, resolveRegion, seasonContext } from "./regions.ts";
 import { METEOSTAT, weatherStations } from "./stations.ts";
 import { fireWeather, MAX_FORECAST_DAYS, MAX_RANGE_DAYS, OPEN_METEO } from "./weather.ts";
+import { investigateMonth } from "../investigate.ts";
 
 type Server = Parameters<Parameters<typeof createMcpHandler>[0]>[0];
 
@@ -175,6 +176,32 @@ export function registerLiveTools(server: Server) {
         const r = await region(region_id);
         const { caveats, ...body } = await recentDetections(r, days);
         return liveResult({ region: regionBlock(r), ...body }, caveats, [FIRMS], mode);
+      }),
+  );
+
+  server.registerTool(
+    "investigate_month",
+    {
+      title: "Investigate one month in one region",
+      description:
+        "One call for 'what happened in <region> in <month>?'. Returns the calendar month (value on the region's main series, likely range " +
+        "before Feb 2012, anomaly flag, percentile rank, baseline median and 90th percentile, ratio to the median, rank among the same month of all years, " +
+        "days with a detection, outages), the Open-Meteo ERA5 weather summary for that month at the region's point (hot-dry-windy days, max temperature, " +
+        "min humidity, rain), and for the current or previous month also FIRMS near-real-time detections of the last 7 days and GDACS / Copernicus EMS alerts " +
+        "of the last 14 days. Evidence links: web map at that month, monthly JSON / CSV, hotspot CSV (Greece). History is always returned; " +
+        "a failing live source only adds an upstream_error caveat. Weather is association, not cause.",
+      inputSchema: z.object({
+        caveats: caveatMode,
+        region_id: regionId,
+        ym: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/).describe("Month YYYY-MM, e.g. 2021-08"),
+      }),
+      annotations: LIVE_RO,
+    },
+    async ({ region_id, ym, caveats: mode }) =>
+      guarded([OPEN_METEO, FIRMS, GDACS, CEMS], mode, async () => {
+        await region(region_id); // unknown id -> input error
+        const { body, caveats, sources } = await investigateMonth(region_id, ym);
+        return liveResult(body, caveats, sources, mode);
       }),
   );
 }
