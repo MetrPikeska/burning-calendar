@@ -60,3 +60,4 @@ sources: [sources/2026-11-13-research-harmonization-validation.md, findings-gree
 - **Agent access, round 2.** Tool surface, `caveats` codes, response size caps, MCP Apps calendar widget (in or out), demo script. Draft in [agent-access.md](agent-access.md).
 - **2026 and NOAA-20 splice.** Deferred (see Made, 13 Nov). Needs a FIRMS MAP_KEY.
 - **Fire type split** (cropland vs forest via CORINE): nice-to-have.
+- **Drought, weather and a predictive model.** Design in `docs/notes/2026-11-14-faktory-a-model.md` (CEMS FWI, ERA5-Land, SPEI, lag analysis, risk context). Not decided. Extrapolating the series is not planned.
