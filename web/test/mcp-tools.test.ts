@@ -7,6 +7,7 @@ import {
   anomaliesFor,
   compactCaveats,
   compareRegions,
+  countriesIn,
   countryOf,
   locate,
   rankRegions,
@@ -41,6 +42,19 @@ describe("countryOf", () => {
     expect(countryOf("30")).toBe("ar");
     expect(countryOf("AR")).toBe("ar");
     expect(countryOf("XX9")).toBeNull();
+  });
+});
+
+describe("countriesIn", () => {
+  it("finds the countries a result covers, for the source links", () => {
+    expect(countriesIn(anomaliesFor(el62, 2021, period))).toEqual(["gr"]);
+    expect(countriesIn(anomaliesFor(er, 2020, period))).toEqual(["ar"]);
+    expect(countriesIn(searchRegions([grIndex, arIndex], { limit: 50 }))).toEqual(["gr", "ar"]);
+    expect(countriesIn(searchRegions([grIndex, arIndex], { country: "AR", limit: 50 }))).toEqual(["ar"]);
+  });
+
+  it("falls back to both countries when a result names none", () => {
+    expect(countriesIn({ topic: "overview", text: "..." })).toEqual(["gr", "ar"]);
   });
 });
 

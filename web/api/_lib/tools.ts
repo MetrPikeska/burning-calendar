@@ -127,6 +127,26 @@ export function withCoverage<T extends object>(result: T, period: Period): T & {
   return { ...result, coverage: { start: period.start, end: period.end }, caveats };
 }
 
+/** Countries a result talks about, from its `country` fields and region ids; both when none is found. */
+export function countriesIn(result: unknown): CountryCode[] {
+  const found = new Set<CountryCode>();
+  const walk = (v: unknown): void => {
+    if (Array.isArray(v)) return v.forEach(walk);
+    if (!v || typeof v !== "object") return;
+    for (const [k, x] of Object.entries(v)) {
+      if (typeof x === "string") {
+        if (k === "country" && (x === "GR" || x === "AR")) found.add(x === "GR" ? "gr" : "ar");
+        if (k === "region_id" || k === "id") {
+          const c = countryOf(x);
+          if (c) found.add(c);
+        }
+      } else walk(x);
+    }
+  };
+  walk(result);
+  return found.size ? (["gr", "ar"] as const).filter((c) => found.has(c)) : ["gr", "ar"];
+}
+
 function outOfCoverage(what: string, period: Period): Caveat {
   return { code: "out_of_coverage", message: `${what} is outside the data coverage ${period.start} to ${period.end}.` };
 }

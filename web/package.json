@@ -11,7 +11,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "typecheck": "tsc && tsc -p api && tsc -p test",
-    "test": "vitest run"
+    "test": "vitest run",
+    "smoke:mcp": "node scripts/smoke-mcp.mjs"
   },
   "dependencies": {
     "@fontsource-variable/ibm-plex-sans": "5.3.0",

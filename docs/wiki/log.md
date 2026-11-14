@@ -42,3 +42,4 @@ Append-only. Format: `YYYY-MM-DD op: what changed`.
 - 2026-11-14 build: MCP fixes from the docs session's production test: `season_window` per row for season_total rankings, caveat texts sent once (agent-access.md).
 - 2026-11-14 build: phone pass on the web: taller calendar rows under 440 px (cells 23x17 px), cells picked from the tap position (no hover needed), bold year label of the compared row, "Tap" on touch screens, header on one row, shorter map (34vh), map legend as a strip under the map, attribution behind its (i), From/To side by side, 44 px zoom buttons.
 - 2026-11-14 decision: data licence CC BY 4.0, not CC0, because GISCO and IGN boundaries require attribution (decisions.md). Author name corrected to Vít Kadlec in LICENSE and CITATION.cff.
+- 2026-11-14 build: MCP `source.details` links only the countries a result covers; `npm run smoke:mcp` checks all 10 tools and the static agent layer on a deployed URL (agent-access.md).

@@ -16,6 +16,7 @@ import {
   type Caveat,
   COMPARE_METRICS,
   compareRegions,
+  countriesIn,
   countryOf,
   locate,
   METHODOLOGY,
@@ -59,21 +60,21 @@ const period = async (): Promise<Period> => (await loadIndex("gr")).period;
 
 type Provenance = { firms?: { downloaded?: string[] } };
 
-/** Short provenance for every result; the full block is `source` in each country's index.json. */
-async function source() {
-  const ix = await Promise.all((["gr", "ar"] as const).map((c) => loadIndex(c)));
+/** Short provenance for every result; the full block is `source` in the index.json of each country the result covers. */
+async function source(countries: CountryCode[]) {
+  const ix = await Promise.all(countries.map((c) => loadIndex(c)));
   const dl = ix.flatMap((i) => (i as IndexFile & { source?: Provenance }).source?.firms?.downloaded ?? []);
   return {
     method_version: ix[0].method_version,
     firms: "NASA FIRMS standard processing, MODIS C6.1 + VIIRS S-NPP 375 m",
     firms_downloaded: [...new Set(dl)].sort(),
-    details: (["gr", "ar"] as const).map((c) => `${PUBLIC_URL}data/v1/${c}/index.json#source`),
+    details: countries.map((c) => `${PUBLIC_URL}data/v1/${c}/index.json#source`),
   };
 }
 
 /** Adds coverage and source, then caveats first in the text block and the full JSON (TextContent mirrors structuredContent). */
 async function ok(raw: object, mode: "full" | "codes" = "full") {
-  const full = { ...withCoverage(raw, await period()), source: await source() };
+  const full = { ...withCoverage(raw, await period()), source: await source(countriesIn(raw)) };
   if (mode === "codes") {
     const result = compactCaveats(full);
     const text = `CAVEATS (codes; get_methodology topic 'caveats' explains them): ${result.caveat_codes.join(", ")}\n${JSON.stringify(result)}`;
