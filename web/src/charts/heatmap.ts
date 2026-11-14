@@ -40,13 +40,30 @@ function title(c: Cell, series: Series): string {
   lines.push(`MODIS ${fmt(r.modis)}  VIIRS ${fmt(r.viirs)}`);
   if (r.anom_pct != null) lines.push(`percentile vs preceding 10 years: ${r.anom_pct}`);
   if (r.anom) lines.push("ANOMALY: above the baseline 90th percentile");
-  if (r.outage) lines.push(`known outage: ${r.outage_days} days`);
+  if (r.outage) lines.push(`known MODIS outage: ${r.outage_days} days`);
   return lines.join("\n");
 }
 
-export function renderHeatmap(region: RegionFile, series: Series): SVGSVGElement | HTMLElement {
+export interface Range {
+  from: string | null;
+  to: string | null;
+}
+
+function inRange(ym: string, r: Range): boolean {
+  return (!r.from || ym >= r.from) && (!r.to || ym <= r.to);
+}
+
+/** Cells outside `range` are dimmed, not removed, so the calendar keeps its shape. */
+export function renderHeatmap(
+  region: RegionFile,
+  series: Series,
+  range: Range = { from: null, to: null },
+  selectedYm: string | null = null,
+  onPick?: (ym: string) => void,
+): SVGSVGElement | HTMLElement {
   const cells = toCells(region.months, series);
-  return Plot.plot({
+  const dim = (c: Cell) => (inRange(c.rec.ym, range) ? 1 : 0.18);
+  const plot = Plot.plot({
     width: 520,
     height: 26 * 17 + 50,
     marginLeft: 44,
@@ -62,11 +79,22 @@ export function renderHeatmap(region: RegionFile, series: Series): SVGSVGElement
       label: `${SERIES_LABEL[series]}, detections / month`,
     },
     marks: [
-      Plot.cell(cells, { x: "month", y: "year", fill: "value", title: (c: Cell) => title(c, series), tip: true }),
+      Plot.cell(cells, { x: "month", y: "year", fill: "value", fillOpacity: dim, title: (c: Cell) => title(c, series), tip: true }),
       // Anomalies: outlined cells.
-      Plot.cell(cells.filter((c) => c.rec.anom), { x: "month", y: "year", fill: null, stroke: "#0b62a4", strokeWidth: 2, inset: 1 }),
-      // Known satellite outages: a cross, the zero is not real.
-      Plot.text(cells.filter((c) => c.rec.outage), { x: "month", y: "year", text: () => "×", fill: "#0b62a4", fontSize: 14 }),
+      Plot.cell(cells.filter((c) => c.rec.anom && inRange(c.rec.ym, range)), { x: "month", y: "year", fill: null, stroke: "#0b62a4", strokeWidth: 2, inset: 1 }),
+      // Known MODIS outages (data/outages.csv): a cross where the shown series depends on MODIS.
+      Plot.text(cells.filter((c) => c.rec.outage && (series === "modis" || (series === "harm" && c.rec.src !== "observed"))), { x: "month", y: "year", text: () => "×", fill: "#0b62a4", fontSize: 14 }),
+      // Month shown in the median panel.
+      Plot.cell(cells.filter((c) => c.rec.ym === selectedYm), { x: "month", y: "year", fill: null, stroke: "#000", strokeWidth: 2.5 }),
     ],
   });
+  if (onPick) {
+    // The tip's pointer keeps the hovered datum in plot.value; a click picks that month.
+    plot.style.cursor = "pointer";
+    plot.addEventListener("click", () => {
+      const c = (plot as unknown as { value?: Cell | null }).value;
+      if (c) onPick(c.rec.ym);
+    });
+  }
+  return plot;
 }

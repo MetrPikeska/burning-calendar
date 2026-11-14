@@ -27,15 +27,32 @@ header label { margin-left: auto; font-size: 0.9rem; }
 main {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 560px;
+  grid-template-rows: auto 1fr;
+  grid-template-areas: "map area" "map panel";
   height: calc(100vh - 3rem);
 }
-#map { min-height: 320px; }
-#panel { overflow-y: auto; padding: 0.8rem 1rem; border-left: 1px solid var(--line); }
+#map { grid-area: map; min-height: 320px; }
+#area {
+  grid-area: area;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.6rem 1rem;
+  border-left: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+#panel { grid-area: panel; overflow-y: auto; padding: 0.8rem 1rem; border-left: 1px solid var(--line); }
 
 @media (max-width: 900px) {
-  main { grid-template-columns: 1fr; height: auto; }
-  #map { height: 50vh; }
-  #panel { border-left: none; }
+  main {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    grid-template-areas: "area" "map" "panel";
+    height: auto;
+  }
+  #map { height: 40vh; }
+  #area, #panel { border-left: none; }
+  #chart { overflow-x: auto; }
 }
 
 h2 { margin: 0 0 0.3rem; font-size: 1.15rem; }
@@ -56,3 +73,17 @@ h2 { margin: 0 0 0.3rem; font-size: 1.15rem; }
 }
 .toggle button + button { border-left: none; }
 .toggle button[aria-pressed="true"] { background: var(--fg); color: white; border-color: var(--fg); }
+
+#area select { max-width: 100%; }
+.latlon { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; }
+.latlon input { width: 11rem; }
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; margin-bottom: 0.5rem; }
+.controls .toggle { margin-bottom: 0; }
+.range { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; font-size: 0.9rem; }
+
+.median { margin: 0.6rem 0; padding-top: 0.5rem; border-top: 1px solid var(--line); max-width: 520px; }
+.median h3 { margin: 0 0 0.3rem; font-size: 1rem; }
+.median p { margin: 0 0 0.4rem; font-size: 0.92rem; }
+.flag { background: var(--accent); color: white; padding: 0 0.35rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; }
+main > * { min-width: 0; }
+.range input { max-width: 10rem; }

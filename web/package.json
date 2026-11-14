@@ -10,7 +10,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc && tsc -p api",
+    "typecheck": "tsc && tsc -p api && tsc -p test",
     "test": "vitest run"
   },
   "dependencies": {

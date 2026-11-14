@@ -57,6 +57,11 @@ export interface MonthRecord {
   anom: boolean;
   outage_days: number;
   outage: boolean;
+  /** Median of the same calendar month over the baseline years, same series as anom_pct. Null with < 5 values. */
+  baseline_median: number | null;
+  baseline_p90: number | null;
+  /** "2010-2019" or "2002-2011 without 2005". */
+  baseline_years: string | null;
 }
 
 export interface SeasonYear {
@@ -104,4 +109,9 @@ export interface RegionFile {
 /** Series a region can show: `harm` is null in relative mode. */
 export function availableSeries(mode: Mode): Series[] {
   return mode === "harmonized" ? ["harm", "modis", "viirs"] : ["modis", "viirs"];
+}
+
+/** Value the anomaly baseline is computed on: harm in harmonized mode, modis in relative mode. */
+export function baselineValue(rec: MonthRecord, mode: Mode): number | null {
+  return mode === "harmonized" ? rec.harm : rec.modis;
 }

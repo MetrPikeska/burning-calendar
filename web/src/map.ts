@@ -1,6 +1,6 @@
 // Region map: OpenFreeMap positron basemap, local Natural Earth fallback when offline
 // or with ?basemap=local. Regions from regions.geojson joined with index.json.
-import { Map as MlMap, NavigationControl, setWorkerUrl, type StyleSpecification } from "maplibre-gl";
+import { Map as MlMap, Marker, NavigationControl, setWorkerUrl, type StyleSpecification } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 // MapLibre 6 resolves its worker next to import.meta.url, which a bundle breaks; hand Vite the file.
 import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
@@ -8,6 +8,7 @@ import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
 setWorkerUrl(workerUrl);
 import type { CountryCode, IndexFile } from "./lib/contract.ts";
 import { regionsGeojsonUrl } from "./lib/data.ts";
+import type { RegionCollection } from "./lib/geo.ts";
 
 const ONLINE_STYLE = "https://tiles.openfreemap.org/styles/positron";
 const STYLE_TIMEOUT_MS = 3000;
@@ -38,15 +39,7 @@ async function pickStyle(forceLocal: boolean): Promise<string | StyleSpecificati
   }
 }
 
-interface RegionFeature {
-  type: "Feature";
-  geometry: { type: "Polygon" | "MultiPolygon"; coordinates: unknown[] };
-  properties: { id: string; name: string };
-}
-interface Geo {
-  type: "FeatureCollection";
-  features: RegionFeature[];
-}
+type Geo = RegionCollection;
 
 function bbox(fc: Geo): [number, number, number, number] {
   let [w, s, e, n] = [180, 90, -180, -90];
@@ -61,8 +54,11 @@ function bbox(fc: Geo): [number, number, number, number] {
 }
 
 export interface RegionMap {
-  setCountry(country: CountryCode, index: IndexFile): Promise<void>;
+  /** Loads the country's regions.geojson, joins index metrics, fits the view; returns the geometry. */
+  setCountry(country: CountryCode, index: IndexFile): Promise<RegionCollection>;
   setSelected(id: string | null): void;
+  /** Marker for a user-entered point; null removes it. */
+  showPoint(lonLat: [number, number] | null): void;
 }
 
 export async function createRegionMap(
@@ -76,6 +72,7 @@ export async function createRegionMap(
   await new Promise<void>((resolve) => map.once("load", () => resolve()));
 
   let selected: string | null = null;
+  let marker: Marker | null = null;
 
   map.addSource("regions", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
   map.addLayer({
@@ -130,10 +127,15 @@ export async function createRegionMap(
       }
       (map.getSource("regions") as unknown as { setData(d: unknown): void }).setData(fc);
       map.fitBounds(bbox(fc), { padding: 24, duration: 0 });
+      return fc;
     },
     setSelected(id) {
       selected = id;
       map.setFilter("regions-selected", ["==", ["get", "id"], selected ?? ""]);
+    },
+    showPoint(lonLat) {
+      marker?.remove();
+      marker = lonLat ? new Marker({ color: "#0b62a4" }).setLngLat(lonLat).addTo(map) : null;
     },
   };
 }

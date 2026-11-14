@@ -20,20 +20,22 @@ Feature freeze Sun 15 Nov 12:00. Local submission Sun 15:00, pitch 16:00 (7 min 
 - [x] P Deploy web/ on Petr's Vercel: https://burning-calendar.vercel.app (CLI from web/, `vercel deploy --prod --yes`, no Git auto-deploy; CLI only under Node 20)
 - [x] P Full harmonization GR: region x month x d/n factors, fallback chain, Terra-only chaining, LOYO, time split, `relative` mode (findings-greece.md)
 - [x] P Toggle MODIS / VIIRS / harmonized, region picker on the map (basic version in the scaffold)
-- [ ] V Panel "chosen month vs median of the preceding 10 years" (personas.md)
-- [ ] V Lat/lon input mapped to a region (point-in-polygon over regions.geojson)
-- [ ] V Date range picker (`from`/`to` are already in the URL state, not used by the UI yet)
+- [x] P `baseline_median`, `baseline_p90`, `baseline_years` per month in regions/{id}.json and CSV
+- [x] P Panel "chosen month vs median of the preceding 10 years" (web/src/charts/median.ts): default = strongest month in the range, else Dec 2025; click a heatmap cell to pick
+- [x] P Lat/lon input mapped to a region (web/src/lib/geo.ts, marker on the map) + region dropdown incl. GR/AR
+- [x] P Date range from/to (dims cells outside, kept in the URL)
 - [x] P Region geometry: GISCO NUTS 2024 1:20M (GR), IGN provinces (AR), as regions.geojson
 - [x] P Argentina through the same pipeline (24 provinces, Paraná 2020 in findings-argentina.md)
 - [x] P Anomalies (percentile vs preceding 10 years), outages from data/outages.csv (in the JSON; outage list has only Aqua 2020 so far)
-- [ ] V CSV export per region (JS from monthly records)
+- [x] P CSV download: static regions/{id}.csv, range-filtered in JS when from/to are set (web/src/lib/csv.ts)
 - [x] P Static agent layer files: per-region CSV, JSON Schema (data/v1/schema/, tested), /llms.txt
 - [x] P CORS header for /data/v1/* in web/vercel.json
 - [x] P Deep-link format into llms.txt: `?country=gr&region=EL52&from=YYYY-MM&to=YYYY-MM&series=harm|modis|viirs` (web/src/lib/url-state.ts)
 - [x] P api/mcp.ts smoke test on Vercel (mcp-handler 2.4.0, one tool `search_regions`), https://burning-calendar.vercel.app/api/mcp
-- [ ] P MCP tools with `caveats` and `view_url` (agent-access.md), test with MCP Inspector and a claude.ai connector
+- [x] P MCP tools with `caveats` and `view_url`: 7 tools in web/api/mcp.ts, logic in web/api/_lib/tools.ts, vitest
+- [ ] P Test the deployed MCP with MCP Inspector and a claude.ai custom connector; record a fallback video
 - [x] P Vercel Git auto-deploy connected (root `web/`, branch main)
-- [ ] P After the next push: `vercel promote` the new deployment (production was rolled back, so auto-assign is paused) and check /api/mcp
+- [x] P Push deploy of fc59713 went to production automatically, /api/mcp checked
 - [ ] P+V README (problem, method, LOYO number, limits, how to run), MIT licence
 - [ ] V Slides (PDF, English, max 7 for global demo), 30 s video, backup screen recording
 - [ ] P+V Project page on the NASA portal, first save by Sun 14:00

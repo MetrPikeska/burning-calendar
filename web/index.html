@@ -20,6 +20,14 @@
     </header>
     <main>
       <div id="map"></div>
+      <section id="area" aria-label="Area of interest">
+        <label>Region <select id="region"></select></label>
+        <form id="latlon-form" class="latlon">
+          <label>Lat, lon <input id="latlon" type="text" inputmode="decimal" placeholder="40.64, 22.94" autocomplete="off" /></label>
+          <button type="submit">Find</button>
+          <span id="latlon-msg" class="muted" role="status"></span>
+        </form>
+      </section>
       <section id="panel"><p class="hint">Loading...</p></section>
     </main>
     <script type="module" src="/src/main.ts"></script>
