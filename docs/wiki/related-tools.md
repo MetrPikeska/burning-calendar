@@ -1,8 +1,8 @@
 ---
 title: Existing fire calendars and tools
-updated: 2026-11-13
-verified_by: URLs below, read by the research agent on 13 Nov 2026
-sources: [sources/2026-11-13-research-harmonization-validation.md, sources/2026-11-13-research-conae-argentina.md]
+updated: 2026-11-14
+verified_by: URLs below, read by the research agent on 13 Nov 2026; EFFIS applications page and VIIRS BA ATBD read 14 Nov 2026
+sources: [sources/2026-11-13-research-harmonization-validation.md, sources/2026-11-13-research-conae-argentina.md, sources/2026-11-14-research-greek-data-prior-art.md]
 ---
 
 | Tool | What it does | Relevance |
@@ -13,6 +13,24 @@ sources: [sources/2026-11-13-research-harmonization-validation.md, sources/2026-
 | [GWIS applications](https://gwis.jrc.ec.europa.eu/applications) | Country profiles, seasonal cumulative fires against the 10-year mean | Anomaly pattern |
 | [Greenpeace Global Fire Calendar](https://maps.greenpeace.org/projects/firecal/) | MODIS 2001-2022, average monthly profile per country in 4 levels. Run by an NGO. | Prior art; MODIS only, not harmonized |
 | NASA FIRMS | Raw data. No official seasonality chart found (UNVERIFIED). | Our data source |
+| [Global Forest Watch fire tool](https://www.globalforestwatch.org/blog/data-and-tools/wildfire-trends-gfw-fire-data/) | Every country, last 5 years, VIIRS and MODIS shown separately | No harmonization, short history |
+| [Fire anomaly from MODIS/FIRMS](https://africa-knowledge-platform.ec.europa.eu/node/36950) | Anomaly map, Africa Knowledge Platform | Anomaly prior art |
+
+No existing app found (14 Nov 2026) that combines a harmonized MODIS+VIIRS calendar, anomalies and area selection.
+
+## EFFIS Current Statistics Portal (read 14 Nov 2026)
+
+- National statistics and three groups of countries (EU, European non-EU, Middle East and North Africa).
+- Burnt area and number of fires against the 14-year mean; the current year can be compared with a single year or a period.
+- Seasonal cumulative trend of burnt area and fires against the 14-year mean.
+- VIIRS thermal anomalies and MODIS thermal anomalies, each against the mean of 2012-2021, shown separately and not harmonized.
+- Raw data only through a request form. No area selection, no calendar view. Use it as the Greece reference for our anomalies.
+
+## NASA harmonization work (not an app)
+
+- Boschetti, Roy and Giglio plan a calibrated 25-year MODIS/VIIRS burned area series (0.25 degree), calibrated against Landsat-8 and Sentinel-2. It covers burned area, not hotspot counts, so the method does not transfer. Details and caveats in [sources/2026-11-14-research-greek-data-prior-art.md](sources/2026-11-14-research-greek-data-prior-art.md).
+- The VIIRS burned area product continues MCD64A1 with the same algorithm. Its ATBD states that burned area cannot be estimated reliably from active fire counts. That supports showing counts, not area.
+- Datasets that fuse the sensors: MODIS+VIIRS FRP 2012-2024 (Remote Sensing 18(10) 1650) and GFED5NRT (ESSD 18, 7535).
 
 ## CONAE catalogue details
 
