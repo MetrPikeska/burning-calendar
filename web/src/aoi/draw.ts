@@ -2,7 +2,7 @@
 // a radius for points and lines, Done and Clear, plus a drop zone for GeoJSON files.
 // Polygon: click adds a vertex; double-click, Enter or Done closes it; Esc cancels.
 import type { FilterSpecification, GeoJSONSource, IControl, Map as MlMap, MapMouseEvent } from "maplibre-gl";
-import { type Aoi, AoiError, aoiBbox, aoiToGeoJson, DEFAULT_RADIUS_KM, emptyAoi, isEmpty, parseGeoJson } from "./geojson.ts";
+import { type Aoi, AoiError, aoiBbox, aoiToGeoJson, DEFAULT_RADIUS_KM, emptyAoi, isEmpty, parseGeoJson, ringSelfIntersects } from "./geojson.ts";
 
 type Mode = "polygon" | "point" | "line";
 const AOI_COLOR = "#1565b5";
@@ -151,7 +151,10 @@ export function attachAoiDraw(map: MlMap, container: HTMLElement, cb: Callbacks,
     const aoi = emptyAoi(radius());
     if (mode === "polygon") {
       if (vs.length < 3) { hint.textContent = "A polygon needs at least 3 corners."; return; }
-      aoi.polygons.push([[...vs, vs[0]]]);
+      const ring = [...vs, vs[0]];
+      // A bowtie has no well-defined inside; keep drawing so the user can fix it (audit BC3-008).
+      if (ringSelfIntersects(ring)) { hint.textContent = "The edges cross. Press Esc and draw the corners in order around the area."; return; }
+      aoi.polygons.push([ring]);
     } else if (mode === "line") {
       if (vs.length < 2) { hint.textContent = "A line needs at least 2 points."; return; }
       aoi.lines.push(vs);

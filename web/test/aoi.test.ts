@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import type { IndexFile, RegionFile } from "../src/lib/contract.ts";
 import { computeAoi, type Detection } from "../src/aoi/compute.ts";
 import { DETECTIONS_HEADER, parseDetectionsCsv } from "../src/aoi/detections.ts";
-import { aoiBbox, aoiToGeoJson, AoiError, areaKm2, contains, parseGeoJson } from "../src/aoi/geojson.ts";
+import { aoiBbox, aoiToGeoJson, AoiError, areaKm2, contains, emptyAoi, parseGeoJson, ringSelfIntersects, sphericalRingAreaKm2 } from "../src/aoi/geojson.ts";
 import { detectionsCsv, monthsCsv, touchedRegions } from "../src/aoi/run.ts";
 import { distanceToLineKm, inPolygon, type RegionCollection } from "../src/lib/geo.ts";
 
@@ -141,10 +141,58 @@ describe("AOI downloads", () => {
   it("monthly CSV keeps the pipeline's columns; detections CSV keeps the published rows", () => {
     const r = aoiOf(["EL64"]);
     const csv = monthsCsv(r.file);
-    expect(csv.split("\n")[0]).toBe(readFileSync("public/data/v1/gr/regions/EL64.csv", "utf8").split("\n")[0]);
+    expect(csv.split("\n")[0]).toBe(readFileSync("public/data/v1/gr/regions/EL64.csv", "utf8").split("\n")[0] + ",aoi_estimate");
+    expect(csv.split("\n").find((l) => l.startsWith("AOI,harmonized,2005-08,"))!.endsWith(",unvalidated")).toBe(true);
+    expect(csv.split("\n").find((l) => l.startsWith("AOI,harmonized,2021-08,"))!.endsWith(",")).toBe(true);
     const aug = csv.split("\n").find((l) => l.startsWith("AOI,harmonized,2021-08,"))!;
     expect(aug.split(",")[5]).toBe("4235");
     const d = dets("EL64").slice(0, 3);
     expect(detectionsCsv(d).split("\n").slice(0, 4)).toEqual([DETECTIONS_HEADER, ...d.map((x) => x.line)]);
+  });
+});
+
+describe("AOI area is the union of its parts (audit BC3-001)", () => {
+  const disc = Math.PI * 25;
+  it("two identical 5 km discs give one disc, not two", () => {
+    const a = { ...emptyAoi(5), points: [[23, 39], [23, 39]] };
+    expect(Math.abs(areaKm2(a) - disc) / disc).toBeLessThan(0.01);
+  });
+
+  it("two discs one radius apart give 2 pi r2 minus their lens", () => {
+    const r = 5, d = 5;
+    const lens = 2 * r * r * Math.acos(d / (2 * r)) - (d / 2) * Math.sqrt(4 * r * r - d * d);
+    const want = 2 * disc - lens;
+    const dLon = d / (111.32 * Math.cos((39 * Math.PI) / 180));
+    const a = { ...emptyAoi(5), points: [[23, 39], [23 + dLon, 39]] };
+    expect(Math.abs(areaKm2(a) - want) / want).toBeLessThan(0.01);
+  });
+
+  it("a disc inside a polygon adds nothing; a hole is subtracted", () => {
+    const sq = [[22, 38], [24, 38], [24, 40], [22, 40], [22, 38]];
+    const hole = [[22.5, 38.5], [23.5, 38.5], [23.5, 39.5], [22.5, 39.5], [22.5, 38.5]];
+    const poly = sphericalRingAreaKm2(sq);
+    const withDisc = areaKm2({ ...emptyAoi(5), polygons: [[sq]], points: [[23, 39]] });
+    expect(Math.abs(withDisc - poly) / poly).toBeLessThan(0.01);
+    expect(areaKm2({ ...emptyAoi(5), polygons: [[sq, hole]] })).toBeCloseTo(poly - sphericalRingAreaKm2(hole), 6);
+  });
+
+  it("the spherical area of EL64's map outline is close to the pipeline's EPSG:6933 area", () => {
+    const geo = read<RegionCollection>("gr/regions.geojson");
+    const f = geo.features.find((x) => x.properties.id === "EL64")!;
+    const polys = f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates;
+    const ours = polys.reduce((t, p) => t + sphericalRingAreaKm2(p[0]) - p.slice(1).reduce((u, h) => u + sphericalRingAreaKm2(h), 0), 0);
+    const ref = index.regions.find((r) => r.id === "EL64")!.area_km2!;
+    expect(Math.abs(ours - ref) / ref).toBeLessThan(0.05); // 1:20M map outline vs 1:1M assignment polygons
+  });
+});
+
+describe("GeoJSON topology (audit BC3-008)", () => {
+  it("rejects an unclosed ring and a bowtie, accepts a plain square", () => {
+    const open = [[22, 38], [24, 38], [24, 40], [22, 40], [22.1, 38.1]];
+    expect(() => parseGeoJson(JSON.stringify({ type: "Polygon", coordinates: [open] }))).toThrow(/not closed/);
+    const bowtie = [[22, 38], [24, 40], [24, 38], [22, 40], [22, 38]];
+    expect(ringSelfIntersects(bowtie)).toBe(true);
+    expect(() => parseGeoJson(JSON.stringify({ type: "Polygon", coordinates: [bowtie] }))).toThrow(/cross/);
+    expect(ringSelfIntersects([[22, 38], [24, 38], [24, 40], [22, 40], [22, 38]])).toBe(false);
   });
 });

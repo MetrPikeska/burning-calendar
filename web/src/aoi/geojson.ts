@@ -28,9 +28,36 @@ const isPos = (c: unknown): c is number[] =>
   Array.isArray(c) && c.length >= 2 && typeof c[0] === "number" && typeof c[1] === "number" &&
   Number.isFinite(c[0]) && Number.isFinite(c[1]) && Math.abs(c[0]) <= 180 && Math.abs(c[1]) <= 90;
 
+/** Rings longer than this skip the O(n2) crossing check (a 20 000-vertex file stays responsive). */
+export const MAX_CROSSING_CHECK = 5000;
+
+const orient = (a: number[], b: number[], c: number[]) => Math.sign((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]));
+
+/** True when two non-adjacent edges of a closed ring cross or touch (a bowtie), audit BC3-008. */
+export function ringSelfIntersects(r: Ring): boolean {
+  const n = r.length - 1; // edges of a closed ring
+  if (n > MAX_CROSSING_CHECK) return false;
+  for (let i = 0; i < n; i++) {
+    const [a, b] = [r[i], r[i + 1]];
+    for (let j = i + 2; j < n; j++) {
+      if (i === 0 && j === n - 1) continue; // first and last edge share the closing vertex
+      const [c, d] = [r[j], r[j + 1]];
+      const o1 = orient(a, b, c), o2 = orient(a, b, d), o3 = orient(c, d, a), o4 = orient(c, d, b);
+      if (o1 !== o2 && o3 !== o4 && o1 * o2 <= 0 && o3 * o4 <= 0) return true;
+    }
+  }
+  return false;
+}
+
 function ring(c: unknown): Ring {
   if (!Array.isArray(c) || c.length < 4 || !c.every(isPos)) throw new AoiError("A polygon ring needs at least 4 lon/lat positions in degrees.");
-  return c.map((p) => [p[0], p[1]]);
+  const r = c.map((p) => [p[0], p[1]]);
+  const [f, l] = [r[0], r[r.length - 1]];
+  if (Math.abs(f[0] - l[0]) > 1e-9 || Math.abs(f[1] - l[1]) > 1e-9) {
+    throw new AoiError("A polygon ring is not closed: its first and last positions differ.");
+  }
+  if (ringSelfIntersects(r)) throw new AoiError("A polygon's edges cross each other (a bowtie); fix the geometry first.");
+  return r;
 }
 
 /** Adds one GeoJSON geometry to the AOI; unsupported types raise an AoiError. */
@@ -117,8 +144,8 @@ export function regionBboxes(fc: RegionCollection): Map<string, Bbox> {
   return out;
 }
 
-/** Shoelace area of a ring in km2, projected at its mean latitude. */
-function ringAreaKm2(r: Ring): number {
+/** Shoelace area of a ring in km2, projected at its mean latitude (kept for reference in tests). */
+export function planarRingAreaKm2(r: Ring): number {
   const lat0 = r.reduce((a, p) => a + p[1], 0) / r.length;
   const kx = 111.32 * Math.cos((lat0 * Math.PI) / 180);
   let a = 0;
@@ -126,13 +153,58 @@ function ringAreaKm2(r: Ring): number {
   return Math.abs(a / 2);
 }
 
-const lineLengthKm = (l: number[][]) => l.slice(1).reduce((s, p, i) => s + distanceToPointKm(p[0], p[1], l[i]), 0);
 
-/** Approximate area in km2 (overlaps between parts are counted twice). */
+const R_KM = 6371.0088;
+const rad = (d: number) => (d * Math.PI) / 180;
+
+/** Area of a closed lon/lat ring on the sphere, km2 (sum over edges; exact for a spherical polygon). */
+export function sphericalRingAreaKm2(r: Ring): number {
+  let a = 0;
+  for (let i = 0; i < r.length - 1; i++) a += rad(r[i + 1][0] - r[i][0]) * (2 + Math.sin(rad(r[i][1])) + Math.sin(rad(r[i + 1][1])));
+  return Math.abs((a * R_KM * R_KM) / 2);
+}
+
+const polygonAreaKm2 = (p: Ring[]) => sphericalRingAreaKm2(p[0]) - p.slice(1).reduce((t, h) => t + sphericalRingAreaKm2(h), 0);
+
+/** Cells x vertices kept under this, so the grid estimate stays fast on large uploads. */
+const GRID_BUDGET = 5e7;
+
+/** Area of the union, km2, by sampling contains() on a lon/lat grid weighted by cos(latitude). */
+function gridAreaKm2(a: Aoi): number {
+  const [w, s, e, n] = aoiBbox(a);
+  const cells = Math.max(3600, Math.min(250_000, Math.floor(GRID_BUDGET / Math.max(1, vertexCount(a)))));
+  const latMid = (s + n) / 2;
+  const wKm = (e - w) * 111.32 * Math.cos(rad(latMid));
+  const hKm = (n - s) * 110.57;
+  const cols = Math.max(1, Math.round(Math.sqrt((cells * wKm) / Math.max(hKm, 1e-9))));
+  const rows = Math.max(1, Math.round(cells / cols));
+  const dLon = (e - w) / cols, dLat = (n - s) / rows;
+  let area = 0;
+  for (let j = 0; j < rows; j++) {
+    const lat = s + (j + 0.5) * dLat;
+    const cellKm2 = dLon * 111.32 * Math.cos(rad(lat)) * dLat * 110.57;
+    for (let i = 0; i < cols; i++) if (contains(a, w + (i + 0.5) * dLon, lat)) area += cellKm2;
+  }
+  return area;
+}
+
+/** Area of the AOI as a union of its parts, km2 (audit BC3-001: overlaps count once). Polygons that cannot
+ *  overlap (disjoint bboxes) use the exact spherical area; anything with circles, lines or overlaps is gridded. */
 export function areaKm2(a: Aoi): number {
-  const poly = a.polygons.reduce((s, p) => s + ringAreaKm2(p[0]) - p.slice(1).reduce((t, h) => t + ringAreaKm2(h), 0), 0);
-  const disc = Math.PI * a.radius_km ** 2;
-  return poly + a.points.length * disc + a.lines.reduce((s, l) => s + 2 * a.radius_km * lineLengthKm(l) + disc, 0);
+  if (!a.points.length && !a.lines.length) {
+    const boxes = a.polygons.map((p) => aoiBbox({ ...emptyAoi(0), polygons: [p] }));
+    const disjoint = boxes.every((b, i) => boxes.every((c, j) => j <= i || !bboxesMeet(b, c)));
+    if (disjoint) return a.polygons.reduce((t, p) => t + polygonAreaKm2(p), 0);
+  }
+  if (!a.polygons.length && !a.lines.length && a.points.length === 1) return Math.PI * a.radius_km ** 2;
+  return gridAreaKm2(a);
+}
+
+/** Bbox grown by km on every side. */
+export function padBbox(b: Bbox, km: number): Bbox {
+  const dLat = km / 110.57;
+  const dLon = km / Math.max(1e-6, 111.32 * Math.cos(rad(Math.max(Math.abs(b[1]), Math.abs(b[3])))));
+  return [b[0] - dLon, b[1] - dLat, b[2] + dLon, b[3] + dLat];
 }
 
 /** 64-gon around a point, for the map. */
@@ -146,10 +218,13 @@ export function circle(p: number[], radiusKm: number, n = 64): Ring {
 }
 
 /** The AOI as GeoJSON: polygons, the point circles, lines (with radius_km), for the map and the download. */
-export function aoiToGeoJson(a: Aoi): { type: "FeatureCollection"; features: object[] } {
+export const AOI_NOTE = "Burning Calendar custom area. Values before Feb 2012 are an exploratory estimate with the factors of each detection's NUTS2 region, not validated for this area.";
+
+export function aoiToGeoJson(a: Aoi): { type: "FeatureCollection"; burning_calendar: { note: string }; features: object[] } {
   const f = (geometry: object, role: string) => ({ type: "Feature", properties: { role, radius_km: role === "polygon" ? null : a.radius_km }, geometry });
   return {
     type: "FeatureCollection",
+    burning_calendar: { note: AOI_NOTE },
     features: [
       ...a.polygons.map((p) => f({ type: "Polygon", coordinates: p }, "polygon")),
       ...a.points.map((p) => f({ type: "Point", coordinates: p }, "point")),

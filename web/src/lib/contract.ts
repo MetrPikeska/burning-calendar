@@ -120,6 +120,8 @@ export interface BandRow {
   month: number;
   q_lo: number;
   q_hi: number;
+  /** Upper bound for a back-cast month whose estimate is 0 (90th percentile of VIIRS in such held-out months). */
+  zero_hi?: number | null;
 }
 
 interface ValidationMonthly {
@@ -153,6 +155,10 @@ export interface RegionValidation {
   mode_reasons?: string[];
   /** null in relative mode. */
   quality?: RegionQuality | null;
+  /** Ablation on the same tests (audit BC3-006): a constant VIIRS/MODIS ratio and a per-month ratio. */
+  baselines?: Record<"constant_ratio" | "month_ratio" | "full_model", { loyo_mdape_pct: number | null; time_split_mdape_pct: number | null; k?: number | null }>;
+  /** Share of held-out 2020-2025 months inside the back-cast band (audit BC3-004). */
+  band_coverage?: { nominal_pct: number; pct: number | null; n: number };
 }
 
 /** "in 2025 (2020-2025 test)" / "in 2018 (left out of the fit)": where the worst held-out year comes from. */

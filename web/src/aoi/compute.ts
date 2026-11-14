@@ -189,6 +189,8 @@ export interface AoiResult {
   /** Regions whose detections fall in the AOI, with their counts. */
   regions: { id: string; mode: Mode; detections: number }[];
   detections: number;
+  /** MODIS detections inside the AOI in the factor fit window (Feb 2012 - Dec 2019): the calibration it leans on. */
+  fit_modis: number;
 }
 
 /**
@@ -220,8 +222,15 @@ export function computeAoi(dets: Detection[], regionIds: string[], regionFiles: 
   const model = new Array(yms.length).fill(0);
   const lo = new Array(yms.length).fill(0);
   const hi = new Array(yms.length).fill(0);
+  let fitModis = 0;
   for (const [id, c] of counts) {
     const f = regionFiles.get(id);
+    // zero_hi (pipeline/validate.py band) is a regional upper bound for a zero estimate; the AOI takes the share
+    // of the region's MODIS record that lies inside it, so the whole region gives exactly the region's bound.
+    let aoiModis = 0;
+    for (let i = 0; i < yms.length; i++) aoiModis += c[i * 6 + COL.terra_D] + c[i * 6 + COL.terra_N] + c[i * 6 + COL.aqua_D] + c[i * 6 + COL.aqua_N];
+    const regionModis = (f?.months ?? []).reduce((a, m) => a + m.modis, 0);
+    const share = regionModis > 0 ? Math.min(1, aoiModis / regionModis) : 0;
     const factor = (kind: string, m: number, dn: string) =>
       f?.factors.find((x) => x.kind === kind && x.month === m && x.dn === dn)?.f ?? 0;
     const band = new Map((f?.band ?? []).map((b) => [b.month, b]));
@@ -239,7 +248,10 @@ export function computeAoi(dets: Detection[], regionIds: string[], regionFiles: 
       }
       model[i] += regionModel;
       lo[i] += (band.get(m)?.q_lo ?? 1) * regionModel;
-      hi[i] += (band.get(m)?.q_hi ?? 1) * regionModel;
+      hi[i] += regionModel === 0 ? (band.get(m)?.zero_hi ?? 0) * share : (band.get(m)?.q_hi ?? 1) * regionModel;
+      if (ym >= VIIRS_START && ym <= "2019-12") {
+        fitModis += c[i * 6 + COL.terra_D] + c[i * 6 + COL.terra_N] + c[i * 6 + COL.aqua_D] + c[i * 6 + COL.aqua_N];
+      }
     });
   }
 
@@ -279,7 +291,7 @@ export function computeAoi(dets: Detection[], regionIds: string[], regionFiles: 
     factors: [], band: [], validation: {},
   };
   return {
-    file, detections: dets.length,
+    file, detections: dets.length, fit_modis: fitModis,
     regions: ids.map((id) => ({ id, mode: regionFiles.get(id)?.mode ?? "relative", detections: perRegion.get(id) ?? 0 })),
   };
 }

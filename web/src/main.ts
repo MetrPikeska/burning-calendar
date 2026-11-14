@@ -205,7 +205,7 @@ function aoiNoteHtml(o: Extract<AoiOutcome, { kind: "calendar" }>): string {
   const regions = o.result.regions.filter((r) => r.detections > 0)
     .map((r) => `${escapeHtml(index.regions.find((x) => x.id === r.id)?.name ?? r.id)} (${escapeHtml(r.id)}) ${r.detections.toLocaleString("en")}`);
   const how = o.result.file.mode === "harmonized"
-    ? "<strong>Estimate.</strong> Before Feb 2012 each detection is converted to the VIIRS scale with the factors of its NUTS2 region; those factors were validated per region, not for this area."
+    ? `<strong>Exploratory estimate, not validated for this area.</strong> Before Feb 2012 each detection is converted to the VIIRS scale with the factors of its NUTS2 region; those factors were validated per region, not for a smaller or cross-region area. Inside this area they rest on ${o.result.fit_modis.toLocaleString("en")} MODIS detections in the fit window Feb 2012 - Dec 2019.`
     : "<strong>Raw MODIS.</strong> The area holds detections of a region in relative mode (harmonization failed validation there), so the calendar uses MODIS for the whole area, as for that region.";
   return `<p class="note aoi-note">${how} ${o.result.detections.toLocaleString("en")} detections inside${regions.length ? `: ${regions.join(", ")}` : ""}.</p>`;
 }

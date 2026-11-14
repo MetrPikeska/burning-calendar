@@ -5,7 +5,10 @@ import type { CountryCode, IndexFile, RegionFile } from "../lib/contract.ts";
 import type { RegionCollection } from "../lib/geo.ts";
 import { type AoiResult, computeAoi, type Detection } from "./compute.ts";
 import { DETECTIONS_HEADER, loadRegionDetections } from "./detections.ts";
-import { type Aoi, aoiBbox, areaKm2, bboxesMeet, contains, regionBboxes } from "./geojson.ts";
+import { type Aoi, aoiBbox, areaKm2, bboxesMeet, contains, padBbox, regionBboxes } from "./geojson.ts";
+
+/** Band of the pipeline's region assignment (pipeline/regions.py, nearest region within 5 km). */
+const ASSIGN_BAND_KM = 5;
 
 export type AoiOutcome =
   | { kind: "calendar"; aoi: Aoi; area_km2: number; result: AoiResult; inside: Detection[] }
@@ -17,7 +20,9 @@ export function touchedRegions(aoi: Aoi, geometry: RegionCollection, index: Inde
   const box = aoiBbox(aoi);
   const boxes = regionBboxes(geometry);
   return index.regions
-    .filter((r) => r.level !== "country" && boxes.has(r.id) && bboxesMeet(box, boxes.get(r.id)!))
+    // The pipeline assigns detections up to 5 km off a region's polygon, so its file can hold points outside the
+    // map outline; grow each region box by that band before choosing which files to load (audit P1-03).
+    .filter((r) => r.level !== "country" && boxes.has(r.id) && bboxesMeet(box, padBbox(boxes.get(r.id)!, ASSIGN_BAND_KM)))
     .map((r) => ({ id: r.id, name: r.name }));
 }
 
@@ -46,12 +51,14 @@ const CSV_FIELDS = ["ym", "modis", "viirs", "harm", "harm_lo", "harm_hi", "src",
   "outage_days", "outage", "baseline_median", "baseline_p90", "baseline_years", "days_modis", "days_viirs",
   "outage_days_viirs", "outage_viirs", "provisional"] as const;
 
+/** Monthly CSV of the area: the pipeline's columns plus aoi_estimate, "unvalidated" on every back-cast month
+ *  (region factors applied to an area they were not validated for, audit BC3-003). */
 export function monthsCsv(file: RegionFile): string {
   const rows = file.months.map((m) => [file.id, file.mode, ...CSV_FIELDS.map((k) => {
     const v = (m as unknown as Record<string, unknown>)[k];
     return v === null || v === undefined ? "" : String(v);
-  })].join(","));
-  return ["region_id,mode," + CSV_FIELDS.join(","), ...rows].join("\n") + "\n";
+  }), file.mode === "harmonized" && m.src !== "observed" ? "unvalidated" : ""].join(","));
+  return ["region_id,mode," + CSV_FIELDS.join(",") + ",aoi_estimate", ...rows].join("\n") + "\n";
 }
 
 /** The detections inside the AOI, in the published CSV format (region_id is each detection's region). */
