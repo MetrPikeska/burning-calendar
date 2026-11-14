@@ -25,7 +25,7 @@ Seven priorities. What the code showed and what changed (branches pipeline-mcp, 
 | 6 | Integration tests | Missing across tools | `web/test/consistency.test.ts` (40 tests), smoke test covers the new tool and units |
 | 7 | Web audit | UX test and critique done 14 Nov; three open findings were cheap | burncal-0kc (median sentence), -5od (series note), -m2s (corner wedge on anomaly cells, checked in grayscale) |
 
-Tests after the round: 122 pytest, 200 vitest, typecheck and build pass; the smoke test against a local server passed all 24 checks (FIRMS without key: warning).
+Tests after the round and the code review fixes: 122 pytest, 209 vitest, typecheck and build pass; the smoke test against a local server passed all 24 checks (FIRMS without key: warning). The code review (standards and spec) found a methodology topic `units` no MCP call could reach, a GR vs NUTS2 test that compared MODIS instead of VIIRS, a wrong unit on `aggregate` `top_months`, a fragile `baseline_kind` parse and a Now line that showed a rate without a ratio; all fixed.
 
 ## Next steps (slide, no code before the freeze)
 
@@ -48,13 +48,13 @@ Arbitrary AOI analysis (review P0.2) and an in-app "AI Fire Investigator" (revie
 
 | Layer | What | Where |
 |---|---|---|
-| Pipeline | Python 3 (uv), pandas; FIRMS archive CSV download, filters (type 0, static sources on a 0.01° grid with 16+ detection days per year), region assignment, harmonization, validation, calendar metrics, JSON/CSV export | `pipeline/*.py`, 69 pytest tests in `tests/` |
+| Pipeline | Python 3 (uv), pandas; FIRMS archive CSV download, filters (type 0, static sources on a 0.01° grid with 16+ detection days per year), region assignment, harmonization, validation, calendar metrics, JSON/CSV export | `pipeline/*.py`, 122 pytest tests in `tests/` (15 Nov) |
 | Data contract | Static JSON + CSV, JSON Schema, generated and committed | `web/public/data/v1/{gr,ar}/`, `web/public/data/v1/schema/`, [wiki/data-contract.md](wiki/data-contract.md) |
 | Web | Vite + TypeScript, no framework, MapLibre GL 6.18, Observable Plot 0.6.19, URL state deep links | `web/src/` |
 | MCP | One stateless read-only Vercel function, mcp-handler 2.4.0, Streamable HTTP, 16 tools (15 before 15 Nov), MCP Apps widget, Origin allowlist (report-only) | `web/api/mcp.ts`, `web/api/_lib/` |
 | Live context | Fixed host allowlist (GDACS, Copernicus EMS, Open-Meteo, Meteostat, FIRMS NRT), 4 s timeout, per-instance cache, `upstream_error` instead of exceptions | `web/api/_lib/live/` |
 | Hosting | Vercel, Git auto-deploy from `main` (every push to `main` is production), `maxDuration` 10 s | `web/vercel.json` |
-| Tests | 130 vitest tests in 11 files (contract, tools, live core, alerts, widget, origin) | `cd web && npx vitest run` |
+| Tests | 209 vitest tests in 14 files (contract, tools, consistency across tools, investigate_month, live core, alerts, widget, origin), 15 Nov | `cd web && npx vitest run` |
 
 No database, no server-side spatial index. Greece ships per-region hotspot CSVs (`data/v1/gr/detections/*.csv`, 16 MB total, columns `region_id,sensor,satellite,acq_date,acq_time,daynight,latitude,longitude,frp,confidence,version`). Argentina ships no hotspot points (raw FIRMS for AR is 362 MB).
 

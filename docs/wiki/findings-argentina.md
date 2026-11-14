@@ -1,6 +1,6 @@
 ---
 title: Findings, Argentina
-updated: 2026-11-14
+updated: 2026-11-15
 verified_by: uv run python pipeline/download_firms_api.py; uv run python pipeline/build.py --refresh --country AR; numbers from web/public/data/v1/ar/validation.json (method v1-region-month-dn-loyo)
 sources: [../../pipeline/build.py, ../../pipeline/validate.py, ../../pipeline/regions.py]
 ---

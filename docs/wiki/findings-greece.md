@@ -1,6 +1,6 @@
 ---
 title: Findings, Greece
-updated: 2026-11-14
+updated: 2026-11-15
 verified_by: uv run python pipeline/download_firms_api.py; uv run python pipeline/build.py --refresh --country GR; numbers from web/public/data/v1/gr/validation.json (method v1-region-month-dn-loyo)
 sources: [../../pipeline/build.py, ../../pipeline/validate.py, ../../pipeline/harmonize.py]
 ---

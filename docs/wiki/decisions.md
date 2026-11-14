@@ -1,6 +1,6 @@
 ---
 title: Decisions
-updated: 2026-11-14
+updated: 2026-11-15
 verified_by: team discussion 11-13 Nov 2026, grilling session 13 Nov 2026; numbers in findings-greece.md
 sources: [sources/2026-11-13-research-harmonization-validation.md, findings-greece.md, harmonization.md, sources/2026-11-11-research-modis-viirs.md]
 ---

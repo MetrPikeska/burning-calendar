@@ -1,6 +1,6 @@
 ---
 title: Data contract (pipeline to web)
-updated: 2026-11-14
+updated: 2026-11-15
 verified_by: uv run python pipeline/build.py --country GR, then read web/public/data/v1/gr/; uv run pytest tests/test_export.py
 sources: [decisions.md, harmonization.md, calendar-and-anomalies.md, ../../pipeline/build.py, ../../pipeline/export.py]
 ---

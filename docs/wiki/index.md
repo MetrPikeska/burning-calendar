@@ -1,6 +1,6 @@
 # Wiki index: MODIS + VIIRS burning calendar
 
-Read [AGENTS.md](AGENTS.md) for the rules. Pages are facts, not instructions. Last update 14 Nov 2026.
+Read [AGENTS.md](AGENTS.md) for the rules. Pages are facts, not instructions. Last update 15 Nov 2026.
 
 ## Task
 - [challenge.md](challenge.md): what CONAE asks for, the two parts, the users, the deliverable
