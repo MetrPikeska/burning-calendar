@@ -9,6 +9,8 @@ import {
   compareRegions,
   countriesIn,
   countryOf,
+  coverageCaveat,
+  SMALL_COUNT,
   locate,
   rankRegions,
   regionSummary,
@@ -582,5 +584,51 @@ describe("back-cast and incomplete season years", () => {
     const post = aggregate([el65], { from: "2020-01", to: "2020-12", top: 3 }, period);
     expect(codes(post)).not.toContain("backcast");
     expect(post).not.toHaveProperty("total_lo");
+  });
+});
+
+describe("honest caveats (15 Nov)", () => {
+  const el52 = read<RegionFile>("gr/regions/EL52.json");
+  const grAll = grIndex.regions.filter((r) => r.level !== "country").map((entry) => ({ country: "gr" as const, entry }));
+
+  it("says when an anomaly flag rests on fewer than 20 detections", () => {
+    const r = anomaliesFor(el52, 2024, period);
+    const may = r.months.find((m) => m.ym === "2024-05")!;
+    expect(may.anom).toBe(true);
+    expect(may.value).toBeLessThan(SMALL_COUNT);
+    const sc = r.caveats.find((c) => c.code === "small_counts")!;
+    expect(sc.message).toMatch(/2024-05 \(13\)/);
+    expect(sc.message).not.toMatch(/2024-08/); // 208 detections
+  });
+
+  it("gives no small_counts caveat when every flagged month is large", () => {
+    expect(anomaliesFor(er, 2020, period).caveats.map((c) => c.code)).not.toContain("small_counts");
+  });
+
+  it("adds small_counts to get_region_series too", () => {
+    const r = regionSeries(el52, { from: "2024-01", to: "2024-12", aggregate: "month" }, period);
+    expect(r.caveats.map((c) => c.code)).toContain("small_counts");
+  });
+
+  it("marks annual_mean and density as including back-cast years in compare and rank", () => {
+    const c = compareRegions(grAll.filter((x) => ["EL52", "EL61"].includes(x.entry.id)), "density_per_1000km2");
+    expect(c.caveats.find((x) => x.code === "backcast")!.message).toMatch(/before Feb 2012/);
+    const r = rankRegions(grAll, "annual_mean", { top: 3, order: "desc" });
+    expect(r.caveats.map((x) => x.code)).toContain("backcast");
+    const p = compareRegions(grAll.filter((x) => ["EL52", "EL61"].includes(x.entry.id)), "peak_month");
+    expect(p.caveats.map((x) => x.code)).not.toContain("backcast");
+  });
+
+  it("points to the live tools in the coverage caveat", () => {
+    expect(coverageCaveat(period).message).toMatch(/get_recent_detections/);
+  });
+
+  it("back-casts January 2012 and keeps its raw partial VIIRS count", () => {
+    const jan = (er.months as { ym: string; src: string; viirs: number | null; harm_lo: number | null; outage_viirs?: boolean }[])
+      .find((m) => m.ym === "2012-01")!;
+    expect(jan.src).toBe("backcast");
+    expect(jan.viirs).toBeGreaterThan(0);
+    expect(jan.harm_lo).not.toBeNull();
+    expect(jan.outage_viirs).toBe(true);
   });
 });
