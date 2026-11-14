@@ -17,10 +17,10 @@ const si = (n: number) => compact.format(n).replace("K", "k");
 
 /** Legend overlay: the fill is sqrt(density / max), so max / 4 sits in the middle. */
 function legendHtml(harmMax: number, hasRelative: boolean): string {
-  return `<div class="map-legend-title">Detections per 1000 km² per year, harmonized</div>
+  return `<div class="map-legend-title"><span class="lt-long">Detections per 1000 km² per year, harmonized</span><span class="lt-short">Detections / 1000 km² / year</span></div>
     <div class="map-legend-ramp" style="background: linear-gradient(to right, ${RAMP.join(", ")})"></div>
     <div class="map-legend-ticks"><span>0</span><span>${si(harmMax / 4)}</span><span>${si(harmMax)}</span></div>
-    ${hasRelative ? `<div class="map-legend-rel"><i style="background:${NO_SCALE_GREY}"></i>Not harmonized (relative mode)</div>` : ""}`;
+    ${hasRelative ? `<div class="map-legend-rel"><i style="background:${NO_SCALE_GREY}"></i>Not harmonized</div>` : ""}`;
 }
 
 const ONLINE_STYLE = "https://tiles.openfreemap.org/styles/positron";
@@ -80,7 +80,15 @@ export async function createRegionMap(
   forceLocal: boolean,
 ): Promise<RegionMap> {
   const style = await pickStyle(forceLocal);
-  const map = new MlMap({ container, style, center: [22, 39], zoom: 5, attributionControl: { compact: true } });
+  const map = new MlMap({
+    container,
+    style,
+    center: [22, 39],
+    zoom: 5,
+    attributionControl: { compact: true },
+    // Touch screens: one finger scrolls the page, two fingers move the map (no swipe ambiguity).
+    cooperativeGestures: matchMedia("(pointer: coarse)").matches,
+  });
   map.addControl(new NavigationControl({ showCompass: false }), "top-right");
   await new Promise<void>((resolve) => map.once("load", () => resolve()));
   // On a phone the compact attribution starts expanded and covers the map; keep it behind its (i) button.
@@ -173,7 +181,11 @@ export async function createRegionMap(
       const hasRelative = index.regions.some((r) => r.level !== "country" && r.mode === "relative");
       legend.innerHTML = legendHtml(harmMax, hasRelative);
       (map.getSource("regions") as unknown as { setData(d: unknown): void }).setData(fc);
-      map.fitBounds(bbox(fc), { padding: 24, duration: 0 });
+      // On desktop the legend sits over the bottom-left corner; keep the regions clear of it.
+      // On a phone the legend is a strip under the map instead.
+      const phone = matchMedia("(max-width: 900px)").matches;
+      const pad = phone ? 12 : 24;
+      map.fitBounds(bbox(fc), { padding: { top: pad, right: pad, left: pad, bottom: phone ? pad : legend.offsetHeight + pad }, duration: 0 });
       return fc;
     },
     setSelected(id) {

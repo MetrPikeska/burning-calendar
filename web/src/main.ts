@@ -36,6 +36,9 @@ let geometry: RegionCollection = { type: "FeatureCollection", features: [] };
 let region: RegionFile | null = null;
 /** Month in the median panel; null = pick the default for the current range. */
 let pickedYm: string | null = null;
+/** Open state of the collapsible panel sections, kept across re-renders. */
+let methodOpen = false;
+let rangeOpen = false;
 /** Chart width of the last render; a resize re-renders only when it changes for real. */
 let lastWidth = 0;
 /** Increments per region load; a slower, older response must not overwrite a newer one. */
@@ -46,6 +49,9 @@ let dimTimer: ReturnType<typeof setTimeout> | undefined;
 let regionCountry: CountryCode | null = null;
 
 const DOWNLOAD_ICON = `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 13.5h11"/></svg>`;
+
+const CHEVRON_LEFT = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5"/></svg>`;
+const CHEVRON_RIGHT = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5"/></svg>`;
 
 const forceLocalBasemap = new URLSearchParams(location.search).get("basemap") === "local";
 
@@ -127,12 +133,9 @@ function focusSelector(el: Element | null): string | null {
   return series ? `button[data-series="${series}"]` : null;
 }
 
-/** Arrow keys on the calendar move the compared month: left/right one month, up/down one year. */
-function onChartKey(e: KeyboardEvent): void {
+/** Moves the compared month by `step` months, clamped to the region's record. */
+function stepMonth(step: number): void {
   if (!region) return;
-  const step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -12, ArrowDown: 12 }[e.key];
-  if (!step) return;
-  e.preventDefault();
   const yms = region.months.map((m) => m.ym);
   const current = pickedYm ?? defaultMonth(region, state.from, state.to);
   const i = yms.indexOf(current);
@@ -141,6 +144,14 @@ function onChartKey(e: KeyboardEvent): void {
     pickedYm = next;
     renderPanel();
   }
+}
+
+/** Arrow keys on the calendar move the compared month: left/right one month, up/down one year. */
+function onChartKey(e: KeyboardEvent): void {
+  const step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -12, ArrowDown: 12 }[e.key];
+  if (!step) return;
+  e.preventDefault();
+  stepMonth(step);
 }
 
 function showError(message: string, retry: () => void): void {
@@ -168,6 +179,15 @@ function renderPanel(): void {
 
   const hasRange = !!(state.from || state.to);
   const refocus = focusSelector(document.activeElement);
+  const narrow = matchMedia("(max-width: 900px)").matches;
+  const ym = pickedYm ?? defaultMonth(region, state.from, state.to);
+  const atStart = ym === region.months[0]?.ym;
+  const atEnd = ym === region.months[region.months.length - 1]?.ym;
+  const rangeHtml = `<div class="range">
+        <label>From <input id="from" type="month" min="${min}" max="${max}" value="${state.from ?? ""}" /></label>
+        <label>To <input id="to" type="month" min="${min}" max="${max}" value="${state.to ?? ""}" /></label>
+        <button type="button" id="range-clear" class="btn btn-quiet" ${hasRange ? "" : "hidden"}>Clear range</button>
+      </div>`;
   panel.innerHTML = `
     <div class="region-head">
       <h2>${escapeHtml(region.name)} <span class="region-id">${escapeHtml(region.id)}</span></h2>
@@ -178,6 +198,13 @@ function renderPanel(): void {
     ${region.mode === "relative"
       ? `<p class="note">Relative mode: harmonization did not pass validation here, so the calendar shows MODIS 2000-2025 and VIIRS as separate series.</p>`
       : ""}
+    <div class="median-card">
+      <div class="stepper" role="group" aria-label="Compared month">
+        <button type="button" id="month-prev" class="btn btn-icon" aria-label="Previous month" ${atStart ? "disabled" : ""}>${CHEVRON_LEFT}</button>
+        <button type="button" id="month-next" class="btn btn-icon" aria-label="Next month" ${atEnd ? "disabled" : ""}>${CHEVRON_RIGHT}</button>
+      </div>
+      <section id="median" aria-live="polite"></section>
+    </div>
     <div class="controls">
       <div class="controls-row">
         <div class="toggle" role="group" aria-label="Series">
@@ -185,21 +212,18 @@ function renderPanel(): void {
         </div>
         <button type="button" id="csv" class="btn">${DOWNLOAD_ICON}Download CSV${hasRange ? " (range)" : ""}</button>
       </div>
-      <div class="range">
-        <label>From <input id="from" type="month" min="${min}" max="${max}" value="${state.from ?? ""}" /></label>
-        <label>To <input id="to" type="month" min="${min}" max="${max}" value="${state.to ?? ""}" /></label>
-        <button type="button" id="range-clear" class="btn btn-quiet" ${hasRange ? "" : "hidden"}>Clear range</button>
-      </div>
+      ${narrow ? `<details class="range-details" ${rangeOpen || hasRange ? "open" : ""}><summary>Date range${hasRange ? `: ${state.from ?? "start"} to ${state.to ?? "end"}` : ""}</summary>${rangeHtml}</details>` : rangeHtml}
     </div>
-    <div id="chart" tabindex="0" role="group" aria-label="Burning calendar, years by months. Arrow keys change the month compared below."></div>
+    <div id="chart" tabindex="0" role="group" aria-label="Burning calendar, years by months. Arrow keys change the compared month."></div>
     ${marksKey(series, hasRange)}
-    <p class="foot">${matchMedia("(pointer: coarse)").matches ? "Tap" : "Click"} a cell to compare that month with its median.${series === "harm"
+    <p class="foot">${matchMedia("(pointer: coarse)").matches ? "Tap" : "Click"} a cell or use the arrows to compare another month.${series === "harm"
       ? " 2000-2011 back-cast from MODIS (range in the tooltip), 2012-2025 VIIRS observed."
       : ""}</p>
-    <section id="median" aria-live="polite"></section>
-    <div id="method"></div>`;
+    <details class="method-details" ${methodOpen ? "open" : ""}>
+      <summary>How well the harmonization holds here</summary>
+      <div id="method"></div>
+    </details>`;
 
-  const ym = pickedYm ?? defaultMonth(region, state.from, state.to);
   const width = chartWidth();
   lastWidth = width;
   $("#chart").append(
@@ -211,6 +235,14 @@ function renderPanel(): void {
   $("#median").append(renderMedianPanel(region, ym, width));
   $("#method").append(renderValidation(region, state.country, width));
   $("#chart").addEventListener("keydown", onChartKey);
+  $("#month-prev").addEventListener("click", () => stepMonth(-1));
+  $("#month-next").addEventListener("click", () => stepMonth(1));
+  panel.querySelector(".method-details")?.addEventListener("toggle", (e) => {
+    methodOpen = (e.target as HTMLDetailsElement).open;
+  });
+  panel.querySelector(".range-details")?.addEventListener("toggle", (e) => {
+    rangeOpen = (e.target as HTMLDetailsElement).open;
+  });
 
   panel.querySelectorAll<HTMLButtonElement>("button[data-series]").forEach((b) =>
     b.addEventListener("click", () => {
@@ -345,5 +377,15 @@ new ResizeObserver(() => {
 }).observe($("#panel"));
 $<HTMLSelectElement>("#region").addEventListener("change", (e) => pickRegion((e.target as HTMLSelectElement).value));
 $("#latlon-form").addEventListener("submit", onLatLon);
+const latlonDetails = $<HTMLDetailsElement>("#latlon-details");
+latlonDetails.addEventListener("toggle", () => {
+  if (latlonDetails.open) $<HTMLInputElement>("#latlon").focus();
+});
+latlonDetails.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && latlonDetails.open) {
+    latlonDetails.open = false;
+    latlonDetails.querySelector("summary")?.focus();
+  }
+});
 
 await setCountry(state.country);

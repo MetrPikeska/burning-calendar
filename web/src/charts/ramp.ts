@@ -58,7 +58,7 @@ export function rampLegend(label: string, domain: [number, number], width: numbe
   const tickMarks = niceTicks(lo, hi, ticks)
     .map((v) => `<g transform="translate(${x(v)},28)"><line y1="-10" y2="6" stroke="currentColor"/><text y="9" dy="0.71em" text-anchor="middle" fill="currentColor">${tickFormat(v)}</text></g>`)
     .join("");
-  return `<svg class="ramp-legend" width="${width}" height="50" viewBox="0 0 ${width} 50" font-size="11" font-variant="tabular-nums" style="display:block;max-width:100%;height:auto;overflow:visible;font-family:inherit">
+  return `<svg class="ramp-legend" width="${width}" height="50" viewBox="0 0 ${width} 50" font-size="12" font-variant="tabular-nums" style="display:block;max-width:100%;height:auto;overflow:visible;font-family:inherit">
     <defs><linearGradient id="${id}">${LEGEND_STOPS}</linearGradient></defs>
     <rect y="18" width="${width}" height="10" fill="url(#${id})"/>${tickMarks}
     <text y="12" fill="currentColor" font-weight="bold">${label}</text></svg>`;

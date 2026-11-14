@@ -83,7 +83,7 @@ export function renderHeatmap(
   const cellW = (width - marginLeft - 4) / 12;
   const narrow = width < 440;
   // Phones get taller rows so a finger can hit one year; desktop stays compact.
-  const rowH = narrow ? 20 : Math.max(12, Math.min(14, cellW * 0.36));
+  const rowH = narrow ? 16 : Math.max(12, Math.min(14, cellW * 0.36));
   const selectedYear = selectedYm ? Number(selectedYm.slice(0, 4)) : null;
   const dim = (c: Cell) => (inRange(c.rec.ym, range) ? 1 : 0.16);
   const colorLabel = `${SERIES_LABEL[series]}, detections / month`;
@@ -96,7 +96,7 @@ export function renderHeatmap(
     marginTop,
     marginBottom: 4,
     padding: 0.08,
-    style: { fontFamily: "inherit", fontSize: "11px" },
+    style: { fontFamily: "inherit", fontSize: "13px" },
     x: {
       type: "band",
       domain: [...Array(12).keys()],
@@ -183,7 +183,7 @@ export function marksKey(series: Series, hasRange: boolean): string {
     [swatch(`<rect x="1" y="1" width="12" height="12" fill="#c33b4c"/><rect x="2.25" y="2.25" width="9.5" height="9.5" fill="none" stroke="${ANOMALY_STROKE}" stroke-width="1.5"/>`),
       "Anomaly: above the 90th percentile of the preceding 10 years"],
     [swatch(`<rect x="1" y="1" width="12" height="12" fill="${pale}"/><rect x="1.25" y="1.25" width="11.5" height="11.5" fill="none" stroke="${RING_OUTER}" stroke-width="2.5"/><rect x="3.4" y="3.4" width="7.2" height="7.2" fill="none" stroke="${RING_INNER}" stroke-width="1.5"/>`),
-      "Month compared below"],
+      "Month compared with its median"],
   ];
   if (series !== "viirs") {
     items.push([swatch(`<rect x="1" y="1" width="12" height="12" fill="${pale}"/><text x="7" y="11" text-anchor="middle" font-size="12" font-weight="600" fill="${OUTAGE_FILL}">×</text>`),

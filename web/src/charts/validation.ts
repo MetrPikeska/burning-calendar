@@ -70,7 +70,7 @@ export function renderValidation(region: RegionFile, country: CountryCode, width
         marginLeft: 36,
         marginRight: 4,
         marginTop: 8,
-        style: { fontFamily: "inherit", fontSize: "11px" },
+        style: { fontFamily: "inherit", fontSize: "12px" },
         x: { type: "band", label: null, tickSize: 0, tickFormat: (y: number) => (narrow ? `'${String(y).slice(2)}` : String(y)), padding: 0.25 },
         y: { label: null, domain: [-maxAbs, maxAbs], ticks: [-MDAPE_LIMIT, 0, MDAPE_LIMIT], tickFormat: (n: number) => `${n > 0 ? "+" : ""}${n}`, clamp: true },
         color: { domain: [loyoKind, testKind], range: [LOYO_FILL, TEST_FILL], legend: false },
@@ -93,7 +93,7 @@ export function renderValidation(region: RegionFile, country: CountryCode, width
   const links = document.createElement("p");
   links.className = "foot";
   links.innerHTML = `${region.mode === "harmonized"
-    ? "Back-cast months (before 2012) carry a likely range, shown in the tooltip and in the month panel above. "
+    ? "Back-cast months (before 2012) carry a likely range, shown in the tooltip and in the month card. "
     : ""}Full numbers: <a href="${dataUrl(country, "validation.json")}">validation.json</a>,
     <a href="${dataUrl(country, `regions/${encodeURIComponent(region.id)}.json`)}">region JSON</a>.`;
   el.append(links);

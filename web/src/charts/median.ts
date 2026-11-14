@@ -76,13 +76,13 @@ export function renderMedianPanel(region: RegionFile, ym: string, width = 520): 
       marginLeft: 10,
       marginRight: 52,
       marginTop: 0,
-      style: { fontFamily: "inherit", fontSize: "11px" },
+      style: { fontFamily: "inherit", fontSize: "12px" },
       x: { label: null, grid: true, nice: true, domain: [0, Math.max(1, ...bars.map((b) => b.v), backcast ? rec.harm_hi! : 0)], ticks: width < 440 ? 3 : 5, tickFormat: countTick },
       y: { label: null, domain: bars.map((b) => b.label), axis: null, padding: 0 },
       color: { domain: ["month", "base"], range: ["#1d1b19", "#c5bbb0"] },
       marks: [
         Plot.barX(bars, { x: "v", y: "label", fill: "kind", insetTop: 17, insetBottom: 3 }),
-        Plot.text(bars, { x: 0, y: "label", text: "label", dx: 3, dy: -11, textAnchor: "start", fill: "currentColor", fontSize: 12 }),
+        Plot.text(bars, { x: 0, y: "label", text: "label", dx: 3, dy: -11, textAnchor: "start", fill: "currentColor", fontSize: 13 }),
         // Back-cast months: the likely range as a whisker over the month bar.
         ...(backcast
           ? [

@@ -18,24 +18,25 @@
         <button type="button" data-country="gr" aria-pressed="true">Greece</button>
         <button type="button" data-country="ar" aria-pressed="false">Argentina</button>
       </div>
+      <div id="area" role="group" aria-label="Area of interest">
+        <label for="region" class="sr-only">Region</label>
+        <select id="region"></select>
+        <details class="latlon" id="latlon-details">
+          <summary class="btn">Find a point</summary>
+          <form id="latlon-form" class="latlon-pop">
+            <label for="latlon">Latitude, longitude in decimal degrees</label>
+            <div class="inline">
+              <input id="latlon" type="text" inputmode="decimal" placeholder="40.64, 22.94" autocomplete="off" aria-describedby="latlon-msg" />
+              <button type="submit" class="btn">Find</button>
+            </div>
+            <span id="latlon-msg" class="field-msg" role="status"></span>
+          </form>
+        </details>
+      </div>
       <button type="button" class="btn" id="ai-open"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 3.5h11v7h-6l-3 2.5v-2.5h-2z"/></svg>Use with AI</button>
     </header>
     <main>
       <div id="map"></div>
-      <section id="area" aria-label="Area of interest">
-        <div class="field">
-          <label for="region">Region</label>
-          <select id="region"></select>
-        </div>
-        <form id="latlon-form" class="field latlon">
-          <label for="latlon">Or find a point (lat, lon)</label>
-          <div class="inline">
-            <input id="latlon" type="text" inputmode="decimal" placeholder="40.64, 22.94" autocomplete="off" aria-describedby="latlon-msg" />
-            <button type="submit" class="btn">Find</button>
-          </div>
-          <span id="latlon-msg" class="field-msg" role="status"></span>
-        </form>
-      </section>
       <section id="panel" tabindex="-1"><p class="hint">Loading...</p></section>
     </main>
     <script type="module" src="/src/main.ts"></script>
