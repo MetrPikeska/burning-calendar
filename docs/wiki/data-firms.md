@@ -1,6 +1,6 @@
 ---
 title: NASA FIRMS data
-updated: 2026-11-13
+updated: 2026-11-14
 verified_by: curl tests of country CSV URLs (11 and 13 Nov 2026); FIRMS FAQ; FIRMS API page; MODIS and VIIRS user guides
 sources: [sources/2026-11-11-research-modis-viirs.md, sources/2026-11-13-research-anomalies-rules.md, https://www.earthdata.nasa.gov/data/tools/firms/faq, https://firms.modaps.eosdis.nasa.gov/api/area/]
 ---
@@ -51,4 +51,5 @@ Sizes:
 
 - **VIIRS static sources:** product versions 1 and 2 left some static sources labelled type 0. This was fixed in v3 in May 2025. The Greek country files are `version 2`, so we apply our own static filter ([decisions.md](decisions.md)).
 - **Static-source share:** in the Greek data 18% of VIIRS detections are `type 2`, against 1% for MODIS.
+- **MODIS `version` by year (Greece country CSVs, `type == 0`, `pipeline/load.py`, 14 Nov 2026):** `6.2` in 2000-2017, `6.03` in 2018-2022, `61.03` in 2023-2025; one value per year, never mixed. VIIRS is `2` in all years. The 2012-2019 fit window spans the 2017/2018 change. The national VIIRS/MODIS annual ratio shows no step there (2016 3.75, 2017 3.18, 2018 3.57, 2019 3.83, after the static filter).
 - **MODIS archive artefact:** data from Feb-Mar 2000 can flag whole scan lines as fire. Our record starts in Nov 2000, so this does not affect us.

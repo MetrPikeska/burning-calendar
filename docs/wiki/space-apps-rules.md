@@ -1,8 +1,8 @@
 ---
 title: Space Apps submission rules
-updated: 2026-11-13
-verified_by: 2026 Judging & Awards Guide, 2026 Project Submission Guide and Thessaloniki event page, read 13 Nov 2026 with curl -k (TLS certificate fails verification from our machine)
-sources: [sources/2026-11-13-research-how-to-win.md, sources/2026-11-13-research-anomalies-rules.md, https://www.spaceappschallenge.org/resources/judging-awards-guide/, https://www.spaceappschallenge.org/resources/project-submission-guide/, https://www.spaceappschallenge.org/2026/local-events/thessaloniki/]
+updated: 2026-11-14
+verified_by: Thessaloniki FAQ and Presentation Guide PDFs and organiser emails, 14 Nov 2026; 2026 Judging & Awards Guide, 2026 Project Submission Guide and Thessaloniki event page, read 13 Nov 2026 with curl -k (TLS certificate fails verification from our machine)
+sources: [sources/2026-11-14-thessaloniki-organiser-info.md, sources/2026-11-13-research-how-to-win.md, sources/2026-11-13-research-anomalies-rules.md, https://www.spaceappschallenge.org/resources/judging-awards-guide/, https://www.spaceappschallenge.org/resources/project-submission-guide/, https://www.spaceappschallenge.org/2026/local-events/thessaloniki/]
 ---
 
 Both guides are dated 12 Nov 2026. Quotes are exact.
@@ -13,20 +13,30 @@ Both guides are dated 12 Nov 2026. Quotes are exact.
 |---|---|---|
 | Global submission window | Sat 14 Nov 09:00 to Sun 15 Nov 23:59, local event time | Submission Guide 2026 |
 | Thessaloniki "Project Submission" | Sun 15 Nov 15:00 | Thessaloniki event page |
+| Send project to the local judges | Sun 15 Nov 15:00, "Submissions past this deadline will not be accepted" | Thessaloniki FAQ |
+| Project page on the NASA portal | Sun 15 Nov 23:59, Team Owner can edit and resubmit until then | Thessaloniki FAQ |
 | Presentations and judging | Sun 15 Nov 16:00 | Thessaloniki event page |
 | Local winners announced | Sun 15 Nov 22:00 | Thessaloniki event page |
 | Global Nominees | 3 Dec 2026 | Judging Guide 2026 |
 | Global Finalists, Honorable Mentions | 17 Dec 2026 | Judging Guide 2026 |
 | Global Winners | 26 Jan 2027 | Judging Guide 2026 |
 
-The two Sunday deadlines disagree (15:00 local vs 23:59 global). Which one the local judges use is UNVERIFIED; the Local Lead decides. Judges see the last saved version; anything saved after the deadline is not judged.
+The Thessaloniki FAQ resolves the two Sunday deadlines: the project goes to the local judges by 15:00, the NASA project page stays editable until 23:59. The FAQ says to send the project "to [email]"; the address is a placeholder in the PDF, so where to send it is UNVERIFIED (ask on Discord or at registration). Judges see the last saved version; anything saved after the deadline is not judged.
 
 ## Thessaloniki event
 
 - Organiser: Greek NewSpace Society. Local Lead: Christos Letsios, Secretary General.
 - Venue: Region of Central Macedonia, 26is Oktovriou 64, Thessaloniki 546 27.
 - Sat: 09:00 registration, 10:00 kick-off, 15:00 lunch, hacking until 21:00. Sun: 09:00 resume, 14:30 lunch.
-- Local prizes, judges and pitch length are not published (UNVERIFIED).
+- On-site hours: Sat 09:00-21:00, Sun 09:00-15:00. Work may continue off-site Sat night (FAQ).
+- Registration in building B (next to Kefallinias street, entrance from the central square), opening talk in building A, diagonal from B (email 14 Nov). Bring a power strip.
+- Announcements: Discord https://discord.gg/E8kkjmSCd3
+- Pitch: 7 minutes, then a short judges' Q&A (FAQ and Presentation Guide).
+- Slides in English; speech in Greek or English. PDF slides recommended.
+- Live demo encouraged, with screenshots or video as backup. "Your app must be deployed and publicly available."
+- Recommended (optional) slide order: challenge, solution, space agency data and tech stack, demo, impact and viability, conclusion.
+- Team: @vkadlec was moved off the waitlist by Christos Letsios on 13 Nov, so the team is no longer Award Ineligible.
+- Local prizes and judges are not published (UNVERIFIED).
 
 ## Judging criteria
 

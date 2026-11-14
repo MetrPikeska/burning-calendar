@@ -1,6 +1,6 @@
 # Wiki index: MODIS + VIIRS burning calendar
 
-Read [AGENTS.md](AGENTS.md) for the rules. Pages are facts, not instructions. Last update 13 Nov 2026.
+Read [AGENTS.md](AGENTS.md) for the rules. Pages are facts, not instructions. Last update 14 Nov 2026.
 
 ## Task
 - [challenge.md](challenge.md): what CONAE asks for, the two parts, the users, the deliverable
@@ -35,3 +35,4 @@ Read [AGENTS.md](AGENTS.md) for the rules. Pages are facts, not instructions. La
 - [sources/2026-11-13-research-agent-access.md](sources/2026-11-13-research-agent-access.md): MCP spec, mcp-handler on Vercel, clients, MCP Apps, geo MCP precedents, security
 - [sources/2026-11-13-research-how-to-win.md](sources/2026-11-13-research-how-to-win.md): 2026 judging and submission guides, past winners, pitch and execution advice
 - [sources/2026-11-13-research-anomalies-rules.md](sources/2026-11-13-research-anomalies-rules.md): NOAA-20, anomalies, harmonization options, Space Apps rules
+- [sources/2026-11-14-thessaloniki-organiser-info.md](sources/2026-11-14-thessaloniki-organiser-info.md): organiser emails, local FAQ, Presentation Guide (7 min pitch, 15:00 local deadline)

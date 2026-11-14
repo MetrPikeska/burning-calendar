@@ -1,4 +1,6 @@
-data/
+data/raw/
+data/interim/
+data/*.log
 output/
 .venv/
 __pycache__/
