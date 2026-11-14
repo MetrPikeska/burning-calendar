@@ -21,7 +21,7 @@ const MODERN_META = {
   "io.modelcontextprotocol/clientCapabilities": {},
 };
 // Live context tools (third-party upstreams): upstream_error or not_configured is a warning, not a failure.
-const LIVE_TOOLS = ["get_fire_alerts", "get_fire_weather", "get_weather_stations", "get_recent_detections"];
+const LIVE_TOOLS = ["get_fire_alerts", "get_fire_weather", "get_weather_stations", "get_recent_detections", "investigate_month"];
 
 let id = 0;
 /** modern: 2026-07-28 request (per-request _meta envelope plus MCP-Protocol-Version and Mcp-Method headers). */
@@ -126,7 +126,15 @@ const checks = [
   ["compare_regions", async () => {
     const s = common(await call("compare_regions", { region_ids: ["EL30", "EL62"], metric: "annual_mean", caveats: "codes" }), { countries: "gr" });
     must(s.ranking_allowed === false, "EL62 is relative, ranking must be refused");
-    return "relative region blocks ranking";
+    must(/VIIRS-equivalent/.test(s.units?.value) && /raw MODIS/.test(s.units?.value_modis), "units for value / value_modis missing");
+    const y = common(await call("compare_regions", { region_ids: ["EL30", "EL64"], metric: "year_total", year: 2021, caveats: "codes" }), { countries: "gr" });
+    must(y.rows.every((r) => r.window?.from === "2021-01" && r.window?.to === "2021-12"), "year_total window is not Jan-Dec");
+    return `relative region blocks ranking; year_total 2021 ${y.rows.map((r) => `${r.id} ${r.value}`).join(", ")}`;
+  }],
+  ["units (relative)", async () => {
+    const s = common(await call("get_region_series", { region_id: "94", from: "2020-01", to: "2020-12", caveats: "codes" }), { countries: "ar" });
+    must(s.unit.startsWith("raw MODIS") && s.units?.modis, `94 unit: ${s.unit}`);
+    return s.unit.slice(0, 40);
   }],
   ["aggregate", async () => {
     const s = common(await call("aggregate", { region_ids: ["30", "82"], from: "2020-01", to: "2020-12", caveats: "codes" }), { countries: "ar" });
@@ -195,7 +203,14 @@ const liveChecks = [
   }],
   ["get_recent_detections", async () => {
     const { s, warn } = live(await call("get_recent_detections", { region_id: "EL64", days: 3, caveats: "codes" }));
-    return { warn, info: s.configured ? `EL64 VIIRS N20 ${s.totals.viirs_noaa20} in 3 days` : "FIRMS_MAP_KEY not set" };
+    const c = s.calendar_context;
+    must(!c || c.nrt_viirs_noaa20_per_day !== 0 || !(s.sources_failed ?? []).includes("VIIRS_NOAA20_NRT"), "rate 0 from a failed NOAA-20 source");
+    return { warn, info: s.configured ? `EL64 VIIRS N20 ${s.totals.viirs_noaa20} in 3 days, ratio ${c?.ratio_to_median_per_day ?? "null"}` : "FIRMS_MAP_KEY not set" };
+  }],
+  ["investigate_month", async () => {
+    const { s, warn } = live(await call("investigate_month", { region_id: "EL64", ym: "2021-08", caveats: "codes" }));
+    must(s.history?.month?.value === 4235 && s.history.month.anom === true, `EL64 2021-08 history: ${JSON.stringify(s.history?.month).slice(0, 120)}`);
+    return { warn, info: `EL64 2021-08 = ${s.history.month.value}, rank ${s.history.month.rank_among_years}/${s.history.month.n_years}, hot-dry-windy days ${s.weather?.summary?.days_hot_dry_windy ?? "-"}` };
   }],
 ];
 
