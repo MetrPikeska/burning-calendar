@@ -1,25 +1,27 @@
 ---
 title: Agent access (MCP, llms.txt, deep links)
 updated: 2026-11-14
-verified_by: smoke test on https://burning-calendar.vercel.app/api/mcp (14 Nov 2026); npm registry mcp-handler 2.4.0 (published 12 Nov 2026, `next` optional peer); modelcontextprotocol.io/specification/versioning.md (current 2026-07-28); ext-apps client-matrix.mdx on GitHub (13 Nov 2026)
-sources: [sources/2026-11-13-research-agent-access.md, https://modelcontextprotocol.io/specification/2026-07-28/changelog.md, https://github.com/vercel-labs/mcp-handler, https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/extensions/client-matrix.mdx]
+verified_by: `cd web && npm test` (test/mcp-endpoint.test.ts) and `node scripts/smoke-mcp.mjs http://127.0.0.1:3210 --no-static` against a local node:http wrapper of api/mcp.ts (14 Nov 2026); smoke test on https://burning-calendar.vercel.app/api/mcp (14 Nov 2026); mcp-handler 2.4.0 and @modelcontextprotocol/server 2.4.0 source in web/node_modules; ext-apps 2.0.4 npm tarball (dist/src/spec.types.d.ts, server/index.js); npm registry mcp-handler 2.4.0 (published 12 Nov 2026, `next` optional peer); modelcontextprotocol.io/specification/versioning.md (current 2026-07-28); ext-apps client-matrix.mdx on GitHub (13 Nov 2026)
+sources: [sources/2026-11-13-research-agent-access.md, https://modelcontextprotocol.io/specification/2026-07-28/changelog.md, https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http.md, https://github.com/modelcontextprotocol/ext-apps/blob/main/specification/2026-01-26/apps.mdx, https://github.com/vercel-labs/mcp-handler, https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/extensions/client-matrix.mdx]
 ---
 
-How AI agents can use the burning calendar. Architecture, priority, language and owners decided 13 Nov ([decisions.md](decisions.md), Made). Tool surface and widget are still a proposal (Open).
+How AI agents can use the burning calendar. Architecture, priority, language and owners decided 13 Nov ([decisions.md](decisions.md), Made). The 11 tools and the calendar widget are built (Implemented tools, MCP Apps).
 
 ## Proposed architecture
 
 - One Vercel Function `api/mcp.ts` in the same project as the static site: `mcp-handler` 2.4.0 (pin exact, published 12 Nov 2026), `@modelcontextprotocol/server` ^2 (2.4.0), `zod` ^4, Node 20+.
 - The function reads the same static JSON, bundled with `functions."api/mcp.ts".includeFiles: "public/data/**"` in `vercel.json`. Stateless, read-only, no auth, no secrets. The map works without it.
-- Smoke test passed 14 Nov 2026: `web/api/mcp.ts` exports the handler as `GET` and `POST` in a plain Vercel function (framework `vite`, no Next.js); `initialize` and `tools/call` answer 200 over SSE on the production URL, and the tool reads `public/data/v1/**` bundled by `includeFiles`. Pinned: `mcp-handler` 2.4.0, `@modelcontextprotocol/server` 2.4.0, `zod` 4.6.7. A 2026-07-28 request without the per-request `_meta` envelope gets HTTP 400 (the SDK requires it); 2025-era clients work. Hono fallback not needed. Vercel puts `includeFiles` at their repo-relative path (`/var/task/web/public/...` for a Git deploy with root `web/`, `/var/task/public/...` for a CLI deploy from `web/`), so `api/mcp.ts` checks both.
+- Smoke test passed 14 Nov 2026: `web/api/mcp.ts` exports the handler as `GET` and `POST` in a plain Vercel function (framework `vite`, no Next.js); `initialize` and `tools/call` answer 200 over SSE on the production URL, and the tool reads `public/data/v1/**` bundled by `includeFiles`. Pinned: `mcp-handler` 2.4.0, `@modelcontextprotocol/server` 2.4.0, `zod` 4.6.7. A 2026-07-28 request without the per-request `_meta` envelope gets HTTP 400 (the SDK requires it, and the spec does too, see MCP protocol facts); 2025-era clients work. Hono fallback not needed. Vercel puts `includeFiles` at their repo-relative path (`/var/task/web/public/...` for a Git deploy with root `web/`, `/var/task/public/...` for a CLI deploy from `web/`), so `api/mcp.ts` checks both.
 - Effort: 4 to 6 h for 6 tools plus a MCP Inspector test (our estimate). Hobby plan: 1,000,000 invocations and 4 h Active CPU a month included.
 - Any computation beyond reading JSON (custom-range anomalies) has to be TypeScript. Share one TS module between the web and the function.
 
 ## MCP protocol facts
 
 - Current revision 2026-07-28: stateless, no `initialize` handshake, no `Mcp-Session-Id`, servers MUST implement `server/discover`. Previous 2025-11-25.
+- A compliant 2026-07-28 request carries `params._meta` with `io.modelcontextprotocol/protocolVersion: "2026-07-28"` and `io.modelcontextprotocol/clientCapabilities` (and SHOULD carry `io.modelcontextprotocol/clientInfo`), plus the headers `MCP-Protocol-Version: 2026-07-28` and `Mcp-Method: <method>`; `tools/call` also needs `Mcp-Name: <tool name>` and `resources/read` `Mcp-Name: <uri>` (changelog items 2 and SEP-2243). `server/discover` is an ordinary request and carries the same envelope.
+- Our endpoint, tested 14 Nov 2026 with the handler called directly: `server/discover` with the envelope returns 200 and `supportedVersions: ["2026-07-28"]`; `tools/list`, `tools/call` and `resources/read` with envelope and headers return 200. Rejections come from the SDK and match the spec: `MCP-Protocol-Version: 2026-07-28` without `_meta` gives HTTP 400 (-32602), a missing `Mcp-Name` gives HTTP 400 (-32020). A POST with neither header nor envelope is treated as 2025-era traffic, so a bare `server/discover` gets -32601 Method not found. 2025-era `initialize` (2025-06-18) and plain `tools/list` keep working.
 - Older clients still send `initialize`. `mcp-handler` 2.x serves both eras on one endpoint.
-- Transports: stdio and Streamable HTTP. HTTP+SSE is deprecated. Streamable HTTP servers MUST validate `Origin` (not checked whether `mcp-handler` does it).
+- Transports: stdio and Streamable HTTP. HTTP+SSE is deprecated. Streamable HTTP servers MUST validate `Origin` and answer 403 when it is present and invalid. `mcp-handler` 2.4.0 does not check it, and the SDK entry it wraps leaves the check to the caller (it exports `originValidationResponse`). Production answered 200 to `Origin: https://evil.example` on 14 Nov 2026; `web/api/_lib/origin.ts` adds the check (Security).
 - Auth is OPTIONAL in the spec. A public read-only server complies.
 - Tool annotations: `readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint`. ChatGPT asks for confirmation on tools without `readOnlyHint`.
 - `structuredContent` must match `outputSchema`; the spec says a TextContent block with the serialized JSON SHOULD accompany it.
@@ -38,11 +40,16 @@ Jury path in 1 minute: claude.ai connector with no auth. Keep a recorded fallbac
 
 ## MCP Apps (UI in chat)
 
+- Built 14 Nov 2026 (burncal-e8b): render tool `show_calendar` plus resource `ui://burning-calendar/calendar-v1.html` (`text/html;profile=mcp-app`, `_meta.ui.prefersBorder: true`), code in `web/api/_lib/widget.ts` and `web/api/_lib/widget-html.ts`. The tool has `_meta.ui.resourceUri` and the deprecated flat `_meta["ui/resourceUri"]`, as `registerAppTool` in ext-apps 2.0.4 writes it. The resource is listed in `resources/list`.
+- No new dependency: the view speaks the postMessage protocol by hand (`ui/initialize`, `ui/notifications/initialized`, `ui/notifications/tool-result`, `ui/notifications/host-context-changed`, `ui/notifications/size-changed`, `ui/open-link`), method names checked against ext-apps 2.0.4 `spec.types.d.ts`. The ext-apps browser bundle with deps is 532 KB.
+- The HTML is self-contained (inline CSS and JS, no external hosts), so it needs no `_meta.ui.csp`; a test fails if it gains a script src, link, img, fetch or an absolute URL other than our own site. It draws a years x months heat strip: reversed inferno on a sqrt scale like the web calendar, harm in harmonized mode or MODIS in relative mode, back-cast months hatched, anomalies (above `baseline_p90`) outlined in #2a9df4, known MODIS outages as a cross, title with region name and mode, caveat codes, a link to `view_url`. Light and dark follow `hostContext.theme` and the host CSS variables, with `prefers-color-scheme` as fallback. Region names are set with `textContent`, never as HTML.
+- Checked in headless Chrome with a fake host page (sandboxed iframe, `allow-scripts`) for EL64 2000-2025 light and dark, EL62 relative and Entre Ríos with `caveats: "codes"`. Not yet seen in a real host.
+- The URI carries a version (`calendar-v1`): bump it when the HTML changes, because hosts MAY cache ui:// resources.
 - Extension `io.modelcontextprotocol/ui`, spec stable 2026-01-26 (SEP-1865), SDK `@modelcontextprotocol/ext-apps` 2.0.4.
 - Supported by Claude web, Claude Desktop, VS Code Copilot, ChatGPT, Cursor, Goose. Claude Code is not listed in the community matrix (Mapbox README says it renders; conflict).
 - Declared as a `ui://` resource with `mimeType: "text/html;profile=mcp-app"`, linked from the tool by `_meta.ui.resourceUri`. External hosts go into `_meta.ui.csp`.
 - Mapbox and OpenAI both separate data tools from one render tool. Mapbox says some hosts render only the last tool's panel (UNVERIFIED vendor claim).
-- Feasible for us: a calendar heat strip (months x years, no basemap, no tile CSP). A full map widget is nice-to-have.
+- A full map widget is nice-to-have and not planned.
 
 ## Agent-ready web without MCP
 
@@ -56,7 +63,7 @@ Jury path in 1 minute: claude.ai connector with no auth. Keep a recorded fallbac
 
 ## Implemented tools (14 Nov 2026)
 
-`web/api/mcp.ts` registers 10 read-only tools; the logic is in `web/api/_lib/tools.ts` (pure, tested in `web/test/mcp-tools.test.ts`).
+`web/api/mcp.ts` registers 11 read-only tools and 1 resource; the data logic is in `web/api/_lib/tools.ts` (pure, tested in `web/test/mcp-tools.test.ts`), the widget in `web/api/_lib/widget.ts`. `web/test/mcp-endpoint.test.ts` calls the exported handler with web Requests in both protocol eras.
 
 | Tool | Inputs | Notes |
 |---|---|---|
@@ -70,6 +77,7 @@ Jury path in 1 minute: claude.ai connector with no auth. Keep a recorded fallbac
 | `find_region_at` | `lat`, `lon` | point in polygon (`regionAt` from `web/src/lib/geo.ts`) over `regions_mcp.geojson` (the 1:1M / IGN 0.001° assignment polygons, not the 1:20M map file); returns climatology, annual mean, last 3 season years, `view_url`, `data_url`, `detections_csv_url`, `backcast` caveat for climatology and annual mean; outside every polygon the nearest region within 5 km. Agreement with the region that counts a Greek hotspot: 99.98 % of 120,332 points (was 98.97 % on the 1:20M map polygons) |
 | `get_validation` | `region_id` | LOYO and time-split errors per year with min/median/max, monthly scores, peak-month hit rates vs raw MODIS, fit-window gap, ratio trend, band, mode reasons; for `GR`/`AR` a table of all regions plus filter and assignment counts |
 | `get_methodology` | `topic` | static text: overview, harmonization, validation, modes, anomalies, calendar, limits |
+| `show_calendar` | `region_id`, `from?`, `to?` (default all of 2000-11 to 2025-12), `series?` (`harm`, `modis`, `viirs`; default harm, or modis for relative regions, which refuse harm) | MCP Apps render tool. `structuredContent` has one cell per month (`ym`, `v`, `lo`/`hi` for back-cast harm, `src`, `anom`, `outage`) plus calendar-year `totals`, `anomaly_months`, `max_value`, links and the usual `source`, `coverage`, `caveats`. The text block keeps the caveat lines first but drops the cells (`months_in_widget` instead), so text-only hosts get totals, anomaly months and `view_url` without about 18 KB of cells |
 
 - The country comes from the region id (`GR`, `EL..` vs `AR`, two digits), so no tool needs a country argument besides `search_regions`.
 - Every result has `source` (method version, FIRMS download dates, links to the full `source` block in the `index.json` of each country the result covers: one for a Greek or Argentine region, both for cross-country lists and `get_methodology`) and `coverage` (`start`, `end` from `index.json` `period`) and `caveats` with codes `coverage` (S-NPP end, no NOAA-20 splice), `out_of_coverage`, `relative_mode`, `backcast`, `backcast_terra`, `outage`, `detections_not_fires`. Series and anomaly results carry `anomaly_definition` (above `baseline_p90`). The text block lists them first, then the JSON; `structuredContent` carries the same object (no `outputSchema`).
@@ -78,8 +86,8 @@ Jury path in 1 minute: claude.ai connector with no auth. Keep a recorded fallbac
 - In full mode the caveat texts appear once, as header lines of the text block; the JSON there lists only `caveat_codes`, while `structuredContent` keeps the full caveats.
 - Every tool except `get_methodology` takes `caveats: "full" | "codes"`. `codes` replaces the caveat texts with `caveat_codes`; `get_methodology` topic `caveats` explains them.
 - `outage` (caveat and month field, with `outage_affects: "modis"`) only for months whose value comes from MODIS, because `data/outages.csv` lists Aqua gaps only. Changes from Petr's first claude.ai test (beads burncal-w7p, -nmk, -j03, -17x, -zgm).
-- MCP resources and an MCP Apps widget are not built.
-- Smoke test: `cd web && npm run smoke:mcp` (production) or `node scripts/smoke-mcp.mjs <base-url> [--no-static]` calls all 10 tools over Streamable HTTP, checks known values (Evia Aug 2021 flagged in EL64, EL30 2007-06 back-cast band, EL62 blocks ranking, point 38.8 N 23.4 E in EL64) plus `llms.txt` and the CORS header on `/data/v1`, and exits 1 on any failure. Run it after every push to `main`.
+- The only MCP resource is the widget; no `burncal://methodology` resources.
+- Smoke test: `cd web && npm run smoke:mcp` (production) or `node scripts/smoke-mcp.mjs <base-url> [--no-static]` calls all 11 tools over Streamable HTTP, checks `resources/list` and `resources/read` of the widget, one 2026-07-28 `server/discover` and the Origin check (foreign Origin 200 report-only or 403 enforced, claude.ai 200), checks known values (Evia Aug 2021 flagged in EL64, EL30 2007-06 back-cast band, EL62 blocks ranking, point 38.8 N 23.4 E in EL64) plus `llms.txt` and the CORS header on `/data/v1`, and exits 1 on any failure. Run it after every push to `main`.
 
 ## Web entry and demo (14 Nov 2026)
 
@@ -107,7 +115,12 @@ All read-only (`readOnlyHint: true`, `openWorldHint: false`), enums for `country
 ## Security
 
 - Spec: servers MUST validate inputs, rate limit tool calls and sanitize outputs.
-- Vercel WAF rate limit: Hobby gets 1 rule per project. claude.ai calls come from Anthropic IP ranges, so a per-IP limit must be generous.
-- Region names come from NUTS and IGN through our pipeline: strip control characters and cap length.
+- Origin check (burncal-0km, 14 Nov 2026): `web/api/_lib/origin.ts` wraps the handler with the SDK's `originValidationResponse`. A request without `Origin` passes (server-to-server: claude.ai and ChatGPT connectors, Claude Code, Cursor, VS Code, curl). A present `Origin` must have one of these hostnames, any scheme and port: `burning-calendar.vercel.app` (our site), `localhost`, `127.0.0.1`, `[::1]` (MCP Inspector, vite dev, vercel dev), `claude.ai`, `claude.com`, `chatgpt.com`, `chat.openai.com`. Everything else, including the opaque `null` origin, is logged (`[mcp] Origin not in allowlist`) and served: the check is report-only by default, because a 403 to an unknown web MCP client during the jury demo costs more than DNS rebinding against a public, read-only, keyless server can gain (Petr's session, 14 Nov). Env var `MCP_ORIGIN_ENFORCE=1` switches to HTTP 403 with JSON-RPC error -32000; turn it on after checking the Vercel logs for rejected origins. More hostnames: env var `MCP_ALLOWED_ORIGINS` (comma separated, for example a preview deployment), then redeploy. Whether claude.ai or ChatGPT send `Origin` at all is not verified; they are listed in case a browser-side path does.
+- Region names come from NUTS and IGN through our pipeline. `tools.ts` `clean()` strips C0 controls and DEL and caps at 80 characters; the widget data use `safeText()` in `widget.ts`, which also strips C1 controls, bidi overrides and zero-width characters. Extending `clean()` the same way is open (tools.ts was edited in parallel).
+- Rate limit, proposal, not applied (14 Nov 2026). Hobby allows 1 custom WAF rule per project, so it goes on the MCP endpoint only; static files are cheap and cached. claude.ai and ChatGPT call from shared cloud IP ranges, so one IP carries many users: the limit is per IP and generous. Counters are per Vercel region. Traffic blocked by WAF is not billed.
+  - Rule: name `Rate limit MCP`, condition path equals `/api/mcp`, action rate limit, fixed window 60 s, 600 requests, key IP, then 429. A judge demo makes about 5 to 30 calls a minute; 600 a minute per IP still stops a loop hammering the function (10 s `maxDuration`, 4 h Active CPU a month on Hobby).
+  - Roll-out: first with action `log`, check the Firewall traffic view for a day (or after the demo), then switch to 429.
+  - Dashboard: project `burning-calendar` > Firewall > Configure > New Rule. If `Request Path` `Equals` `/api/mcp`, Then `Rate Limit`, Fixed Window, 60 seconds, 600 requests, key `IP Address`, follow-up action `Log` (later `Too Many Requests (429)`). Save, Review Changes, Publish.
+  - CLI, from a checkout linked to the project (`cd web && vercel link`): `vercel firewall rules add "Rate limit MCP" --condition '{"type":"path","op":"eq","value":"/api/mcp"}' --action rate_limit --rate-limit-window 60 --rate-limit-requests 600 --rate-limit-keys ip --rate-limit-action log --yes`, then `vercel firewall diff` and `vercel firewall publish --yes`. To enforce: `vercel firewall rules remove "Rate limit MCP" --yes`, the same `add` with `--rate-limit-action rate_limit`, `diff`, `publish --yes`.
 - The function never fetches a URL from tool input, so SSRF does not apply.
 - Space Apps 2026 FAQ: AI is called "Super Intelligence (SI)"; the submission must describe how SI tools were used ([space-apps-rules.md](space-apps-rules.md)).

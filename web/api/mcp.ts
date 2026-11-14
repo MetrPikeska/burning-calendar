@@ -31,6 +31,8 @@ import {
   seasonCalendar,
   withCoverage,
 } from "./_lib/tools.ts";
+import { withOriginCheck } from "./_lib/origin.ts";
+import { registerCalendar } from "./_lib/widget.ts";
 
 // Vercel bundles includeFiles at their repo-relative path: /var/task/public/... for a CLI deploy
 // from web/, /var/task/web/public/... for a Git deploy with root directory web/. Locally cwd is web/.
@@ -356,8 +358,14 @@ const handler = createMcpHandler(
       },
       async ({ topic }) => await ok({ topic, text: METHODOLOGY[topic] }),
     );
+
+    // MCP Apps render tool and its ui:// resource (web/api/_lib/widget.ts).
+    registerCalendar(server, { ok, fail, loadRegion, period, regionId, ym, caveatMode, annotations: RO });
   },
   { serverInfo: { name: "burning-calendar", version: "0.5.0" } },
 );
 
-export { handler as GET, handler as POST };
+// Origin allowlist in front of the handler (web/api/_lib/origin.ts); requests without Origin pass.
+const guarded = withOriginCheck(handler);
+
+export { guarded as GET, guarded as POST };

@@ -3,7 +3,8 @@
 // Usage: node scripts/smoke-mcp.mjs [base-url] [--no-static]   (default: production)
 // --no-static skips llms.txt and /data (for a local server that serves only the function).
 // Calls every tool once over Streamable HTTP (2025-06-18 era, stateless), checks key fields
-// and known values, prints one line per check, exits 1 on any failure.
+// and known values, the MCP Apps resource, one 2026-07-28 request and the Origin check,
+// prints one line per check, exits 1 on any failure.
 
 const args = process.argv.slice(2);
 const STATIC = !args.includes("--no-static");
@@ -11,21 +12,36 @@ const BASE = (args.find((a) => !a.startsWith("--")) ?? "https://burning-calendar
 const MCP = `${BASE}/api/mcp`;
 const TOOLS = [
   "search_regions", "get_region_series", "get_season_calendar", "get_anomalies", "compare_regions",
-  "aggregate", "rank_regions", "find_region_at", "get_validation", "get_methodology",
+  "aggregate", "rank_regions", "find_region_at", "get_validation", "get_methodology", "show_calendar",
 ];
+const WIDGET_URI = "ui://burning-calendar/calendar-v1.html";
+const MODERN_META = {
+  "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+  "io.modelcontextprotocol/clientInfo": { name: "smoke-mcp", version: "1" },
+  "io.modelcontextprotocol/clientCapabilities": {},
+};
 
 let id = 0;
-async function rpc(method, params) {
-  const res = await fetch(MCP, {
+/** modern: 2026-07-28 request (per-request _meta envelope plus MCP-Protocol-Version and Mcp-Method headers). */
+async function post(method, params, { modern = false, origin } = {}) {
+  const headers = {
+    "content-type": "application/json",
+    accept: "application/json, text/event-stream",
+    "mcp-protocol-version": modern ? "2026-07-28" : "2025-06-18",
+  };
+  if (modern) headers["mcp-method"] = method;
+  if (origin) headers.origin = origin;
+  const p = modern ? { ...params, _meta: MODERN_META } : params;
+  return fetch(MCP, {
     method: "POST",
-    headers: {
-      "content-type": "application/json",
-      accept: "application/json, text/event-stream",
-      "mcp-protocol-version": "2025-06-18",
-    },
-    body: JSON.stringify({ jsonrpc: "2.0", id: ++id, method, params }),
+    headers,
+    body: JSON.stringify({ jsonrpc: "2.0", id: ++id, method, params: p }),
     signal: AbortSignal.timeout(30_000),
   });
+}
+
+async function rpc(method, params, opts) {
+  const res = await post(method, params, opts);
   const body = await res.text();
   if (!res.ok) throw new Error(`HTTP ${res.status}: ${body.slice(0, 200)}`);
   // SSE: take the last `data:` line; plain JSON otherwise.
@@ -62,7 +78,25 @@ const checks = [
     const names = r.tools.map((t) => t.name).sort();
     must(JSON.stringify(names) === JSON.stringify([...TOOLS].sort()), `tools: ${names.join(",")}`);
     must(r.tools.every((t) => t.annotations?.readOnlyHint === true), "a tool lacks readOnlyHint");
-    return `${names.length} tools, all readOnlyHint`;
+    const cal = r.tools.find((t) => t.name === "show_calendar");
+    must(cal._meta?.ui?.resourceUri === WIDGET_URI, "show_calendar lacks _meta.ui.resourceUri");
+    return `${names.length} tools, all readOnlyHint, show_calendar -> ${WIDGET_URI}`;
+  }],
+  ["resources/list", async () => {
+    const r = await rpc("resources/list", {});
+    const w = r.resources.find((x) => x.uri === WIDGET_URI);
+    must(w?.mimeType === "text/html;profile=mcp-app", `widget resource missing: ${JSON.stringify(r.resources)}`);
+    const read = await rpc("resources/read", { uri: WIDGET_URI });
+    const html = read.contents[0].text;
+    must(html.startsWith("<!doctype html>") && html.includes("ui/initialize"), "widget HTML unexpected");
+    return `${WIDGET_URI}, ${html.length} chars`;
+  }],
+  ["show_calendar", async () => {
+    const r = await call("show_calendar", { region_id: "EL64", from: "2021-01", to: "2021-12" });
+    const s = common(r, { countries: "gr" });
+    must(s.months.length === 12 && s.months.find((m) => m.ym === "2021-08")?.anom === true, "EL64 2021-08 cell not flagged");
+    must(r.content[0].text.startsWith("CAVEAT ") && !r.content[0].text.includes('"months":['), "text block should have caveats first and no cells");
+    return `EL64 2021: 12 cells, max ${s.max_value}, ${s.view_url}`;
   }],
   ["search_regions", async () => {
     const s = common(await call("search_regions", { country: "GR" }), { countries: "gr" });
@@ -117,6 +151,20 @@ const checks = [
     return "topic caveats";
   }],
 ];
+checks.push(
+  ["2026-07-28 discover", async () => {
+    const r = await rpc("server/discover", {}, { modern: true });
+    must(r.supportedVersions?.includes("2026-07-28"), `supportedVersions ${r.supportedVersions}`);
+    return `supportedVersions ${r.supportedVersions.join(",")}`;
+  }],
+  ["origin check", async () => {
+    const bad = await post("tools/list", {}, { origin: "https://evil.example" });
+    must(bad.status === 403 || bad.ok, `foreign Origin got HTTP ${bad.status}, expected 403 (enforced) or 200 (report-only)`);
+    const good = await post("tools/list", {}, { origin: "https://claude.ai" });
+    must(good.ok, `claude.ai Origin got HTTP ${good.status}`);
+    return `evil.example ${bad.status} (${bad.status === 403 ? "enforced" : "report-only"}), claude.ai 200`;
+  }],
+);
 const staticChecks = [
   ["static: llms.txt", async () => {
     const res = await fetch(`${BASE}/llms.txt`);
