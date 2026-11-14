@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import type { IndexFile, RegionFile } from "../src/lib/contract.ts";
 import { computeAoi, type Detection } from "../src/aoi/compute.ts";
 import { DETECTIONS_HEADER, parseDetectionsCsv } from "../src/aoi/detections.ts";
-import { aoiBbox, aoiToGeoJson, AoiError, areaKm2, contains, emptyAoi, parseGeoJson, ringSelfIntersects, sphericalRingAreaKm2 } from "../src/aoi/geojson.ts";
+import { AOI_NOTE, aoiBbox, aoiToGeoJson, AoiError, areaKm2, contains, emptyAoi, GRID_BUDGET, gridCells, MAX_VERTICES, parseGeoJson, ringSelfIntersects, sphericalRingAreaKm2 } from "../src/aoi/geojson.ts";
 import { detectionsCsv, monthsCsv, touchedRegions } from "../src/aoi/run.ts";
 import { distanceToLineKm, inPolygon, type RegionCollection } from "../src/lib/geo.ts";
 
@@ -96,6 +96,12 @@ describe("AOI geometry and GeoJSON", () => {
       expect(areaKm2(b)).toBeCloseTo(areaKm2(a), 6);
       for (const [lon, lat] of [[23.03, 39], [23.04, 39.0], [23.05, 38.0], [25, 41]]) expect(contains(b, lon, lat)).toBe(contains(a, lon, lat));
     }
+    // The note travels in each feature's properties, which GIS tools keep (a top-level member gets dropped).
+    const out = aoiToGeoJson({ polygons: [[square]], points: [[23, 39]], lines: [], radius_km: 2 });
+    const props = out.features.map((f) => (f as { properties: { note?: string } }).properties);
+    expect(props.length).toBe(3);
+    expect(props.every((p) => p.note === AOI_NOTE)).toBe(true);
+    expect("burning_calendar" in out).toBe(false);
     // A foreign file without radius_km takes the picker radius.
     expect(parseGeoJson(JSON.stringify({ type: "Point", coordinates: [23, 39] }), 3).radius_km).toBe(3);
   });
@@ -167,6 +173,32 @@ describe("AOI area is the union of its parts (audit BC3-001)", () => {
     expect(Math.abs(areaKm2(a) - want) / want).toBeLessThan(0.01);
   });
 
+  it("adding a disc outside a polygon never shrinks the area (grid and exact use one sphere)", () => {
+    const sq = [[20, 36], [28, 36], [28, 42], [20, 42], [20, 36]];
+    const alone = areaKm2({ ...emptyAoi(5), polygons: [[sq]] }); // exact path
+    const both = areaKm2({ ...emptyAoi(20), polygons: [[sq]], points: [[29, 39]] }); // grid path
+    expect(alone).toBeCloseTo(sphericalRingAreaKm2(sq), 6);
+    expect(both).toBeGreaterThanOrEqual(alone);
+    expect(Math.abs(both - (alone + Math.PI * 400)) / (alone + Math.PI * 400)).toBeLessThan(0.01);
+  });
+
+  it("the grid keeps cells x vertices within budget up to the vertex limit", () => {
+    for (const v of [1, 172, 1000, 13_900, 20_000, MAX_VERTICES]) expect(gridCells(v) * v).toBeLessThanOrEqual(GRID_BUDGET);
+    expect(gridCells(1)).toBeLessThanOrEqual(60_000);
+    // A 20 000-vertex polygon plus a point goes through the grid without error and in reasonable time.
+    const n = 19_998;
+    const ring = Array.from({ length: n }, (_, i) => {
+      const t = (2 * Math.PI * i) / n;
+      return [23 + Math.cos(t), 39 + 0.8 * Math.sin(t)];
+    });
+    const a = { ...emptyAoi(5), polygons: [[[...ring, ring[0]]]], points: [[25, 39]] };
+    const t0 = performance.now();
+    const got = areaKm2(a);
+    const want = sphericalRingAreaKm2([...ring, ring[0]]) + Math.PI * 25;
+    expect(performance.now() - t0).toBeLessThan(5000);
+    expect(Math.abs(got - want) / want).toBeLessThan(0.03);
+  });
+
   it("a disc inside a polygon adds nothing; a hole is subtracted", () => {
     const sq = [[22, 38], [24, 38], [24, 40], [22, 40], [22, 38]];
     const hole = [[22.5, 38.5], [23.5, 38.5], [23.5, 39.5], [22.5, 39.5], [22.5, 38.5]];
@@ -194,5 +226,19 @@ describe("GeoJSON topology (audit BC3-008)", () => {
     expect(ringSelfIntersects(bowtie)).toBe(true);
     expect(() => parseGeoJson(JSON.stringify({ type: "Polygon", coordinates: [bowtie] }))).toThrow(/cross/);
     expect(ringSelfIntersects([[22, 38], [24, 38], [24, 40], [22, 40], [22, 38]])).toBe(false);
+  });
+
+  it("rejects collinear overlapping edges and an edge folding back on its neighbour", () => {
+    // Edge (0,0)-(3,0) runs back over the first edge (2,0)-(4,0): every orientation is 0.
+    const overlap = [[2, 0], [4, 0], [4, 1], [0, 1], [0, 0], [3, 0], [2, 0]];
+    expect(ringSelfIntersects(overlap)).toBe(true);
+    expect(() => parseGeoJson(JSON.stringify({ type: "Polygon", coordinates: [overlap] }))).toThrow(/cross/);
+    // A spike: the second edge folds straight back along the first.
+    expect(ringSelfIntersects([[0, 0], [4, 0], [2, 0], [0, 0]])).toBe(true);
+    // The same fold across the closing vertex.
+    expect(ringSelfIntersects([[3, 0], [1, 0], [0, 0], [3, 0]])).toBe(true);
+    // Straight continuation through a vertex is fine; the closing edge touching the first is fine.
+    expect(ringSelfIntersects([[0, 0], [2, 0], [4, 0], [4, 4], [0, 4], [0, 0]])).toBe(false);
+    expect(ringSelfIntersects([[0, 0], [4, 0], [4, 4], [0, 0]])).toBe(false);
   });
 });
