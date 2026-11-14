@@ -32,7 +32,7 @@ Code: https://github.com/MetrPikeska/burning-calendar
 4. Validation by leave-one-year-out: the harmonized series hits the VIIRS peak month in 86 % of held-out Greek seasons, against 57 % for raw MODIS (Argentina 100 % vs 86 %). A time split (fit 2012-2019, test 2020-2025) gives 7.1 % and 7.0 % median annual error.
 5. Regions that fail validation (Ionian Islands, Buenos Aires city, Neuquén, Tierra del Fuego) are shown in a relative mode built on MODIS alone, so the app never presents an unreliable number as harmonized.
 
-**AI agent access.** A read-only MCP server at `https://burning-calendar.vercel.app/api/mcp` exposes tools for region search, series, season calendars, anomalies, rankings by count or density, aggregation, point lookup and methodology. Each answer carries its caveats (back-cast interval, relative mode, detections are not fires) and a deep link to the map view.
+**AI agent access.** A read-only MCP server at `https://burning-calendar.vercel.app/api/mcp` exposes tools for region search, series, season calendars, anomalies, rankings by count or density, aggregation, validation per region and year, point lookup and methodology. Each answer carries its caveats (back-cast interval, relative mode, detections are not fires), in full on the first call and as short codes after, and a deep link to the map view.
 
 **Benefits.** One series instead of two incompatible ones, a season calendar per administrative region that agencies already report on, open data under CC BY 4.0, and honest uncertainty: every modelled value comes with a range.
 

@@ -60,7 +60,7 @@ Leave-one-year-out (LOYO) over 2012-2019: fit on seven years, predict the eighth
 
 ## AI agents (MCP)
 
-The MCP server is stateless, read-only and needs no key. It answers questions such as "which province had the most detections per km²" or "was August 2021 abnormal in Attica" with numbers, caveats and a link back to the map.
+The MCP server is stateless, read-only and needs no key. It answers questions such as "which province had the most detections per km²" or "was August 2021 abnormal in Attica" with numbers, caveats and a link back to the map. After the first call an agent can ask for caveat codes instead of full texts to save tokens.
 
 - claude.ai or Claude Desktop: Customize > Connectors > Add custom connector, paste the URL above.
 - Claude Code: `claude mcp add --transport http burncal https://burning-calendar.vercel.app/api/mcp`
