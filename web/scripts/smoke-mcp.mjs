@@ -104,6 +104,7 @@ const checks = [
   ["find_region_at", async () => {
     const s = common(await call("find_region_at", { lat: 38.8, lon: 23.4, caveats: "codes" }), { countries: "gr" });
     must(s.found && s.id === "EL64", `Evia point gave ${s.id}`);
+    must(s.detections_csv_url?.endsWith("/data/v1/gr/detections/EL64.csv"), "detections_csv_url missing");
     return "Evia -> EL64";
   }],
   ["get_validation", async () => {
@@ -121,6 +122,13 @@ const staticChecks = [
     const res = await fetch(`${BASE}/llms.txt`);
     must(res.ok && (await res.text()).startsWith("# "), `llms.txt HTTP ${res.status}`);
     return "ok";
+  }],
+  ["static: hotspot CSV", async () => {
+    const res = await fetch(`${BASE}/data/v1/gr/detections/EL64.csv`);
+    must(res.ok, `HTTP ${res.status}`);
+    const lines = (await res.text()).trimEnd().split("\n");
+    must(lines[0].startsWith("region_id,sensor,satellite,acq_date,acq_time"), "unexpected header");
+    return `EL64 ${lines.length - 1} detections`;
   }],
   ["static: data CORS", async () => {
     const res = await fetch(`${BASE}/data/v1/gr/index.json`);

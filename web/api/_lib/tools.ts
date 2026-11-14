@@ -68,6 +68,16 @@ export function viewUrl(country: CountryCode, region: string | null, from: strin
 const dataUrl = (country: CountryCode, id: string, ext: "json" | "csv") =>
   `${PUBLIC_URL}data/v1/${country}/regions/${id}.${ext}`;
 
+const FIRMS_DOWNLOAD = "https://firms.modaps.eosdis.nasa.gov/download/";
+
+/** Individual detections (hotspot CSV, written by pipeline/hotspots.py) exist for Greece only. */
+export function hotspotLinks(country: CountryCode, id: string) {
+  return country === "gr"
+    ? { detections_csv_url: `${PUBLIC_URL}data/v1/gr/detections/${id}.csv` }
+    : { detections_csv_url: null,
+        detections_note: `Individual detections are not hosted for Argentina (4.5 M rows); download them from NASA FIRMS: ${FIRMS_DOWNLOAD}` };
+}
+
 /** Region names come from NUTS / IGN through the pipeline; strip control characters and cap length. */
 const clean = (s: string) => s.replace(/[\u0000-\u001f\u007f]/g, "").slice(0, 80);
 
@@ -280,6 +290,7 @@ export function regionSeries(region: RegionFile,
     view_url: viewUrl(country, region.id, months.length ? from : null, months.length ? to : null),
     data_url: dataUrl(country, region.id, "json"),
     csv_url: dataUrl(country, region.id, "csv"),
+    ...hotspotLinks(country, region.id),
   };
   if (p.aggregate === "month") {
     return { ...base, fields, records: months.map((m) => monthOut(m, region.mode, fields)),
@@ -547,6 +558,7 @@ export function regionSummary(country: CountryCode, entry: Entry, region: Region
     caveats: caveatsFor(entry.mode, []),
     view_url: viewUrl(country, entry.id),
     data_url: dataUrl(country, entry.id, "json"),
+    ...hotspotLinks(country, entry.id),
   };
 }
 

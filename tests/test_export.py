@@ -42,3 +42,22 @@ def test_write_csv_nulls_and_booleans(tmp_path):
     rows = list(csv.DictReader(p.open()))
     assert rows[0]["region_id"] == "EL52" and rows[0]["viirs"] == "" and rows[0]["harm_hi"] == ""
     assert rows[0]["anom"] == "true" and rows[0]["outage"] == "false" and rows[0]["harm"] == "9.5"
+
+
+@pytest.mark.parametrize("path", sorted(WEB_DATA.glob("*/detections/*.csv")),
+                         ids=lambda p: f"{p.parent.parent.name}-{p.stem}")
+def test_detection_csv_adds_up_to_monthly_counts(path):
+    """Hotspot rows per month and sensor equal the `modis` and `viirs` counts of the region JSON."""
+    region = json.loads((path.parent.parent / "regions" / f"{path.stem}.json").read_text())
+    counts: dict[tuple[str, str], int] = {}
+    with path.open(encoding="utf-8") as f:
+        rows = csv.DictReader(f)
+        assert rows.fieldnames[:4] == ["region_id", "sensor", "satellite", "acq_date"]
+        for r in rows:
+            assert r["region_id"] == path.stem
+            key = (r["acq_date"][:7], r["sensor"])
+            counts[key] = counts.get(key, 0) + 1
+    for m in region["months"]:
+        for sensor in ("modis", "viirs"):
+            assert counts.pop((m["ym"], sensor), 0) == (m[sensor] or 0), (m["ym"], sensor)
+    assert not counts, f"rows outside the monthly series: {sorted(counts)[:3]}"

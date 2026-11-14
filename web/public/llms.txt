@@ -16,6 +16,7 @@ Read before using the numbers:
 - [Argentina index](/data/v1/ar/index.json): all Argentine provinces, same fields
 - [Region detail, JSON](/data/v1/gr/regions/EL52.json): pattern `/data/v1/{gr|ar}/regions/{id}.json`, monthly series, season years, factors, band, validation
 - [Region detail, CSV](/data/v1/ar/regions/30.csv): pattern `/data/v1/{gr|ar}/regions/{id}.csv`, one row per month
+- [Hotspots, CSV](/data/v1/gr/detections/EL64.csv): Greece only, pattern `/data/v1/gr/detections/{id}.csv` (`GR.csv` for the whole country), one row per FIRMS detection after the filters: date, UTC time, sensor, satellite, lat/lon, FRP, confidence. Argentina: download from NASA FIRMS
 - [Greece geometry](/data/v1/gr/regions.geojson): GeoJSON, property `id` matches the index
 - [Argentina geometry](/data/v1/ar/regions.geojson): GeoJSON, IGN province id `in1` as `id`
 - [Validation, Greece](/data/v1/gr/validation.json) and [Validation, Argentina](/data/v1/ar/validation.json): per-region LOYO, time split, ratio trend, mode reasons

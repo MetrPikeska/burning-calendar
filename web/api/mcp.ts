@@ -136,7 +136,8 @@ const handler = createMcpHandler(
           "Monthly (max 120 records) or calendar-year detection counts for one region: modis, viirs, harm (VIIRS-equivalent), " +
           "harm_lo..harm_hi for modelled months before 2012, anomaly flags. Null fields are omitted; `fields` picks record keys. " +
           "Month mode also returns calendar-year totals on the same series (harm, or modis in relative mode), partial years marked. " +
-          "Always pass on the caveats; quote back-cast months with their range. Returns view_url (map), data_url (JSON) and csv_url (full series).",
+          "Always pass on the caveats; quote back-cast months with their range. Returns view_url (map), data_url (JSON), csv_url (full monthly series) and, for Greece, " +
+          "detections_csv_url: every individual hotspot (date, UTC time, sensor, lat/lon, FRP, confidence) of the region.",
         inputSchema: z.object({ caveats: caveatMode,
           region_id: regionId,
           from: ym,
@@ -292,7 +293,7 @@ const handler = createMcpHandler(
         title: "Find region at a point",
         description:
           "Region (Greek NUTS2 or Argentine province) containing a latitude/longitude, with its season climatology, annual mean, " +
-          "last 3 season years, view_url and data_url. Outside both countries: found false, plus the nearest region within 5 km if any.",
+          "last 3 season years, view_url, data_url and (Greece) detections_csv_url with the individual hotspots. Outside both countries: found false, plus the nearest region within 5 km if any.",
         inputSchema: z.object({ caveats: caveatMode, lat: z.number().min(-90).max(90), lon: z.number().min(-180).max(180) }),
         annotations: RO,
       },

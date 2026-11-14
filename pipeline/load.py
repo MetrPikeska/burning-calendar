@@ -26,12 +26,13 @@ def cell_key(lat: pd.Series, lon: pd.Series) -> pd.Series:
     return pd.Series(ilat * 100_000 + ilon, index=lat.index)
 
 
-def read_csvs(country: str, raw_dir: Path = RAW) -> pd.DataFrame:
+def read_csvs(country: str, raw_dir: Path = RAW, usecols: list[str] = USECOLS) -> pd.DataFrame:
     name = COUNTRIES[country]
     frames = []
     for sensor, prefix in SENSOR_PREFIX.items():
         for path in sorted(raw_dir.glob(f"{prefix}_*_{name}.csv")):
-            df = pd.read_csv(path, usecols=USECOLS, dtype={"satellite": str, "version": str})
+            df = pd.read_csv(path, usecols=usecols,
+                             dtype={"satellite": str, "version": str, "acq_time": str, "confidence": str})
             df["sensor"] = sensor
             frames.append(df)
     if not frames:

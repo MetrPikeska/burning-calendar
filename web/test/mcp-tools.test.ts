@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import type { IndexFile, RegionFile } from "../src/lib/contract.ts";
 import type { RegionCollection } from "../src/lib/geo.ts";
@@ -42,6 +42,17 @@ describe("countryOf", () => {
     expect(countryOf("30")).toBe("ar");
     expect(countryOf("AR")).toBe("ar");
     expect(countryOf("XX9")).toBeNull();
+  });
+});
+
+describe("hotspot CSV links", () => {
+  it("points Greek regions to an existing detections file and Argentine ones to FIRMS", () => {
+    const gr = regionSeries(el62, { from: "2021-01", to: "2021-12", aggregate: "month" }, period);
+    expect(gr.detections_csv_url).toBe("https://burning-calendar.vercel.app/data/v1/gr/detections/EL62.csv");
+    expect(existsSync("public/data/v1/gr/detections/EL62.csv")).toBe(true);
+    const ar = regionSeries(er, { from: "2020-01", to: "2020-12", aggregate: "month" }, period);
+    expect(ar.detections_csv_url).toBeNull();
+    expect(ar.detections_note).toMatch(/firms\.modaps/);
   });
 });
 

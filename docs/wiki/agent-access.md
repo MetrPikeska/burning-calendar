@@ -61,13 +61,13 @@ Jury path in 1 minute: claude.ai connector with no auth. Keep a recorded fallbac
 | Tool | Inputs | Notes |
 |---|---|---|
 | `search_regions` | `country?`, `level?`, `query?`, `limit` | climatology, `area_km2`, `annual_mean` and `density_per_1000km2` (null for relative regions, raw values in `*_modis`), `loyo_mdape_pct`, `view_url` |
-| `get_region_series` | `region_id`, `from`, `to`, `aggregate`, `fields?` (incl. `days_viirs`, `days_modis`) | max 120 monthly records, else an error that suggests `aggregate: "year"`; nulls omitted; month mode adds calendar-year `totals` on harm (modis in relative mode) with `partial`; ranges outside coverage are clipped with an `out_of_coverage` caveat; `view_url`, `data_url`, `csv_url` |
+| `get_region_series` | `region_id`, `from`, `to`, `aggregate`, `fields?` (incl. `days_viirs`, `days_modis`) | max 120 monthly records, else an error that suggests `aggregate: "year"`; nulls omitted; month mode adds calendar-year `totals` on harm (modis in relative mode) with `partial`; ranges outside coverage are clipped with an `out_of_coverage` caveat; `view_url`, `data_url`, `csv_url`, `detections_csv_url` (Greece: individual hotspots; Argentina null plus `detections_note` pointing to FIRMS) |
 | `get_season_calendar` | `region_id`, `year?` | climatology and season years |
 | `get_anomalies` | `region_id`, `year` | percentile, `baseline_median`, `baseline_p90`, `baseline_years`, `ratio_to_median`, `flagged` |
 | `compare_regions` | `region_ids` (2-10), `metric`, `year?` | count metrics ranked only when all regions are harmonized (`ranking_allowed`); relative regions get `value_modis` instead of `value` |
 | `aggregate` | `region_ids` (1-40), `from`, `to`, `top` | totals per region and overall, top months of the sum; harm when all regions are harmonized, else MODIS for all with a caveat; refuses a country together with its own regions |
 | `rank_regions` | `metric`, `country?`, `level?`, `year?`, `top`, `order` | metrics `annual_mean`, `density_per_1000km2`, `season_total`, `season_length`, `loyo_mdape_pct`; count metrics rank harmonized regions only, relative ones in `excluded_relative`; country rows only with `level: country`; caveat `size_bias` for absolute counts |
-| `find_region_at` | `lat`, `lon` | point in polygon (`regionAt` from `web/src/lib/geo.ts`); returns climatology, annual mean, last 3 season years, `view_url`, `data_url`; outside both countries the nearest region within 5 km |
+| `find_region_at` | `lat`, `lon` | point in polygon (`regionAt` from `web/src/lib/geo.ts`); returns climatology, annual mean, last 3 season years, `view_url`, `data_url`, `detections_csv_url`; outside both countries the nearest region within 5 km |
 | `get_validation` | `region_id` | LOYO and time-split errors per year with min/median/max, monthly scores, peak-month hit rates vs raw MODIS, fit-window gap, ratio trend, band, mode reasons; for `GR`/`AR` a table of all regions plus filter and assignment counts |
 | `get_methodology` | `topic` | static text: overview, harmonization, validation, modes, anomalies, calendar, limits |
 
