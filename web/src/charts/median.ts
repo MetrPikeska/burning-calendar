@@ -1,6 +1,7 @@
 // Panel "chosen month vs median of the preceding 10 years", from the pipeline's baseline_* fields.
 import * as Plot from "@observablehq/plot";
 import { baselineValue, type MonthRecord, type RegionFile } from "../lib/contract.ts";
+import { countTick } from "./ramp.ts";
 
 const monthYear = (ym: string) =>
   new Date(`${ym}-15T00:00:00Z`).toLocaleDateString("en", { month: "long", year: "numeric", timeZone: "UTC" });
@@ -8,10 +9,14 @@ const monthOnly = (ym: string) =>
   new Date(`${ym}-15T00:00:00Z`).toLocaleDateString("en", { month: "long", timeZone: "UTC" });
 const num = (n: number) => (n >= 100 ? Math.round(n).toLocaleString("en") : n.toFixed(1));
 
-/** Month to show first: the strongest month inside [from, to], else the latest month of the series. */
+/**
+ * Month to show first: the strongest month inside [from, to]; without a range, the strongest of the
+ * last 12 months (the latest season's peak, not an off-season December).
+ */
 export function defaultMonth(region: RegionFile, from: string | null, to: string | null): string {
-  const inRange = region.months.filter((m) => (!from || m.ym >= from) && (!to || m.ym <= to));
-  if (!from && !to) return region.months[region.months.length - 1].ym;
+  const inRange = from || to
+    ? region.months.filter((m) => (!from || m.ym >= from) && (!to || m.ym <= to))
+    : region.months.slice(-12);
   let best: MonthRecord | null = null;
   for (const m of inRange) {
     const v = baselineValue(m, region.mode) ?? -1;
@@ -28,7 +33,7 @@ function ratioText(value: number, median: number): string {
   return "close to the median";
 }
 
-export function renderMedianPanel(region: RegionFile, ym: string): HTMLElement {
+export function renderMedianPanel(region: RegionFile, ym: string, width = 520): HTMLElement {
   const el = document.createElement("div");
   el.className = "median";
   const rec = region.months.find((m) => m.ym === ym);
@@ -50,7 +55,7 @@ export function renderMedianPanel(region: RegionFile, ym: string): HTMLElement {
     <h3>${monthYear(ym)} vs the median</h3>
     <p><strong>${num(value)}</strong> ${seriesName} detections, ${ratioText(value, rec.baseline_median)}
       of ${monthOnly(ym)} ${rec.baseline_years} (${num(rec.baseline_median)}).
-      Percentile ${rec.anom_pct ?? "n/a"}, ${verdict}.
+      Percentile ${rec.anom_pct == null ? "n/a" : Math.round(rec.anom_pct)}, ${verdict}.
       ${rec.outage && (region.mode === "relative" || rec.src !== "observed") ? `<br>Known MODIS outage: ${rec.outage_days} days, the count may be too low.` : ""}
       ${region.mode === "harmonized" && rec.src !== "observed" ? `<br>Back-cast month, range ${num(rec.harm_lo ?? 0)}-${num(rec.harm_hi ?? 0)}.` : ""}</p>`;
 
@@ -59,17 +64,23 @@ export function renderMedianPanel(region: RegionFile, ym: string): HTMLElement {
     { label: `median ${rec.baseline_years}`, v: rec.baseline_median, kind: "base" },
     { label: "90th percentile", v: rec.baseline_p90, kind: "base" },
   ];
+  // Bar labels sit above each bar instead of in a left margin: the median label is long.
+  const band = 38;
   el.append(
     Plot.plot({
-      width: 520,
-      height: 96,
-      marginLeft: 170,
-      x: { label: null, grid: true, nice: true },
-      y: { label: null, domain: bars.map((b) => b.label) },
-      color: { domain: ["month", "base"], range: ["#b2182b", "#b8b0a6"] },
+      width,
+      height: bars.length * band + 22,
+      marginLeft: 10,
+      marginRight: 52,
+      marginTop: 0,
+      style: { fontFamily: "inherit", fontSize: "11px" },
+      x: { label: null, grid: true, nice: true, domain: [0, Math.max(1, ...bars.map((b) => b.v))], ticks: width < 440 ? 3 : 5, tickFormat: countTick },
+      y: { label: null, domain: bars.map((b) => b.label), axis: null, padding: 0 },
+      color: { domain: ["month", "base"], range: ["#1d1b19", "#c5bbb0"] },
       marks: [
-        Plot.barX(bars, { x: "v", y: "label", fill: "kind" }),
-        Plot.text(bars, { x: "v", y: "label", text: (b: { v: number }) => num(b.v), dx: 4, textAnchor: "start" }),
+        Plot.barX(bars, { x: "v", y: "label", fill: "kind", insetTop: 17, insetBottom: 3 }),
+        Plot.text(bars, { x: 0, y: "label", text: "label", dx: 3, dy: -11, textAnchor: "start", fill: "currentColor", fontSize: 12 }),
+        Plot.text(bars, { x: "v", y: "label", text: (b: { v: number }) => num(b.v), dx: 5, dy: 7, textAnchor: "start", fontWeight: 600 }),
         Plot.ruleX([0]),
       ],
     }),

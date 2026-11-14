@@ -8,27 +8,34 @@
     <link rel="icon" href="data:," />
   </head>
   <body>
+    <a class="skip" href="#panel">Skip to the region panel</a>
     <header>
-      <h1>Burning Calendar</h1>
-      <span class="muted">MODIS + VIIRS active fires, harmonized, 2000-2025</span>
-      <label>Country
-        <select id="country">
-          <option value="gr">Greece</option>
-          <option value="ar">Argentina</option>
-        </select>
-      </label>
+      <div class="brand">
+        <h1>Burning Calendar</h1>
+        <p class="tagline">MODIS + VIIRS active fires, harmonized, 2000-2025</p>
+      </div>
+      <div class="toggle" id="country" role="group" aria-label="Country">
+        <button type="button" data-country="gr" aria-pressed="true">Greece</button>
+        <button type="button" data-country="ar" aria-pressed="false">Argentina</button>
+      </div>
     </header>
     <main>
       <div id="map"></div>
       <section id="area" aria-label="Area of interest">
-        <label>Region <select id="region"></select></label>
-        <form id="latlon-form" class="latlon">
-          <label>Lat, lon <input id="latlon" type="text" inputmode="decimal" placeholder="40.64, 22.94" autocomplete="off" /></label>
-          <button type="submit">Find</button>
-          <span id="latlon-msg" class="muted" role="status"></span>
+        <div class="field">
+          <label for="region">Region</label>
+          <select id="region"></select>
+        </div>
+        <form id="latlon-form" class="field latlon">
+          <label for="latlon">Or find a point (lat, lon)</label>
+          <div class="inline">
+            <input id="latlon" type="text" inputmode="decimal" placeholder="40.64, 22.94" autocomplete="off" aria-describedby="latlon-msg" />
+            <button type="submit" class="btn">Find</button>
+          </div>
+          <span id="latlon-msg" class="field-msg" role="status"></span>
         </form>
       </section>
-      <section id="panel"><p class="hint">Loading...</p></section>
+      <section id="panel" tabindex="-1"><p class="hint">Loading...</p></section>
     </main>
     <script type="module" src="/src/main.ts"></script>
   </body>

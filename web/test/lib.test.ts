@@ -56,7 +56,7 @@ describe("defaultMonth", async () => {
   it("picks the strongest month in the range (Paraná 2020)", () => {
     expect(defaultMonth(entreRios, "2020-01", "2020-12")).toBe("2020-08");
   });
-  it("falls back to the latest month without a range", () => {
-    expect(defaultMonth(entreRios, null, null)).toBe("2025-12");
+  it("without a range picks the strongest of the last 12 months, not the latest month", () => {
+    expect(defaultMonth(entreRios, null, null)).toBe("2025-08");
   });
 });

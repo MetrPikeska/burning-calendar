@@ -9,6 +9,19 @@ setWorkerUrl(workerUrl);
 import type { CountryCode, IndexFile } from "./lib/contract.ts";
 import { regionsGeojsonUrl } from "./lib/data.ts";
 import type { RegionCollection } from "./lib/geo.ts";
+import { MAP_RAMP_MAX, MAP_RAMP_MIN, NO_SCALE_GREY, rampColors } from "./charts/ramp.ts";
+
+const RAMP = rampColors(9, MAP_RAMP_MAX, MAP_RAMP_MIN);
+const compact = new Intl.NumberFormat("en", { notation: "compact", maximumSignificantDigits: 2 });
+const si = (n: number) => compact.format(n).replace("K", "k");
+
+/** Legend overlay: the fill is sqrt(annual_mean / max), so max / 4 sits in the middle. */
+function legendHtml(harmMax: number, hasRelative: boolean): string {
+  return `<div class="map-legend-title">Mean detections / year, harmonized</div>
+    <div class="map-legend-ramp" style="background: linear-gradient(to right, ${RAMP.join(", ")})"></div>
+    <div class="map-legend-ticks"><span>0</span><span>${si(harmMax / 4)}</span><span>${si(harmMax)}</span></div>
+    ${hasRelative ? `<div class="map-legend-rel"><i style="background:${NO_SCALE_GREY}"></i>Not harmonized (relative mode)</div>` : ""}`;
+}
 
 const ONLINE_STYLE = "https://tiles.openfreemap.org/styles/positron";
 const STYLE_TIMEOUT_MS = 3000;
@@ -73,6 +86,11 @@ export async function createRegionMap(
 
   let selected: string | null = null;
   let marker: Marker | null = null;
+  // Region layers go under the basemap labels so city names stay readable (local style has none).
+  const beforeId = map.getStyle().layers.find((l) => l.type === "symbol")?.id;
+  const legend = Object.assign(document.createElement("div"), { className: "map-legend" });
+  legend.setAttribute("aria-label", "Map legend");
+  container.append(legend);
 
   map.addSource("regions", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
   map.addLayer({
@@ -83,32 +101,51 @@ export async function createRegionMap(
       // Harmonized regions coloured by sqrt(annual_mean); relative regions grey (their mean is MODIS scale).
       "fill-color": [
         "case",
-        ["==", ["get", "mode"], "relative"], "#c9c9c9",
-        ["interpolate", ["linear"], ["get", "level_value"], 0, "#fff1d6", 1, "#b2182b"],
+        ["==", ["get", "mode"], "relative"], NO_SCALE_GREY,
+        ["interpolate", ["linear"], ["get", "level_value"], ...RAMP.flatMap((c, i) => [i / (RAMP.length - 1), c])],
       ],
-      "fill-opacity": 0.75,
+      "fill-opacity": 0.62,
     },
-  });
+  }, beforeId);
   map.addLayer({
     id: "regions-line",
     type: "line",
     source: "regions",
-    paint: { "line-color": "#5a4a42", "line-width": 0.7 },
-  });
+    paint: { "line-color": "#4a3c36", "line-opacity": 0.55, "line-width": 0.7 },
+  }, beforeId);
+  map.addLayer({
+    id: "regions-hover",
+    type: "line",
+    source: "regions",
+    filter: ["==", ["get", "id"], ""],
+    paint: { "line-color": "#111", "line-width": 1.4 },
+  }, beforeId);
   map.addLayer({
     id: "regions-selected",
     type: "line",
     source: "regions",
     filter: ["==", ["get", "id"], ""],
     paint: { "line-color": "#111", "line-width": 2.5 },
-  });
+  }, beforeId);
 
   map.on("click", "regions-fill", (e) => {
     const id = e.features?.[0]?.properties?.id;
     if (typeof id === "string") onSelect(id);
   });
-  map.on("mouseenter", "regions-fill", () => (map.getCanvas().style.cursor = "pointer"));
-  map.on("mouseleave", "regions-fill", () => (map.getCanvas().style.cursor = ""));
+  let hovered = "";
+  map.on("mousemove", "regions-fill", (e) => {
+    const id = e.features?.[0]?.properties?.id;
+    map.getCanvas().style.cursor = "pointer";
+    if (typeof id === "string" && id !== hovered) {
+      hovered = id;
+      map.setFilter("regions-hover", ["==", ["get", "id"], id]);
+    }
+  });
+  map.on("mouseleave", "regions-fill", () => {
+    map.getCanvas().style.cursor = "";
+    hovered = "";
+    map.setFilter("regions-hover", ["==", ["get", "id"], ""]);
+  });
 
   return {
     async setCountry(country, index) {
@@ -125,6 +162,8 @@ export async function createRegionMap(
         props.mode = r?.mode ?? "relative";
         props.level_value = r && r.annual_mean_of === "harm" ? Math.sqrt(r.annual_mean / harmMax) : 0;
       }
+      const hasRelative = index.regions.some((r) => r.level !== "country" && r.mode === "relative");
+      legend.innerHTML = legendHtml(harmMax, hasRelative);
       (map.getSource("regions") as unknown as { setData(d: unknown): void }).setData(fc);
       map.fitBounds(bbox(fc), { padding: 24, duration: 0 });
       return fc;
@@ -135,7 +174,7 @@ export async function createRegionMap(
     },
     showPoint(lonLat) {
       marker?.remove();
-      marker = lonLat ? new Marker({ color: "#0b62a4" }).setLngLat(lonLat).addTo(map) : null;
+      marker = lonLat ? new Marker({ color: "#1d1b19" }).setLngLat(lonLat).addTo(map) : null;
     },
   };
 }

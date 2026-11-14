@@ -1,9 +1,15 @@
 // Year x month burning calendar with Observable Plot.
 import * as Plot from "@observablehq/plot";
 import type { MonthRecord, RegionFile, Series } from "../lib/contract.ts";
+import { COLOR_SCHEME, NO_SCALE_GREY, countTick } from "./ramp.ts";
 
-/** Perceptually uniform, colour-blind safe ramp. Swap here if the team prefers viridis/cividis. */
-export const COLOR_SCHEME = "inferno";
+export { COLOR_SCHEME };
+
+/** Mark colours, shared with the key under the chart. */
+export const ANOMALY_STROKE = "#2a9df4";
+const RING_OUTER = "#111";
+const RING_INNER = "#fff";
+const OUTAGE_FILL = "#1d1b19";
 
 const SERIES_LABEL: Record<Series, string> = {
   harm: "Harmonized (VIIRS-equivalent)",
@@ -38,9 +44,9 @@ function title(c: Cell, series: Series): string {
     lines.push(`back-cast from MODIS, range ${fmt(r.harm_lo)}-${fmt(r.harm_hi)}`);
   }
   lines.push(`MODIS ${fmt(r.modis)}  VIIRS ${fmt(r.viirs)}`);
-  if (r.anom_pct != null) lines.push(`percentile vs preceding 10 years: ${r.anom_pct}`);
+  if (r.anom_pct != null) lines.push(`percentile vs preceding 10 years: ${Math.round(r.anom_pct)}`);
   if (r.anom) lines.push("ANOMALY: above the baseline 90th percentile");
-  if (r.outage) lines.push(`known MODIS outage: ${r.outage_days} days`);
+  if (showsOutage(c, series)) lines.push(`known MODIS outage: ${r.outage_days} days`);
   return lines.join("\n");
 }
 
@@ -53,41 +59,81 @@ function inRange(ym: string, r: Range): boolean {
   return (!r.from || ym >= r.from) && (!r.to || ym <= r.to);
 }
 
-/** Cells outside `range` are dimmed, not removed, so the calendar keeps its shape. */
+/** The outage cross only where the shown series depends on MODIS (data/outages.csv lists Aqua only). */
+function showsOutage(c: Cell, series: Series): boolean {
+  return !!c.rec.outage && (series === "modis" || (series === "harm" && c.rec.src !== "observed"));
+}
+
+/**
+ * Colour legend + calendar, `width` px wide. Cells outside `range` are dimmed, not removed,
+ * so the calendar keeps its shape.
+ */
 export function renderHeatmap(
   region: RegionFile,
   series: Series,
   range: Range = { from: null, to: null },
   selectedYm: string | null = null,
   onPick?: (ym: string) => void,
-): SVGSVGElement | HTMLElement {
+  width = 520,
+): HTMLElement {
   const cells = toCells(region.months, series);
-  const dim = (c: Cell) => (inRange(c.rec.ym, range) ? 1 : 0.18);
+  const years = [...new Set(cells.map((c) => c.year))].sort((a, b) => a - b);
+  const marginLeft = 40;
+  const marginTop = 24;
+  const cellW = (width - marginLeft - 4) / 12;
+  const rowH = Math.max(12, Math.min(14, cellW * 0.36));
+  const dim = (c: Cell) => (inRange(c.rec.ym, range) ? 1 : 0.16);
+  const narrow = width < 440;
+
   const plot = Plot.plot({
-    width: 520,
-    height: 26 * 17 + 50,
-    marginLeft: 44,
-    padding: 0.06,
-    x: { type: "band", domain: [...Array(12).keys()], tickFormat: Plot.formatMonth("en", "short"), label: null, axis: "top" },
-    y: { type: "band", label: null, tickFormat: (y: number) => (y % 5 === 0 ? String(y) : "") },
+    width,
+    height: years.length * rowH + marginTop + 4,
+    marginLeft,
+    marginRight: 4,
+    marginTop,
+    marginBottom: 4,
+    padding: 0.08,
+    style: { fontFamily: "inherit", fontSize: "11px" },
+    x: {
+      type: "band",
+      domain: [...Array(12).keys()],
+      tickFormat: Plot.formatMonth("en", narrow ? "narrow" : "short"),
+      label: null,
+      axis: "top",
+      tickSize: 0,
+    },
+    y: { type: "band", domain: years, label: null, ticks: years.filter((y) => y % 5 === 0), tickSize: 0 },
     color: {
       type: "sqrt",
       scheme: COLOR_SCHEME,
       reverse: true,
-      unknown: "#e6e6e6",
-      legend: true,
+      unknown: NO_SCALE_GREY,
       label: `${SERIES_LABEL[series]}, detections / month`,
     },
     marks: [
       Plot.cell(cells, { x: "month", y: "year", fill: "value", fillOpacity: dim, title: (c: Cell) => title(c, series), tip: true }),
-      // Anomalies: outlined cells.
-      Plot.cell(cells.filter((c) => c.rec.anom && inRange(c.rec.ym, range)), { x: "month", y: "year", fill: null, stroke: "#0b62a4", strokeWidth: 2, inset: 1 }),
-      // Known MODIS outages (data/outages.csv): a cross where the shown series depends on MODIS.
-      Plot.text(cells.filter((c) => c.rec.outage && (series === "modis" || (series === "harm" && c.rec.src !== "observed"))), { x: "month", y: "year", text: () => "×", fill: "#0b62a4", fontSize: 14 }),
-      // Month shown in the median panel.
-      Plot.cell(cells.filter((c) => c.rec.ym === selectedYm), { x: "month", y: "year", fill: null, stroke: "#000", strokeWidth: 2.5 }),
+      // Anomalies: thin outline, inset so neighbouring outlines do not merge.
+      Plot.cell(cells.filter((c) => c.rec.anom && inRange(c.rec.ym, range)), {
+        x: "month", y: "year", fill: null, stroke: ANOMALY_STROKE, strokeWidth: 1.5, inset: 1.5,
+      }),
+      // Known MODIS outages: a cross with a white halo, readable on every ramp colour.
+      Plot.text(cells.filter((c) => showsOutage(c, series)), {
+        x: "month", y: "year", text: () => "×", fill: OUTAGE_FILL, stroke: "white", strokeWidth: 3, paintOrder: "stroke", fontSize: 13, fontWeight: 600,
+      }),
+      // Month shown in the median panel: black ring outside, white ring inside, visible on pale and black cells.
+      Plot.cell(cells.filter((c) => c.rec.ym === selectedYm), { x: "month", y: "year", fill: null, stroke: RING_OUTER, strokeWidth: 2.5, inset: -1 }),
+      Plot.cell(cells.filter((c) => c.rec.ym === selectedYm), { x: "month", y: "year", fill: null, stroke: RING_INNER, strokeWidth: 1.5, inset: 1.25 }),
     ],
   });
+
+  const legend = plot.legend("color", {
+    width: Math.min(300, width - marginLeft),
+    marginLeft: 0,
+    ticks: 4,
+    tickFormat: countTick,
+    style: { fontFamily: "inherit", fontSize: "11px" },
+  }) as HTMLElement | SVGSVGElement | undefined;
+
   if (onPick) {
     // The tip's pointer keeps the hovered datum in plot.value; a click picks that month.
     plot.style.cursor = "pointer";
@@ -96,5 +142,38 @@ export function renderHeatmap(
       if (c) onPick(c.rec.ym);
     });
   }
-  return plot;
+
+  const wrap = document.createElement("div");
+  wrap.className = "heatmap";
+  if (legend) {
+    const lg = document.createElement("div");
+    lg.className = "heatmap-legend";
+    lg.style.paddingLeft = `${marginLeft}px`;
+    lg.append(legend);
+    wrap.append(lg);
+  }
+  wrap.append(plot);
+  return wrap;
+}
+
+const SW = 14;
+const swatch = (inner: string) =>
+  `<svg width="${SW}" height="${SW}" viewBox="0 0 ${SW} ${SW}" aria-hidden="true">${inner}</svg>`;
+
+/** Key for the calendar marks; items appear only when they can occur for this view. */
+export function marksKey(series: Series, hasRange: boolean): string {
+  const pale = "#fbe7a6";
+  const items: [string, string][] = [
+    [swatch(`<rect x="1" y="1" width="12" height="12" fill="#c33b4c"/><rect x="2.25" y="2.25" width="9.5" height="9.5" fill="none" stroke="${ANOMALY_STROKE}" stroke-width="1.5"/>`),
+      "Anomaly: above the 90th percentile of the preceding 10 years"],
+    [swatch(`<rect x="1" y="1" width="12" height="12" fill="${pale}"/><rect x="1.25" y="1.25" width="11.5" height="11.5" fill="none" stroke="${RING_OUTER}" stroke-width="2.5"/><rect x="3.4" y="3.4" width="7.2" height="7.2" fill="none" stroke="${RING_INNER}" stroke-width="1.5"/>`),
+      "Month compared below"],
+  ];
+  if (series !== "viirs") {
+    items.push([swatch(`<rect x="1" y="1" width="12" height="12" fill="${pale}"/><text x="7" y="11" text-anchor="middle" font-size="12" font-weight="600" fill="${OUTAGE_FILL}">×</text>`),
+      "Known MODIS outage"]);
+  }
+  items.push([swatch(`<rect x="1" y="1" width="12" height="12" fill="${NO_SCALE_GREY}"/>`), "No value"]);
+  if (hasRange) items.push([swatch(`<rect x="1" y="1" width="12" height="12" fill="#c33b4c" opacity="0.16"/>`), "Outside the date range"]);
+  return `<ul class="key">${items.map(([s, t]) => `<li>${s}<span>${t}</span></li>`).join("")}</ul>`;
 }
