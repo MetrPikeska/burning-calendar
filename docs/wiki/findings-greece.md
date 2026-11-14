@@ -30,16 +30,17 @@ All numbers recomputed on 14 Nov 2026 from FIRMS SP country CSVs (MODIS C6.1 200
 | EL41 | Voreio Aigaio | harmonized | 9.7 | 1.0 / 0.857 | 23.7 | 0.1 |
 | EL42 | Notio Aigaio | harmonized | 25.0 | 0.429 / 0.286 | 22.7 | -12.6 |
 | EL43 | Kriti | harmonized | 13.9 | 0.625 / 0.625 | 15.8 | 1.5 |
-| EL51 | Anatoliki Makedonia, Thraki | relative | 7.3 | 0.857 / 1.0 | 11.0 | 0.9 |
+| EL51 | Anatoliki Makedonia, Thraki | harmonized | 7.3 | 0.857 / 1.0 | 11.0 | 0.9 |
 | EL52 | Kentriki Makedonia | harmonized | 4.0 | 0.857 / 0.857 | 11.7 | 0.5 |
 | EL53 | Dytiki Makedonia | harmonized | 6.3 | 1.0 / 1.0 | 30.5 | -6.6 |
 | EL54 | Ipeiros | harmonized | 24.2 | 0.571 / 0.429 | 31.9 | -10.3 |
-| EL61 | Thessalia | relative | 4.1 | 0.714 / 0.857 | 19.2 | -6.2 |
+| EL61 | Thessalia | harmonized | 4.1 | 0.714 / 0.857 | 19.2 | -6.2 |
 | EL62 | Ionia Nisia | relative | 32.0 | 1.0 / 1.0 | 40.5 | 3.6 |
 | EL63 | Dytiki Elláda | harmonized | 19.6 | 0.857 / 0.429 | 22.5 | -19.0 |
-| EL64 | Sterea Elláda | relative | 16.9 | 0.714 / 0.857 | 12.8 | 18.5 |
+| EL64 | Sterea Elláda | harmonized | 16.9 | 0.714 / 0.857 | 12.8 | 18.5 |
 | EL65 | Peloponnisos | harmonized | 17.5 | 1.0 / 0.857 | 16.1 | 9.8 |
 
-- Peak hit rates use 7 or 8 season years, so one year moves the rate by 0.125-0.143. Three of the four `relative` regions (EL51, EL61, EL64) are there because of a single season year. EL61 Thessalia has the second-lowest annual error of all regions (4.1 %).
+- 12 of 13 regions are `harmonized`; EL62 Ionia Nisia is `relative` on the 25 % error threshold.
+- Peak hit rates use 7 or 8 season years, so one year moves the rate by 0.125-0.143. Under the original rule (13 Nov) EL51, EL61 and EL64 were `relative` because of a single season year; the amended rule (14 Nov, [decisions.md](decisions.md)) allows one year of difference.
 - EL42 sits exactly at the 25 % threshold and stays `harmonized`.
 - Regional VIIRS/MODIS fit-window ratios range from 2.49 (EL64) to 4.21 (EL42).

@@ -4,8 +4,9 @@
    The out-of-sample months form one series, on which season metrics are compared per season year.
 2. Time split: fit on 2012-2019, predict 2020-2025.
 3. Trend of the annual VIIRS/MODIS ratio per day/night over 2012-2025 (OLS, % of mean per year).
-Mode rule (decided 13 Nov 2026): `relative` when LOYO median absolute annual error > 25 %, or
-the LOYO peak-month hit rate is worse than raw MODIS vs VIIRS.
+Mode rule (decided 13 Nov 2026, peak part amended 14 Nov 2026): `relative` when the LOYO median
+absolute annual error > 25 %, or the harmonized series hits the VIIRS peak month in more than
+PEAK_MARGIN fewer held-out season years than raw MODIS does.
 """
 
 import numpy as np
@@ -15,6 +16,7 @@ from calendar_metrics import climatology, season_metrics
 from harmonize import FIT_YEARS, FULL_YEARS, SEASON, VIIRS_START, fit, model
 
 MDAPE_MAX = 25.0
+PEAK_MARGIN = 1  # season years
 
 
 def _obs(m: pd.DataFrame) -> pd.Series:
@@ -89,6 +91,7 @@ def _season_compare(pred: pd.Series, obs: pd.Series, modis: pd.Series, start: in
                  if X[y]["season_length"] and O[y]["season_length"]]
         out[name] = {
             "peak_hit_rate": round(float(np.mean(hits)), 3) if hits else None,
+            "peak_hits": int(sum(hits)),
             "onset_mad_months": round(float(np.mean(d_on)), 2) if d_on else None,
             "end_mad_months": round(float(np.mean(d_end)), 2) if d_end else None,
             "length_mad_months": round(float(np.mean(d_len)), 2) if d_len else None,
@@ -138,13 +141,15 @@ def validate(m: pd.DataFrame, national: pd.DataFrame | None, start_month: int) -
     mod_s = pd.Series(lo["modis"].to_numpy(float), index=lo.index)
     seasons = _season_compare(pred_s, obs_s, mod_s, start_month)
     mdape = float(np.nanmedian(ann["err_pct"].abs())) if ann["err_pct"].notna().any() else np.nan
-    harm_hit = seasons["harm"]["peak_hit_rate"]
-    raw_hit = seasons["modis_raw"]["peak_hit_rate"]
+    harm_hits = seasons["harm"]["peak_hits"]
+    raw_hits = seasons["modis_raw"]["peak_hits"]
+    n_seasons = len(seasons["season_years"])
     reasons = []
     if not (mdape <= MDAPE_MAX):
         reasons.append(f"loyo_mdape {mdape:.1f} > {MDAPE_MAX}")
-    if harm_hit is not None and raw_hit is not None and harm_hit < raw_hit:
-        reasons.append(f"peak_hit {harm_hit} < raw MODIS {raw_hit}")
+    if raw_hits - harm_hits > PEAK_MARGIN:
+        reasons.append(f"peak hits {harm_hits}/{n_seasons} vs raw MODIS {raw_hits}/{n_seasons}, "
+                       f"more than {PEAK_MARGIN} season year worse")
     gap = fit_window_gap(m, national)
     res = {
         "loyo": {

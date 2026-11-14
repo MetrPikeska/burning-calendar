@@ -30,7 +30,7 @@ All numbers computed on 14 Nov 2026 from FIRMS SP country CSVs (MODIS 2000-2025,
 | 06 | Buenos Aires | harmonized | 8.7 | 0.857 / 0.857 | 22.8 | 12.2 |
 | 10 | Catamarca | harmonized | 13.2 | 1.0 / 0.857 | 13.1 | -7.7 |
 | 14 | Córdoba | harmonized | 11.1 | 1.0 / 1.0 | 5.1 | 1.2 |
-| 18 | Corrientes | relative | 7.3 | 0.857 / 1.0 | 4.6 | 3.4 |
+| 18 | Corrientes | harmonized | 7.3 | 0.857 / 1.0 | 4.6 | 3.4 |
 | 22 | Chaco | harmonized | 2.8 | 1.0 / 1.0 | 7.7 | -2.8 |
 | 26 | Chubut | harmonized | 11.8 | 0.857 / 0.714 | 19.2 | -7.2 |
 | 30 | Entre Ríos | harmonized | 7.6 | 1.0 / 1.0 | 11.2 | -1.4 |
@@ -42,7 +42,7 @@ All numbers computed on 14 Nov 2026 from FIRMS SP country CSVs (MODIS 2000-2025,
 | 54 | Misiones | harmonized | 2.9 | 1.0 / 1.0 | 10.9 | -3.3 |
 | 58 | Neuquén | relative | 26.5 | 0.571 / 0.857 | 21.6 | 4.2 |
 | 62 | Río Negro | harmonized | 6.2 | 0.571 / 0.571 | 7.6 | 0.7 |
-| 66 | Salta | relative | 7.1 | 0.857 / 1.0 | 7.8 | 11.6 |
+| 66 | Salta | harmonized | 7.1 | 0.857 / 1.0 | 7.8 | 11.6 |
 | 70 | San Juan | harmonized | 7.6 | 1.0 / 0.714 | 6.5 | 2.6 |
 | 74 | San Luis | harmonized | 6.1 | 0.714 / 0.714 | 6.2 | -2.7 |
 | 78 | Santa Cruz | harmonized | 15.8 | 0.571 / 0.571 | 14.0 | -6.2 |
@@ -51,9 +51,9 @@ All numbers computed on 14 Nov 2026 from FIRMS SP country CSVs (MODIS 2000-2025,
 | 90 | Tucumán | harmonized | 7.4 | 1.0 / 1.0 | 2.8 | -0.5 |
 | 94 | Tierra del Fuego, Antártida e Islas del Atlántico Sur | relative | 45.4 | 0.143 / 0.143 | 54.6 | 93.4 |
 
-- 19 of 24 provinces are `harmonized`. CABA (02) and Tierra del Fuego (94) are `relative` on the error threshold (very few detections); Corrientes (18) and Salta (66) on one season year of the peak-hit rule; Neuquén (58) on both.
+- 21 of 24 provinces are `harmonized`. CABA (02) and Tierra del Fuego (94) are `relative` on the error threshold (very few detections); Neuquén (58) on both the error threshold and the peak-hit rule (4 of 7 vs raw MODIS 6 of 7). Under the original rule Corrientes (18) and Salta (66) were also `relative`, on one season year.
 
 ## Stress years
 
 - Entre Ríos (Paraná Delta), season year 2020 (Dec 2019 to Nov 2020): 39,311 VIIRS detections, the highest of the record; next highest 2022 with 22,422. Every month from Feb to Dec 2020 is flagged as an anomaly (above the 90th percentile of the preceding 10 years); August 2020 alone has 16,492.
-- Corrientes 2022: January (3,435 MODIS) and February (6,526 MODIS) 2022 flagged as anomalies. Corrientes is in `relative` mode, so the values are MODIS counts.
+- Corrientes 2022: January (16,292 VIIRS; 3,435 MODIS) and February (26,213 VIIRS; 6,526 MODIS) 2022 flagged as anomalies.

@@ -19,7 +19,7 @@ sources: [sources/2026-11-13-research-harmonization-validation.md, findings-gree
 | 13 Nov | Reference scale: VIIRS-equivalent. VIIRS kept as is from 2012; 2000-2011 back-cast from MODIS | MODIS ends 2026/27 and only VIIRS remains; INPE plans the same direction. GFED5NRT goes the other way. |
 | 13 Nov | Fit window rule: fit on 2012-2019 and 2012-2025; if they differ by more than the LOYO error, back-cast with 2012-2019 | MODIS 2000-2011 was observed at nominal orbits; drift starts 2020-2021 ([harmonization.md](harmonization.md)) |
 | 13 Nov | Terra-only months (Nov 2000 to Jun 2002): chained factor, (T+A)/T fitted on 2003-2011, then V/(T+A); flagged `backcast_terra` | Avoids Terra drift in the overlap |
-| 13 Nov | Fallback per region: mode `relative` when LOYO median absolute error of annual totals is above 25 %, or back-cast peak-month hit rate is worse than raw MODIS vs VIIRS | Fixed before seeing results. The 25 % threshold is our own guess, no literature anchor. |
+| 13 Nov | Fallback per region: mode `relative` when LOYO median absolute error of annual totals is above 25 %, or back-cast peak-month hit rate is worse than raw MODIS vs VIIRS | Fixed before seeing results. The 25 % threshold is our own guess, no literature anchor. Peak-hit part amended 14 Nov (below). |
 | 13 Nov | In `relative` mode: calendar and anomalies from MODIS 2000-2025 alone, VIIRS shown next to it, `harm` is null | One consistent sensor; constant factors do not change relative metrics (INPE approach) |
 | 13 Nov | Region units: administrative. Fit on NUTS2 (Greece, 13) and provinces (Argentina, 24); display also one level down (NUTS3, departments), inheriting the parent factor | NUTS3 averages about 35 MODIS detections a year, too thin for region × month × day/night strata. Argentine departments only if the web size allows. User-drawn area is nice-to-have over a 0.1° grid. |
 | 13 Nov | Stratum fallback: ≥5 MODIS detections per year and ≥30 over the fit window; region × month × day/night, then × season × day/night, then × day/night, then national × day/night; Argentina night never pooled with Greece | Giglio 2006 mask; SAMA filter |
@@ -45,10 +45,9 @@ sources: [sources/2026-11-13-research-harmonization-validation.md, findings-gree
 | 14 Nov | Season-year label = calendar year holding most of its months (start month 8-12 gives the next year) | With a December start, the Paraná Delta 2020 fires were labelled 2019 |
 | 14 Nov | Argentina provinces from the IGN WFS layer `ign:provincia` (SHAPE-ZIP), id `in1`, clipped at 56° S; web geometry simplified at 0.02° (141 kB) | Same ids as CONAE; direct file links do not exist on the IGN page |
 | 14 Nov | Country itself is a region (`GR`) fitted on national counts, shown next to NUTS2 | National LOYO error 5.4 %, a clear number for the pitch |
+| 14 Nov | Mode rule amended after seeing results: the peak-hit part triggers `relative` only when the harmonized series misses the VIIRS peak month in more than one season year more than raw MODIS (error threshold 25 % unchanged) | With 7-8 held-out season years one year moves the hit rate by 0.13-0.14; the original rule put EL51, EL61, EL64, Corrientes and Salta in `relative` on a single year while their annual errors were 4-17 %. Changed after results; say so in the pitch and README |
 
 ## Open
-
-- **Peak-hit rule is decided by one season year.** With 7-8 held-out season years, three of four Greek `relative` regions (EL51, EL61 Thessalia, EL64) flip on a single year, while their annual errors are 4-17 % ([findings-greece.md](findings-greece.md)). The rule was fixed before results; changing it now needs a team decision.
 
 - **Agent access, round 2.** Tool surface, `caveats` codes, response size caps, MCP Apps calendar widget (in or out), demo script. Draft in [agent-access.md](agent-access.md).
 - **2026 and NOAA-20 splice.** Deferred (see Made, 13 Nov). Needs a FIRMS MAP_KEY.

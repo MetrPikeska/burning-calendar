@@ -5,7 +5,7 @@ Feature freeze Sun 15 Nov 12:00. Local submission Sun 15:00, pitch 16:00 (7 min 
 
 ## Must-have
 
-- [ ] P+V Team decision: keep the peak-hit part of the mode rule? (3 of 4 Greek `relative` regions flip on one season year, see decisions.md Open)
+- [x] P+V Team decision on the peak-hit rule: relative only when more than one season year worse than raw MODIS (decisions.md)
 
 - [x] P Scaffold: pyproject (uv), TODO.md, docs/si-use.md
 - [x] P FIRMS download script, Greece CSVs in data/raw/firms/
