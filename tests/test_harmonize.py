@@ -141,12 +141,21 @@ def _toy(ratio=3.0, modis_jul=10, start=2002, end=2025, extra=()):
 
 
 def test_validation_season_window_ignores_validation_years():
-    """Audit BC3-002: the validation start month comes from MODIS up to 2011 only."""
-    from validate import validation_start_month
+    """Audit BC3-002: the validation start month comes from MODIS up to 2011 only.
 
-    base = _toy()
-    spiky = _toy(extra=[("modis", "Aqua", f"{y}-02", "D", 400) for y in (2016, 2017, 2018)])
-    assert validation_start_month(base) == validation_start_month(spiky)
+    MODIS has 10 detections a month, March 3 and November 5. Heavy March fires in 2016-2019
+    move the 2000-2025 climatological minimum to November but must not move the validation one."""
+    from harmonize import START
+    from validate import raw_start_month, validation_start_month
+
+    low = {"03": 3, "11": 5}
+    yms = pd.period_range(START, "2025-12", freq="M").strftime("%Y-%m")
+    rows = [("modis", "Aqua", ym, "D", low.get(ym[5:], 10)) for ym in yms]
+    base = monthly_counts(detections(rows))
+    spiky = monthly_counts(detections(rows + [("modis", "Aqua", f"{y}-03", "D", 60) for y in range(2016, 2020)]))
+
+    assert raw_start_month(base) == 3 and raw_start_month(spiky) == 11  # the old 2025 window moves
+    assert validation_start_month(base) == validation_start_month(spiky) == 3
 
 
 def test_zero_prediction_months_get_an_upper_bound():
