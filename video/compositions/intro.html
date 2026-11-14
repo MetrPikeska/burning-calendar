@@ -1,0 +1,141 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "IBM Plex Sans";
+      src: url("assets/fonts/IBMPlexSans-Variable.woff2") format("woff2");
+      font-weight: 100 700;
+      font-style: normal;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      font-family: "IBM Plex Sans", sans-serif;
+      background: #12100e;
+      color: #faf8f5;
+      font-variant-numeric: tabular-nums;
+    }
+    #intro-header {
+      position: absolute;
+      left: 120px;
+      top: 64px;
+      font-size: 28px;
+      font-weight: 500;
+      color: #a59c92;
+    }
+    #intro-header b {
+      color: #faf8f5;
+      font-weight: 650;
+    }
+    #intro-q {
+      position: absolute;
+      left: 120px;
+      top: 140px;
+      width: 1680px;
+      font-size: 96px;
+      font-weight: 650;
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+    }
+    #intro-q span {
+      color: #f98e09;
+    }
+    #intro-sub {
+      position: absolute;
+      left: 120px;
+      top: 290px;
+      width: 1680px;
+      font-size: 40px;
+      font-weight: 450;
+      color: #c5bbb0;
+      opacity: 0;
+    }
+    #intro-svg {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+    }
+    #intro-svg text {
+      font-family: "IBM Plex Sans", sans-serif;
+      font-variant-numeric: tabular-nums;
+    }
+    #intro-src {
+      position: absolute;
+      left: 120px;
+      bottom: 64px;
+      font-size: 28px;
+      color: #a59c92;
+    }
+  </style>
+  <div id="root" data-composition-id="intro" data-width="1920" data-height="1080">
+    <svg id="intro-svg" viewBox="0 0 1920 1080" width="1920" height="1080" data-layout-allow-overflow>
+      <g id="intro-axis"></g>
+      <rect id="intro-modis" x="0" y="520" height="64" width="0" fill="#c5bbb0" />
+      <text id="intro-modis-label" x="0" y="502" fill="#c5bbb0" font-size="32" font-weight="600" opacity="0">MODIS · Terra, Aqua</text>
+      <rect id="intro-viirs" x="0" y="680" height="64" width="0" fill="#f98e09" />
+      <path id="intro-viirs-arrow" fill="#f98e09" opacity="0" />
+      <text id="intro-viirs-label" x="0" y="662" fill="#f98e09" font-size="32" font-weight="600" opacity="0">VIIRS · S-NPP, NOAA-20, NOAA-21</text>
+      <line id="intro-mark" stroke="#faf8f5" stroke-width="3" stroke-dasharray="10 8" opacity="0" />
+      <text id="intro-mark-label" fill="#faf8f5" font-size="34" font-weight="650" text-anchor="middle" opacity="0">2027</text>
+      <text id="intro-end" fill="#faf8f5" font-size="30" font-weight="600" opacity="0">MODIS ends</text>
+    </svg>
+    <div id="intro-header">NASA Space Apps 2026 · <b>Harmonization of MODIS and VIIRS Hot Spots</b> · Team Spearow</div>
+    <div id="intro-q">How will we track fires in <span>2027</span>?</div>
+    <div id="intro-sub">MODIS, the fire record since 2000, switches off. VIIRS counts fires differently.</div>
+    <div id="intro-src">Mission end: Terra Feb 2027, Aqua Sep 2027 (NASA Science)</div>
+  </div>
+  <script>
+    (function () {
+      // Timeline 2000-2030 on x 200..1720
+      const X0 = 200, X1 = 1720, Y0 = 2000, Y1 = 2030;
+      const xOf = (y) => X0 + ((X1 - X0) * (y - Y0)) / (Y1 - Y0);
+      const NS = "http://www.w3.org/2000/svg";
+      const ax = document.getElementById("intro-axis");
+      const mk = (tag, a, t) => {
+        const e = document.createElementNS(NS, tag);
+        for (const k in a) e.setAttribute(k, a[k]);
+        if (t != null) e.textContent = t;
+        ax.appendChild(e);
+      };
+      mk("line", { x1: X0, x2: X1, y1: 800, y2: 800, stroke: "#4a443e", "stroke-width": 2 });
+      [2000, 2005, 2010, 2015, 2020, 2025, 2030].forEach((y) => {
+        mk("line", { x1: xOf(y), x2: xOf(y), y1: 800, y2: 812, stroke: "#4a443e", "stroke-width": 2 });
+        mk("text", { x: xOf(y), y: 852, "text-anchor": "middle", fill: "#a59c92", "font-size": 28 }, String(y));
+      });
+      const modisEnd = 2027 + 8 / 12; // Aqua, Sep 2027
+      const S = { m: 0, v: 0 };
+      const modis = document.getElementById("intro-modis");
+      const viirs = document.getElementById("intro-viirs");
+      const arrow = document.getElementById("intro-viirs-arrow");
+      modis.setAttribute("x", xOf(2000.83));
+      viirs.setAttribute("x", xOf(2012.05));
+      document.getElementById("intro-modis-label").setAttribute("x", xOf(2000.83));
+      document.getElementById("intro-viirs-label").setAttribute("x", xOf(2012.05));
+      const xm = xOf(2027);
+      const line = document.getElementById("intro-mark");
+      line.setAttribute("x1", xm); line.setAttribute("x2", xm);
+      line.setAttribute("y1", 470); line.setAttribute("y2", 812);
+      const ml = document.getElementById("intro-mark-label");
+      ml.setAttribute("x", xm); ml.setAttribute("y", 452);
+      const me = document.getElementById("intro-end");
+      me.setAttribute("x", xOf(modisEnd) + 18); me.setAttribute("y", 563);
+      function draw() {
+        modis.setAttribute("width", Math.max(0, (xOf(modisEnd) - xOf(2000.83)) * S.m));
+        const vx = xOf(2012.05) + (X1 - 40 - xOf(2012.05)) * S.v;
+        viirs.setAttribute("width", Math.max(0, vx - xOf(2012.05)));
+        arrow.setAttribute("d", "M" + vx + ",660 L" + (vx + 48) + ",712 L" + vx + ",764 Z");
+      }
+      const tl = gsap.timeline({ paused: true, onUpdate: draw, defaults: { immediateRender: false } });
+      tl.fromTo(S, { m: 0 }, { m: 1, duration: 1.0, ease: "power2.inOut", immediateRender: true }, 0.2);
+      tl.fromTo("#intro-modis-label", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out", immediateRender: true }, 0.3);
+      tl.fromTo(S, { v: 0 }, { v: 1, duration: 1.0, ease: "power2.inOut", immediateRender: true }, 0.6);
+      tl.fromTo("#intro-viirs-label", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out", immediateRender: true }, 0.7);
+      tl.fromTo("#intro-viirs-arrow", { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "power2.out", immediateRender: true }, 1.4);
+      tl.fromTo(["#intro-mark", "#intro-mark-label", "#intro-end"], { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power2.out", immediateRender: true }, 1.25);
+      tl.fromTo("#intro-sub", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.25, ease: "power4.out", immediateRender: true }, 1.5);
+      draw();
+      window.__timelines["intro"] = tl;
+    })();
+  </script>
+</template>

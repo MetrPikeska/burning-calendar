@@ -93,27 +93,27 @@
       </svg>
     </div>
 
-    <div id="chart-header-clip" class="clip" data-start="0" data-duration="11" data-track-index="2">
+    <div id="chart-header-clip" class="clip" data-start="0" data-duration="8" data-track-index="2">
       <div id="chart-header" class="chart-header">
         NASA Space Apps 2026 · <b>Harmonization of MODIS and VIIRS Hot Spots</b> · Team Spearow
       </div>
     </div>
 
-    <div id="chart-q-clip" class="clip" data-start="3.1" data-duration="2.4" data-track-index="3">
+    <div id="chart-q-clip" class="clip" data-start="2.1" data-duration="1.85" data-track-index="3">
       <div id="chart-q" class="chart-line">Did fires in Greece <span class="chart-jump" id="chart-q-word">triple</span> in 2012?</div>
     </div>
 
-    <div id="chart-a-clip" class="clip" data-start="5.4" data-duration="2.3" data-track-index="3">
+    <div id="chart-a-clip" class="clip" data-start="3.95" data-duration="1.95" data-track-index="3">
       <div id="chart-a" class="chart-line">
         No. The satellite changed.
         <span class="chart-sub" id="chart-a-sub">VIIRS sees <b id="chart-ratio">3.5</b>× more detections of the same fires than MODIS.</span>
       </div>
     </div>
 
-    <div id="chart-h-clip" class="clip" data-start="8" data-duration="3" data-track-index="3">
+    <div id="chart-h-clip" class="clip" data-start="5.9" data-duration="2.1" data-track-index="3">
       <div id="chart-h" class="chart-line chart-harm">
-        Harmonized: MODIS years back-cast onto the VIIRS scale
-        <span class="chart-sub">with an error range for every modelled month. The jump is gone.</span>
+        Harmonized: every year on the VIIRS scale
+        <span class="chart-sub">MODIS years back-cast with an error range. The jump is gone, the record goes on.</span>
       </div>
     </div>
   </div>
@@ -250,25 +250,25 @@
 
       const tl = gsap.timeline({ paused: true, onUpdate: render, defaults: { immediateRender: false } });
       // raw stitched record draws, pauses before 2012, steps up, continues
-      tl.fromTo(S, { u: 2 }, { u: iJump - 1, duration: 1.3, ease: "none", immediateRender: true }, 0);
-      tl.fromTo(S, { u: iJump - 1 }, { u: iJump, duration: 0.3, ease: "power2.in" }, 1.6);
-      tl.fromTo(S, { marker: 0 }, { marker: 1, duration: 0.25, ease: "power2.out" }, 1.9);
-      tl.fromTo(S, { u: iJump }, { u: n, duration: 1.1, ease: "none" }, 1.9);
+      tl.fromTo(S, { u: 2 }, { u: iJump - 1, duration: 0.95, ease: "none", immediateRender: true }, 0);
+      tl.fromTo(S, { u: iJump - 1 }, { u: iJump, duration: 0.3, ease: "power2.in" }, 1.1);
+      tl.fromTo(S, { marker: 0 }, { marker: 1, duration: 0.25, ease: "power2.out" }, 1.4);
+      tl.fromTo(S, { u: iJump }, { u: n, duration: 0.85, ease: "none" }, 1.4);
       // lines of text (baselines first)
-      tl.fromTo("#chart-q", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 3.1);
-      tl.fromTo("#chart-q", { opacity: 1 }, { opacity: 0, duration: 0.15, ease: "power3.in" }, 5.3);
-      tl.fromTo("#chart-a", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 5.4);
-      tl.fromTo("#chart-a-sub", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 5.9);
-      tl.fromTo("#chart-a", { opacity: 1 }, { opacity: 0, duration: 0.15, ease: "power3.in" }, 7.5);
+      tl.fromTo("#chart-q", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 2.1);
+      tl.fromTo("#chart-q", { opacity: 1 }, { opacity: 0, duration: 0.15, ease: "power3.in" }, 3.8);
+      tl.fromTo("#chart-a", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 3.95);
+      tl.fromTo("#chart-a-sub", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 4.3);
+      tl.fromTo("#chart-a", { opacity: 1 }, { opacity: 0, duration: 0.15, ease: "power3.in" }, 5.75);
       // rescale, grey the raw MODIS years, draw the harmonized line and band
-      tl.fromTo(S, { ymax: 10500 }, { ymax: 30000, duration: 0.8, ease: "power2.inOut" }, 7.6);
-      tl.fromTo(S, { jumpOp: 1, marker: 1 }, { jumpOp: 0, marker: 0.35, duration: 0.4, ease: "power2.out" }, 8.1);
-      tl.fromTo(S, { modisGrey: 0 }, { modisGrey: 1, duration: 0.4, ease: "power2.out" }, 8.1);
-      tl.fromTo(S, { h: 0 }, { h: iJump, duration: 1.6, ease: "none" }, 8.3);
-      tl.fromTo(S, { band: 0 }, { band: 0.16, duration: 0.6, ease: "power2.out" }, 8.3);
-      tl.fromTo("#chart-h", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 8);
-      tl.fromTo("#chart-stage", { opacity: 1 }, { opacity: 0.0, duration: 0.2, ease: "power3.in" }, 10.78);
-      tl.fromTo("#chart-h", { opacity: 1 }, { opacity: 0, duration: 0.2, ease: "power3.in" }, 10.78);
+      tl.fromTo(S, { ymax: 10500 }, { ymax: 30000, duration: 0.6, ease: "power2.inOut" }, 5.8);
+      tl.fromTo(S, { jumpOp: 1, marker: 1 }, { jumpOp: 0, marker: 0.35, duration: 0.4, ease: "power2.out" }, 6.15);
+      tl.fromTo(S, { modisGrey: 0 }, { modisGrey: 1, duration: 0.4, ease: "power2.out" }, 6.15);
+      tl.fromTo(S, { h: 0 }, { h: iJump, duration: 1.2, ease: "none" }, 6.3);
+      tl.fromTo(S, { band: 0 }, { band: 0.16, duration: 0.6, ease: "power2.out" }, 6.3);
+      tl.fromTo("#chart-h", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 5.9);
+      tl.fromTo("#chart-stage", { opacity: 1 }, { opacity: 0.0, duration: 0.2, ease: "power3.in" }, 7.78);
+      tl.fromTo("#chart-h", { opacity: 1 }, { opacity: 0, duration: 0.2, ease: "power3.in" }, 7.78);
       render();
       window.__timelines["chart"] = tl;
     })();

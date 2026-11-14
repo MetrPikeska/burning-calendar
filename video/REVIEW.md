@@ -1,4 +1,8 @@
-# Review: rough cut v4 (14 Nov 2026)
+# Review: rough cut v5 (14 Nov 2026)
+
+v5 reorders the film to Petr's storyline: question first, then fire, then MCP, then the app and the chart. 0-3.5 s `intro` "How will we track fires in 2027?" with a MODIS/VIIRS mission timeline (Terra Feb 2027, Aqua Sep 2027, NASA Science; see docs/wiki/sensors.md); 3.5-6 s Evia map; 6-10.5 s MCP ("Was it normal? Ask any AI assistant"); 10.5-16.5 s app ("The same answer on the map", media-start 2.6); 16.5-24.5 s chart, cut from 11 s to 8 s, which answers the question (harmonized record on the VIIRS scale); numbers and end card unchanged. Render `out/burning-calendar-roughcut-v5.mp4`, 30.0 s, 1920x1080, 3.5 MB. `lint`: 0 errors, same 5 fromTo warnings as v4.
+
+## v4
 
 v4 keeps the film in Greece: the app shot is re-recorded on Evia (Sterea Elláda, EL64), Aug 2021, 4,235 detections, 67x the 2011-2020 median, the same answer the MCP scene shows next ("Same question, from any AI assistant"). Argentina stays in the numbers' small print and on the end card.
 

@@ -74,13 +74,13 @@
       <path id="fires-land" fill="#2a2622" stroke="#4a443e" stroke-width="1.5" />
       <g id="fires-days"></g>
     </svg>
-    <div id="fires-text-clip" class="clip" data-start="0" data-duration="2" data-track-index="2">
+    <div id="fires-text-clip" class="clip" data-start="0" data-duration="2.5" data-track-index="2">
       <div id="fires-title">Every dot is one satellite detection<small>Greece, VIIRS 375 m, summer 2021</small></div>
       <div id="fires-date">15 Jul 2021</div>
       <div id="fires-count">0 detections</div>
       <div id="fires-src">NASA FIRMS VIIRS S-NPP, vegetation fires, static sources removed</div>
     </div>
-    <div id="fires-evia-clip" class="clip" data-start="0.85" data-duration="1.15" data-track-index="3">
+    <div id="fires-evia-clip" class="clip" data-start="1.1" data-duration="1.4" data-track-index="3">
       <div id="fires-evia">Evia</div>
     </div>
   </div>
@@ -141,8 +141,8 @@
       }
 
       const tl = gsap.timeline({ paused: true, onUpdate: draw, defaults: { immediateRender: false } });
-      tl.fromTo(S, { day: 0 }, { day: F.days - 0.01, duration: 1.75, ease: "none", immediateRender: true }, 0.05);
-      tl.fromTo("#fires-evia", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.15, ease: "power4.out", immediateRender: true }, 0.85);
+      tl.fromTo(S, { day: 0 }, { day: F.days - 0.01, duration: 2.25, ease: "none", immediateRender: true }, 0.05);
+      tl.fromTo("#fires-evia", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.15, ease: "power4.out", immediateRender: true }, 1.1);
       draw();
       window.__timelines["fires"] = tl;
     })();

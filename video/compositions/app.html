@@ -61,20 +61,20 @@
         class="clip"
         src="assets/footage/app-evia.mp4"
         data-start="0"
-        data-duration="7"
-        data-media-start="2.5"
+        data-duration="6"
+        data-media-start="2.6"
         data-track-index="1"
         muted
         playsinline
       ></video>
     </div>
-    <div id="app-card1-clip" class="clip" data-start="0.2" data-duration="3.3" data-track-index="2">
+    <div id="app-card1-clip" class="clip" data-start="0.15" data-duration="3.3" data-track-index="2">
       <div id="app-card1" class="app-card">
-        Pick a region, then a month
-        <small>burning-calendar.vercel.app · Greece, 13 regions · Argentina, 24 provinces</small>
+        The same answer on the map
+        <small>burning-calendar.vercel.app · pick a region, then a month</small>
       </div>
     </div>
-    <div id="app-card2-clip" class="clip" data-start="4.7" data-duration="2.3" data-track-index="2">
+    <div id="app-card2-clip" class="clip" data-start="4.4" data-duration="1.6" data-track-index="2">
       <div id="app-card2" class="app-card">
         Evia (Sterea Elláda), August 2021: <span id="app-times">67</span>× the August median
         <small id="app-base">median of 2010-2019 · flagged as an anomaly</small>
@@ -87,11 +87,11 @@
       document.getElementById("app-times").textContent = Math.round(E.ratio_to_median);
       document.getElementById("app-base").textContent = "median of " + E.baseline_years + " · flagged as an anomaly";
       const tl = gsap.timeline({ paused: true, defaults: { immediateRender: false } });
-      tl.fromTo("#app-card1", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 0.2);
-      tl.fromTo("#app-card1", { opacity: 1 }, { opacity: 0, duration: 0.15, ease: "power3.in" }, 3.35);
-      // punch-in on the median panel after the Aug 2020 click (cell click at ~3.7 s)
-      tl.fromTo("#app-cam", { scale: 1, x: 0, y: 0 }, { scale: 2, x: -1920, y: 0, duration: 0.8, ease: "power2.inOut" }, 4.0);
-      tl.fromTo("#app-card2", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 4.7);
+      tl.fromTo("#app-card1", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 0.15);
+      tl.fromTo("#app-card1", { opacity: 1 }, { opacity: 0, duration: 0.15, ease: "power3.in" }, 3.3);
+      // punch-in on the median panel after the Aug 2021 cell click (~3.6 s)
+      tl.fromTo("#app-cam", { scale: 1, x: 0, y: 0 }, { scale: 2, x: -1920, y: 0, duration: 0.7, ease: "power2.inOut" }, 3.75);
+      tl.fromTo("#app-card2", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 4.4);
       window.__timelines["app"] = tl;
     })();
   </script>
