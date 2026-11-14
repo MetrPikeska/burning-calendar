@@ -7,6 +7,7 @@ import {
   compareRegions,
   countryOf,
   locate,
+  rankRegions,
   regionSummary,
   regionSeries,
   searchRegions,
@@ -262,5 +263,66 @@ describe("find_region_at", () => {
     expect(s.last_season_years).toHaveLength(3);
     expect(s.last_season_years[2]).toHaveProperty("total");
     expect(s.data_url).toBe("https://burning-calendar.vercel.app/data/v1/ar/regions/30.json");
+  });
+});
+
+// burncal-ytn: area and density
+describe("area and density", () => {
+  it("exposes area_km2 and density for harmonized regions", () => {
+    const r = searchRegions([arIndex], { query: "30", limit: 1 }).regions[0];
+    expect(r.area_km2).toBeGreaterThan(75000); // Entre Ríos about 78,800 km2
+    expect(r.area_km2).toBeLessThan(82000);
+    expect(r.density_per_1000km2).toBeCloseTo((1000 * (r.annual_mean as number)) / (r.area_km2 as number), 1);
+  });
+
+  it("moves density of relative regions to density_modis_per_1000km2", () => {
+    const r = searchRegions([grIndex], { query: "EL62", limit: 1 }).regions[0];
+    expect(r.density_per_1000km2).toBeNull();
+    expect(r).toHaveProperty("density_modis_per_1000km2");
+  });
+
+  it("ranks by density only over harmonized regions", () => {
+    const entry = (ix: IndexFile, id: string) => ix.regions.find((x) => x.id === id)!;
+    const ok = compareRegions([{ country: "ar", entry: entry(arIndex, "06") }, { country: "ar", entry: entry(arIndex, "34") }],
+      "density_per_1000km2");
+    expect(ok.ranking_allowed).toBe(true);
+    expect(ok.rows[0].id).toBe("34"); // Formosa is denser than Buenos Aires
+    const mixed = compareRegions([{ country: "gr", entry: entry(grIndex, "EL62") }, { country: "gr", entry: entry(grIndex, "EL52") }],
+      "density_per_1000km2");
+    expect(mixed.ranking_allowed).toBe(false);
+  });
+});
+
+// burncal-mpw: ranking over many regions
+describe("rankRegions", () => {
+  const all = [
+    ...grIndex.regions.filter((r) => r.level !== "country").map((entry) => ({ country: "gr" as const, entry })),
+    ...arIndex.regions.filter((r) => r.level !== "country").map((entry) => ({ country: "ar" as const, entry })),
+  ];
+
+  it("ranks harmonized regions by density and lists relative ones apart", () => {
+    const r = rankRegions(all, "density_per_1000km2", { top: 5, order: "desc" });
+    expect(r.ranked).toHaveLength(5);
+    expect(r.ranked[0]).toMatchObject({ rank: 1, id: "34" }); // Formosa
+    expect(r.ranked.every((x) => x.mode === "harmonized")).toBe(true);
+    expect(r.excluded_relative.map((x) => x.id).sort()).toEqual(["02", "58", "94", "EL62"]);
+    expect(r.caveats.map((c) => c.code)).toContain("relative_mode");
+  });
+
+  it("ranks season totals for a year from region files", () => {
+    const items = ["30", "18", "14"].map((id) => ({
+      country: "ar" as const,
+      entry: arIndex.regions.find((x) => x.id === id)!,
+      region: read<RegionFile>(`ar/regions/${id}.json`),
+    }));
+    const r = rankRegions(items, "season_total", { year: 2020, top: 10, order: "desc" });
+    expect(r.ranked.map((x) => x.value)).toEqual([...r.ranked.map((x) => x.value)].sort((a, b) => (b as number) - (a as number)));
+    expect(() => rankRegions(items, "season_total", { top: 10, order: "desc" })).toThrow(/year/);
+  });
+
+  it("does not exclude relative regions for non-count metrics", () => {
+    const r = rankRegions(all, "loyo_mdape_pct", { top: 50, order: "asc" });
+    expect(r.excluded_relative).toEqual([]);
+    expect(r.ranked[0].value).toBeLessThanOrEqual(r.ranked[1].value as number);
   });
 });

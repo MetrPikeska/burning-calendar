@@ -47,6 +47,16 @@ def region_table(country: str) -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
     raise NotImplementedError(country)
 
 
+AREA_CRS = "EPSG:6933"  # WGS 84 / NSIDC EASE-Grid 2.0 Global, cylindrical equal-area
+
+
+def region_areas(polys: gpd.GeoDataFrame) -> dict[str, float]:
+    """Area in km2 per region id from the assignment polygons, in an equal-area CRS.
+    Argentina 94 includes the Malvinas, as in the IGN layer."""
+    a = polys.to_crs(AREA_CRS).area / 1e6
+    return {i: round(float(v), 1) for i, v in zip(polys["id"], a)}
+
+
 def assign(det: pd.DataFrame, polys: gpd.GeoDataFrame) -> tuple[pd.Series, dict]:
     """Region id per detection: within, then nearest within NEAREST_MAX_M, else None.
     Coordinates are deduplicated on a 0.001 deg (~100 m) grid first; the detection

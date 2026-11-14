@@ -17,7 +17,8 @@
     "years",
     "factors",
     "band",
-    "validation"
+    "validation",
+    "area_km2"
   ],
   "properties": {
     "schema_version": {
@@ -114,6 +115,10 @@
     },
     "validation": {
       "$ref": "#/$defs/validation"
+    },
+    "area_km2": {
+      "type": "number",
+      "exclusiveMinimum": 0
     }
   },
   "$defs": {

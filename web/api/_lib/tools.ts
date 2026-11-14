@@ -21,6 +21,9 @@ export interface Period {
   end: string;
 }
 
+/** Index entry plus the area fields the pipeline adds (burncal-ytn). */
+type Entry = IndexRegion & { area_km2?: number; density_per_1000km2?: number | null };
+
 type Month = MonthRecord & {
   baseline_median?: number | null;
   baseline_p90?: number | null;
@@ -35,7 +38,8 @@ export interface Caveat {
     | "outage"
     | "detections_not_fires"
     | "coverage"
-    | "out_of_coverage";
+    | "out_of_coverage"
+    | "size_bias";
   message: string;
 }
 
@@ -126,13 +130,16 @@ function outOfCoverage(what: string, period: Period): Caveat {
 
 // ---------- search_regions ----------
 
-/** annual_mean is only comparable across harmonized regions; relative regions get it as annual_mean_modis. */
-function annualMeanFields(r: IndexRegion) {
+/** annual_mean and density are only comparable across harmonized regions; relative regions get them as *_modis. */
+function annualMeanFields(r: Entry) {
+  const area_km2 = r.area_km2 ?? null;
+  const density = r.density_per_1000km2 ?? null;
   return r.mode === "harmonized"
-    ? { annual_mean: r.annual_mean, annual_mean_of: "harm" as const }
+    ? { annual_mean: r.annual_mean, annual_mean_of: "harm" as const, area_km2, density_per_1000km2: density }
     : {
         annual_mean: null, annual_mean_modis: r.annual_mean, annual_mean_of: "modis" as const,
-        caveat: "relative_mode: annual_mean_modis is a raw MODIS count, not comparable with annual_mean of harmonized regions",
+        area_km2, density_per_1000km2: null, density_modis_per_1000km2: density,
+        caveat: "relative_mode: annual_mean_modis and density_modis_per_1000km2 are raw MODIS counts, not comparable with harmonized regions",
       };
 }
 
@@ -306,10 +313,14 @@ export function anomaliesFor(region: RegionFile, year: number, period: Period) {
 
 // ---------- compare_regions ----------
 
-export type CompareMetric = "annual_mean" | "season_total" | "peak_month" | "onset" | "end" | "season_length" | "loyo_mdape_pct";
-const COUNT_METRICS: CompareMetric[] = ["annual_mean", "season_total"];
+export const COMPARE_METRICS = [
+  "annual_mean", "density_per_1000km2", "season_total", "peak_month", "onset", "end", "season_length", "loyo_mdape_pct",
+] as const;
+export type CompareMetric = (typeof COMPARE_METRICS)[number];
+/** Detection-count metrics: never ranked across modes. */
+export const COUNT_METRICS: readonly CompareMetric[] = ["annual_mean", "density_per_1000km2", "season_total"];
 
-export function compareRegions(items: { country: CountryCode; entry: IndexRegion; region?: RegionFile }[],
+export function compareRegions(items: { country: CountryCode; entry: Entry; region?: RegionFile }[],
                                metric: CompareMetric, year?: number) {
   const isCount = COUNT_METRICS.includes(metric);
   const rows = items.map(({ country, entry, region }) => {
@@ -342,6 +353,48 @@ export function compareRegions(items: { country: CountryCode; entry: IndexRegion
     if (ranking_allowed) rows.sort((a, b) => (b.value ?? -1) - (a.value ?? -1));
   }
   return { metric, year: year ?? null, ranking_allowed, rows, caveats };
+}
+
+// ---------- rank_regions ----------
+
+export const RANK_METRICS = ["annual_mean", "density_per_1000km2", "season_total", "season_length", "loyo_mdape_pct"] as const;
+export type RankMetric = (typeof RANK_METRICS)[number];
+
+/** Sorted list over many regions. Count metrics rank harmonized regions only; relative ones are listed apart. */
+export function rankRegions(items: { country: CountryCode; entry: Entry; region?: RegionFile }[], metric: RankMetric,
+                            p: { year?: number; top: number; order: "desc" | "asc" }) {
+  if (metric === "season_total" && p.year === undefined) throw new Error("season_total needs a year");
+  const isCount = COUNT_METRICS.includes(metric);
+  const value = ({ entry, region }: (typeof items)[number]): number | null =>
+    metric === "season_total"
+      ? (region?.years.find((y) => y.season_year === p.year)?.total ?? null)
+      : ((entry[metric] as number | null | undefined) ?? null);
+  const row = (it: (typeof items)[number]) => ({
+    id: it.entry.id, name: clean(it.entry.name), country: it.country.toUpperCase(), level: it.entry.level,
+    mode: it.entry.mode, view_url: viewUrl(it.country, it.entry.id),
+  });
+  const rankable = items.filter((it) => !(isCount && it.entry.mode === "relative"));
+  const sign = p.order === "desc" ? -1 : 1;
+  const ranked = rankable
+    .map((it) => ({ ...row(it), value: value(it) }))
+    .filter((r) => r.value !== null)
+    .sort((a, b) => sign * ((a.value as number) - (b.value as number)))
+    .slice(0, p.top)
+    .map((r, i) => ({ rank: i + 1, ...r }));
+  const excluded = items.filter((it) => isCount && it.entry.mode === "relative")
+    .map((it) => ({ ...row(it), value_modis: value(it) }));
+  const caveats: Caveat[] = [];
+  if (excluded.length) {
+    caveats.push({
+      code: "relative_mode",
+      message: `Not ranked: ${excluded.map((r) => r.id).join(", ")} (relative mode, raw MODIS counts on a different scale). They are listed in excluded_relative.`,
+    });
+  }
+  if (isCount) caveats.push(DETECTIONS);
+  if (metric === "annual_mean" || metric === "season_total") {
+    caveats.push({ code: "size_bias", message: "Absolute counts favour large regions; use density_per_1000km2 to compare regions of different size." });
+  }
+  return { metric, year: p.year ?? null, order: p.order, ranked, excluded_relative: excluded, caveats };
 }
 
 // ---------- find_region_at ----------
@@ -389,7 +442,7 @@ export function locate(geo: Record<CountryCode, RegionCollection>, lat: number, 
 }
 
 /** What find_region_at returns for a matched region: summary, last 3 season years, links. */
-export function regionSummary(country: CountryCode, entry: IndexRegion, region: RegionFile) {
+export function regionSummary(country: CountryCode, entry: Entry, region: RegionFile) {
   const c = region.summary;
   return {
     id: entry.id, name: clean(entry.name), country: country.toUpperCase(), level: entry.level, mode: entry.mode,

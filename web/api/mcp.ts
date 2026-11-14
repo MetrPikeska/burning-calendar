@@ -10,11 +10,14 @@ import type { RegionCollection } from "../src/lib/geo.ts";
 import {
   anomaliesFor,
   type Caveat,
+  COMPARE_METRICS,
   compareRegions,
   countryOf,
   locate,
   METHODOLOGY,
   MONTH_FIELDS,
+  RANK_METRICS,
+  rankRegions,
   type Period,
   regionSeries,
   regionSummary,
@@ -165,11 +168,11 @@ const handler = createMcpHandler(
       {
         title: "Compare regions",
         description:
-          "Compare 2 to 10 regions on one metric. Count metrics (annual_mean, season_total) are ranked only when all regions are harmonized; " +
+          "Compare 2 to 10 regions on one metric. Count metrics (annual_mean, density_per_1000km2, season_total) are ranked only when all regions are harmonized; " +
           "otherwise ranking_allowed is false and you must not rank them. season_total needs a year.",
         inputSchema: z.object({
           region_ids: z.array(regionId).min(2).max(10),
-          metric: z.enum(["annual_mean", "season_total", "peak_month", "onset", "end", "season_length", "loyo_mdape_pct"]),
+          metric: z.enum(COMPARE_METRICS),
           year: year.optional(),
         }),
         annotations: RO,
@@ -185,6 +188,41 @@ const handler = createMcpHandler(
             }),
           );
           return await ok(compareRegions(items, metric, y));
+        } catch (e) {
+          return fail(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      "rank_regions",
+      {
+        title: "Rank regions",
+        description:
+          "Rank all regions (or one country / level) by a metric, e.g. 'where were the most fires'. Prefer density_per_1000km2 " +
+          "(detections per 1000 km2 per year) over annual_mean, which favours large regions. Count metrics rank harmonized regions only; " +
+          "relative-mode regions are returned apart in excluded_relative. season_total needs a year. Country-level rows are left out unless level is 'country'.",
+        inputSchema: z.object({
+          metric: z.enum(RANK_METRICS),
+          country: z.enum(["GR", "AR"]).optional(),
+          level: z.enum(["country", "nuts2", "province"]).optional(),
+          year: year.optional(),
+          top: z.number().int().min(1).max(50).default(10),
+          order: z.enum(["desc", "asc"]).default("desc"),
+        }),
+        annotations: RO,
+      },
+      async ({ metric, country, level, year: y, top, order }) => {
+        try {
+          const items = [];
+          for (const c of ["gr", "ar"] as const) {
+            if (country && country.toLowerCase() !== c) continue;
+            for (const entry of (await loadIndex(c)).regions) {
+              if (level ? entry.level !== level : entry.level === "country") continue;
+              items.push({ country: c, entry, region: metric === "season_total" ? await loadRegion(entry.id) : undefined });
+            }
+          }
+          return await ok(rankRegions(items, metric, { year: y, top, order }));
         } catch (e) {
           return fail(e);
         }
@@ -230,7 +268,7 @@ const handler = createMcpHandler(
       async ({ topic }) => await ok({ topic, text: METHODOLOGY[topic] }),
     );
   },
-  { serverInfo: { name: "burning-calendar", version: "0.3.0" } },
+  { serverInfo: { name: "burning-calendar", version: "0.4.0" } },
 );
 
 export { handler as GET, handler as POST };

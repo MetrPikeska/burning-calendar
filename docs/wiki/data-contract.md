@@ -31,12 +31,13 @@ One region entry:
 - `mode`: `harmonized` or `relative` (criterion in [decisions.md](decisions.md))
 - climatology over the full period, months 1-12: `peak_month`, `onset`, `end`, `season_length` (months, inclusive), `season_start_month` (climatological minimum), `bimodal`
 - `annual_mean`: mean season-year total, for map colouring; `annual_mean_of`: `harm` or `modis` (in `relative` mode the mean is of MODIS counts, so do not colour both modes on one scale)
+- `area_km2`: area of the assignment polygons in EPSG:6933 (equal-area); the country entry is the sum of its regions. Argentina 94 includes the Malvinas. `density_per_1000km2`: `annual_mean` per 1000 km2 per year, on the same series as `annual_mean_of`
 - `loyo_mdape_pct`, `peak_hit_rate`, `peak_hit_rate_raw`: validation summary (LOYO annual median absolute error; peak-month hit rate of the harmonized and of raw MODIS against VIIRS)
 - `season_start_month` is the climatological minimum of the region's MODIS series (scale-free, the same in both modes)
 
 ## `regions/{id}.json`
 
-Header: `schema_version`, `generated_at`, `units`, `id`, `name`, `level`, `parent`, `mode`, `summary` (same climatology fields as the index entry), `months`, `years`, `factors`, `band`, `validation` (same object as in `validation.json`).
+Header: `schema_version`, `generated_at`, `units`, `id`, `name`, `level`, `parent`, `mode`, `area_km2`, `summary` (same climatology fields as the index entry), `months`, `years`, `factors`, `band`, `validation` (same object as in `validation.json`).
 
 Monthly record (`months`, 302 entries, Nov 2000 to Dec 2025):
 

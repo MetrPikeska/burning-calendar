@@ -16,7 +16,7 @@ from export import ROOT, export_country, write_json
 from filters import drop_static
 from harmonize import fit, monthly_counts, series
 from load import COUNTRIES, load
-from regions import assign, region_table
+from regions import assign, region_areas, region_table
 from validate import raw_start_month, validate
 
 OUTAGE_MIN_DAYS = 3
@@ -24,7 +24,7 @@ LEVEL = {"GR": "nuts2", "AR": "province"}
 
 
 def build_region(rid: str, name: str, level: str, parent: str | None, m: pd.DataFrame,
-                 national: pd.DataFrame | None, outages: pd.DataFrame) -> dict:
+                 national: pd.DataFrame | None, outages: pd.DataFrame, area_km2: float) -> dict:
     start = raw_start_month(m)
     val, band = validate(m, national, start)
     mode = val["mode"]
@@ -42,15 +42,19 @@ def build_region(rid: str, name: str, level: str, parent: str | None, m: pd.Data
     rec["outage"] = od >= OUTAGE_MIN_DAYS
     months = [{k: (None if pd.isna(v) else v) for k, v in r.items()}
               for r in rec.reset_index().to_dict("records")]
+    annual_mean = round(sum(y["total"] for y in years) / max(len(years), 1), 1)
+    density = round(1000 * annual_mean / area_km2, 2) if area_km2 > 0 else None
     entry = {"id": rid, "name": name, "level": level, "parent": parent, "mode": mode, **summary,
-             "annual_mean": round(sum(y["total"] for y in years) / max(len(years), 1), 1),
+             "annual_mean": annual_mean,
              "annual_mean_of": "harm" if mode == "harmonized" else "modis",
+             "area_km2": area_km2,
+             "density_per_1000km2": density,
              "loyo_mdape_pct": val["loyo"]["annual_mdape_pct"],
              "peak_hit_rate": val["loyo"]["season"]["harm"]["peak_hit_rate"],
              "peak_hit_rate_raw": val["loyo"]["season"]["modis_raw"]["peak_hit_rate"]}
     factors = pd.concat([F.assign(kind="viirs_over_modis", window="2012-2019"),
                          G.assign(kind="modis_over_terra", window="2003-2011")])
-    detail = {"id": rid, "name": name, "level": level, "parent": parent, "mode": mode,
+    detail = {"id": rid, "name": name, "level": level, "parent": parent, "mode": mode, "area_km2": area_km2,
               "summary": summary, "months": months, "years": years,
               "factors": factors.round(4).to_dict("records"), "band": band.to_dict("records"),
               "validation": val}
@@ -71,12 +75,14 @@ def main() -> None:
     kept["region"], assign_stats = assign(kept, polys)
     print("assignment:", assign_stats)
     outages = pd.read_csv(ROOT / "data" / "outages.csv")
+    areas = region_areas(polys)
 
     national = monthly_counts(kept)
-    out = [build_region(c, COUNTRIES[c], "country", None, national, None, outages)]
+    out = [build_region(c, COUNTRIES[c], "country", None, national, None, outages,
+                        round(sum(areas.values()), 1))]
     for _, p in polys.sort_values("id").iterrows():
         m = monthly_counts(kept[kept["region"] == p["id"]])
-        out.append(build_region(p["id"], p["name"], LEVEL[c], c, m, national, outages))
+        out.append(build_region(p["id"], p["name"], LEVEL[c], c, m, national, outages, areas[p["id"]]))
 
     for r in out:
         e = r["entry"]
