@@ -7,6 +7,7 @@ import { dataUrl, loadIndex, loadRegion } from "./lib/data.ts";
 import { parseLatLon, regionAt, type RegionCollection } from "./lib/geo.ts";
 import { parseState, serializeState, type AppState } from "./lib/url-state.ts";
 import { marksKey, renderHeatmap } from "./charts/heatmap.ts";
+import { renderContextPanel } from "./charts/context.ts";
 import { defaultMonth, renderMedianPanel } from "./charts/median.ts";
 import { rampColors } from "./charts/ramp.ts";
 import { renderValidation } from "./charts/validation.ts";
@@ -219,6 +220,7 @@ function renderPanel(): void {
     <p class="foot">${matchMedia("(pointer: coarse)").matches ? "Tap" : "Click"} a cell or use the arrows to compare another month.${series === "harm"
       ? " 2000-2011 back-cast from MODIS (range in the tooltip), 2012-2025 VIIRS observed."
       : ""}</p>
+    <section id="context" aria-live="polite"></section>
     <details class="method-details" ${methodOpen ? "open" : ""}>
       <summary>How well the harmonization holds here</summary>
       <div id="method"></div>
@@ -233,6 +235,8 @@ function renderPanel(): void {
     }, width),
   );
   $("#median").append(renderMedianPanel(region, ym, width));
+  const ctx = renderContextPanel(region, ym);
+  if (ctx) $("#context").append(ctx);
   $("#method").append(renderValidation(region, state.country, width));
   $("#chart").addEventListener("keydown", onChartKey);
   $("#month-prev").addEventListener("click", () => stepMonth(-1));

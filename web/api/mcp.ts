@@ -148,7 +148,7 @@ const handler = createMcpHandler(
           to: ym,
           aggregate: z.enum(["month", "year"]).default("month"),
           fields: z.array(z.enum(MONTH_FIELDS)).max(MONTH_FIELDS.length).optional()
-            .describe("Month record keys to return (ym is always included). Default: the series of the region's mode, src, anom, outage. days_viirs / days_modis: days of the month with at least one detection."),
+            .describe("Month record keys to return (ym is always included). Default: the series of the region's mode, src, anom, outage. days_viirs / days_modis: days of the month with at least one detection. fwi, fwi_pct, fwi_level, spei3, spei6: optional weather and drought context, present only where the data were built; context, not an explanation."),
         }),
         annotations: RO,
       },

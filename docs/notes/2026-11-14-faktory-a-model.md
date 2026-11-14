@@ -51,3 +51,13 @@ Přesné licence a podmínky použití nejsou ověřené (UNVERIFIED), pro výsl
 - Přístup do CDS vyžaduje registraci (osobní údaje a klíč), proto to zatím není hotové.
 - Příliš silné tvrzení "sucho předpovídá požáry" při 25 letech dat a jedné zemi by neobstálo u poroty. Raději "souvislost s lagem X týdnů, interval Y".
 - Rozdíl mezi počtem hotspotů a počtem požárů (greece.md, EFFIS vs hasiči) znamená, že se model neptá na stejné číslo jako oficiální statistiky.
+
+## Implementace (kontext měsíce, Greece)
+
+Rozhodnutí týmu: tři faktory (FWI, SPEI, krajina) jako **kontext vybraného měsíce**, jen Greece, zdroj Copernicus. Žádný model a žádná lag-analýza v této fázi.
+
+- `pipeline/factors.py`: agregace mřížek na regiony (buňky se středem v polygonu, jinak nejbližší buňka), měsíční FWI a percentil proti stejnému kalendářnímu měsíci (úrovně normal pod 75, elevated od 75, critical od 90), SPEI-3 a SPEI-6 (dry při -1 a méně, wet při 1 a více), podíl krajiny z CORINE. Testy: `tests/test_factors.py`.
+- `pipeline/download_factors.py`: stažení FWI přes EWDS (`cems-fire-historical-v1`, endpoint `https://ewds.climate.copernicus.eu/api`). Klíč se čte z `~/.cdsapirc`, nikdy ne z repozitáře. Klíče požadavku jsou z formuláře datasetu a označené `UNVERIFIED`. SPEIbase se ukládá ručně jako `data/raw/factors/spei03.nc` a `spei06.nc` (DOI 10.20350/digitalCSIC/16497). CORINE jako `data/raw/factors/clc_*.gpkg`.
+- `pipeline/build.py`: nová volitelná pole v měsících (`fwi`, `fwi_pct`, `fwi_level`, `spei3`, `spei6`, `spei3_level`, `spei6_level`) a blok `context` v `regions/{id}.json`. Bez vstupních souborů jsou pole `null` a aplikace blok skryje. Harmonizace a anomálie se nemění.
+- Web: panel Context (`web/src/charts/context.ts`, logika `web/src/lib/context.ts`), pole v MCP (`fields`), sloupce v CSV.
+- **Stav:** kód a testy hotové, **skutečná data nejsou stažená** (chybí EWDS klíč, SPEIbase a CORINE). Committed JSON v `web/public/data/v1/gr/` se proto nezměnil.
