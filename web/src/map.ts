@@ -10,6 +10,8 @@ import type { CountryCode, IndexFile } from "./lib/contract.ts";
 import { regionsGeojsonUrl } from "./lib/data.ts";
 import type { RegionCollection } from "./lib/geo.ts";
 import { MAP_RAMP_MAX, MAP_RAMP_MIN, NO_SCALE_GREY, rampColors } from "./charts/ramp.ts";
+import { attachAoiDraw } from "./aoi/draw.ts";
+import type { Aoi } from "./aoi/geojson.ts";
 
 const RAMP = rampColors(9, MAP_RAMP_MAX, MAP_RAMP_MIN);
 const compact = new Intl.NumberFormat("en", { notation: "compact", maximumSignificantDigits: 2 });
@@ -72,12 +74,22 @@ export interface RegionMap {
   setSelected(id: string | null): void;
   /** Marker for a user-entered point; null removes it. */
   showPoint(lonLat: [number, number] | null): void;
+  /** Draws the custom area (null removes it); fit moves the view to it. */
+  showAoi(aoi: Aoi | null, fit?: boolean): void;
+}
+
+/** What the map reports about the custom area the user draws or drops. */
+export interface AoiHandlers {
+  onAoi(aoi: Aoi): void;
+  onClear(): void;
+  onError(message: string): void;
 }
 
 export async function createRegionMap(
   container: HTMLElement,
   onSelect: (id: string) => void,
   forceLocal: boolean,
+  aoiHandlers: AoiHandlers,
 ): Promise<RegionMap> {
   const style = await pickStyle(forceLocal);
   const map = new MlMap({
@@ -140,12 +152,16 @@ export async function createRegionMap(
     paint: { "line-color": "#111", "line-width": 2.5 },
   }, beforeId);
 
+  const draw = attachAoiDraw(map, container, aoiHandlers, beforeId);
+
   map.on("click", "regions-fill", (e) => {
+    if (draw.active()) return; // the click adds a vertex of the custom area
     const id = e.features?.[0]?.properties?.id;
     if (typeof id === "string") onSelect(id);
   });
   let hovered = "";
   map.on("mousemove", "regions-fill", (e) => {
+    if (draw.active()) return;
     const id = e.features?.[0]?.properties?.id;
     map.getCanvas().style.cursor = "pointer";
     if (typeof id === "string" && id !== hovered) {
@@ -154,7 +170,7 @@ export async function createRegionMap(
     }
   });
   map.on("mouseleave", "regions-fill", () => {
-    map.getCanvas().style.cursor = "";
+    if (!draw.active()) map.getCanvas().style.cursor = "";
     hovered = "";
     map.setFilter("regions-hover", ["==", ["get", "id"], ""]);
   });
@@ -192,6 +208,11 @@ export async function createRegionMap(
       if (id === selected) return;
       selected = id;
       map.setFilter("regions-selected", ["==", ["get", "id"], selected ?? ""]);
+    },
+    showAoi(aoi, fit = false) {
+      draw.show(aoi, fit);
+      // Fade the region colours under a custom area so its outline reads as the subject.
+      map.setPaintProperty("regions-fill", "fill-opacity", aoi ? 0.28 : 0.62);
     },
     showPoint(lonLat) {
       // Move the existing marker; building a new one each Find costs a DOM rebuild.

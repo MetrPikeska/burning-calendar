@@ -13,6 +13,8 @@ import { defaultMonth, renderMedianPanel } from "./charts/median.ts";
 import { rampColors } from "./charts/ramp.ts";
 import { renderValidation } from "./charts/validation.ts";
 import { createRegionMap } from "./map.ts";
+import { aoiToGeoJson, type Aoi } from "./aoi/geojson.ts";
+import { detectionsCsv, monthsCsv, runAoi, type AoiOutcome } from "./aoi/run.ts";
 import { initAgentPanel } from "./ui/agent-panel.ts";
 
 const monthName = formatMonth("en", "short");
@@ -49,6 +51,11 @@ let loadToken = 0;
 let loading = false;
 let dimTimer: ReturnType<typeof setTimeout> | undefined;
 let regionCountry: CountryCode | null = null;
+/** The custom area shown instead of a region (null: a region is shown). */
+let aoiOutcome: AoiOutcome | null = null;
+/** Region to return to when the custom area is cleared. */
+let regionBeforeAoi: string | null = null;
+let aoiToken = 0;
 
 const DOWNLOAD_ICON = `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 13.5h11"/></svg>`;
 
@@ -167,10 +174,76 @@ function rangeBounds(): { min: string; max: string } {
   return { min: index.period.start, max: index.period.end };
 }
 
+/** Panel for a custom area that has no calendar: outside the regions, or in Argentina (no detection points). */
+function renderAoiMessage(o: Exclude<AoiOutcome, { kind: "calendar" }>): void {
+  const panel = $("#panel");
+  const head = aoiHead(o.area_km2);
+  if (o.kind === "outside") {
+    panel.innerHTML = `${head}<p class="note">Your area lies outside the ${escapeHtml(index.country_name)} regions. Draw it inside the country, or switch the country above.</p>${aoiDownloads(false)}`;
+  } else {
+    panel.innerHTML = `${head}<p class="note">The calendar for a custom area works for Greece only for now: individual detections are published for Greece, not for Argentina (4.5 million rows). The provinces your area touches:</p>
+      <ul class="aoi-regions">${o.regions.map((r) => `<li><button type="button" class="btn btn-quiet" data-region="${escapeHtml(r.id)}">${escapeHtml(r.name)} (${escapeHtml(r.id)})</button></li>`).join("")}</ul>${aoiDownloads(false)}`;
+    panel.querySelectorAll<HTMLButtonElement>("button[data-region]").forEach((b) => b.addEventListener("click", () => pickRegion(b.dataset.region!)));
+  }
+  wireAoiDownloads();
+}
+
+function aoiHead(area: number): string {
+  return `<div class="region-head"><h2>Your area <span class="region-id">about ${Math.round(area).toLocaleString("en")} km²</span></h2></div>`;
+}
+
+/** What the area holds and how its numbers are made. */
+function aoiNoteHtml(o: Extract<AoiOutcome, { kind: "calendar" }>): string {
+  const regions = o.result.regions.filter((r) => r.detections > 0)
+    .map((r) => `${escapeHtml(index.regions.find((x) => x.id === r.id)?.name ?? r.id)} (${escapeHtml(r.id)}) ${r.detections.toLocaleString("en")}`);
+  const how = o.result.file.mode === "harmonized"
+    ? "<strong>Estimate.</strong> Before Feb 2012 each detection is converted to the VIIRS scale with the factors of its NUTS2 region; those factors were validated per region, not for this area."
+    : "<strong>Raw MODIS.</strong> The area holds detections of a region in relative mode (harmonization failed validation there), so the calendar uses MODIS for the whole area, as for that region.";
+  return `<p class="note aoi-note">${how} ${o.result.detections.toLocaleString("en")} detections inside${regions.length ? `: ${regions.join(", ")}` : ""}.</p>`;
+}
+
+function aoiDownloads(calendar: boolean): string {
+  return `<div class="downloads aoi-downloads" role="group" aria-label="Downloads">
+    ${calendar ? `<button type="button" id="csv" class="btn">${DOWNLOAD_ICON}Monthly CSV${state.from || state.to ? " (range)" : ""}</button>
+    <button type="button" id="aoi-detections" class="btn btn-quiet" title="Every detection inside the area: date, time, sensor, lat/lon, FRP">${DOWNLOAD_ICON}Detections CSV</button>` : ""}
+    <button type="button" id="aoi-geojson" class="btn btn-quiet" title="The area as drawn or uploaded">${DOWNLOAD_ICON}Area GeoJSON</button>
+  </div>`;
+}
+
+function wireAoiDownloads(): void {
+  if (!aoiOutcome) return;
+  const o = aoiOutcome;
+  document.querySelector("#aoi-geojson")?.addEventListener("click", () =>
+    saveText(JSON.stringify(aoiToGeoJson(o.aoi)), "burning-calendar_gr_area.geojson", "application/geo+json"));
+  if (o.kind === "calendar") {
+    document.querySelector("#aoi-detections")?.addEventListener("click", () =>
+      saveText(detectionsCsv(o.inside), "burning-calendar_gr_area_detections.csv", "text/csv"));
+  }
+}
+
+function saveText(text: string, name: string, type: string): void {
+  const href = URL.createObjectURL(new Blob([text], { type }));
+  const a = Object.assign(document.createElement("a"), { href, download: name });
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(href), 1000);
+}
+
 function renderPanel(): void {
   const panel = $("#panel");
+  if (aoiOutcome && aoiOutcome.kind !== "calendar") {
+    renderAoiMessage(aoiOutcome);
+    return;
+  }
   if (!region) {
     panel.innerHTML = `<p class="hint">Pick a region on the map or in the list.</p>`;
+    return;
+  }
+  const aoi = aoiOutcome?.kind === "calendar" ? aoiOutcome : null;
+  if (aoi && aoi.result.detections === 0) {
+    panel.innerHTML = `${aoiHead(aoi.area_km2)}<p class="note">No active fire detections inside this area from ${index.period.start} to ${index.period.end} (after the calendar's filters).</p>${aoiDownloads(false)}`;
+    wireAoiDownloads();
     return;
   }
   const s = region.summary;
@@ -193,14 +266,16 @@ function renderPanel(): void {
         <label>To <input id="to" type="month" min="${min}" max="${max}" value="${state.to ?? ""}" /></label>
         <button type="button" id="range-clear" class="btn btn-quiet" ${hasRange ? "" : "hidden"}>Clear range</button>
       </div>`;
+  const aoiNote = aoi ? aoiNoteHtml(aoi) : "";
   panel.innerHTML = `
     <div class="region-head">
-      <h2>${escapeHtml(region.name)} <span class="region-id">${escapeHtml(region.id)}</span></h2>
+      <h2>${aoi ? `Your area <span class="region-id">about ${Math.round(aoi.area_km2).toLocaleString("en")} km²</span>` : `${escapeHtml(region.name)} <span class="region-id">${escapeHtml(region.id)}</span>`}</h2>
       <p class="headline">Critical period <strong>${monthName(s.onset - 1)} to ${monthName(s.end - 1)}</strong>,
         peak <strong>${monthName(s.peak_month - 1)}</strong>${s.bimodal ? ", two seasons" : ""}</p>
       ${seasonStrip(s.onset, s.end, s.peak_month)}
     </div>
-    ${region.mode === "relative"
+    ${aoiNote}
+    ${region.mode === "relative" && !aoi
       ? `<p class="note">Relative mode: harmonization did not pass validation here, so the calendar shows MODIS 2000-${endYear} and VIIRS as separate series.</p>`
       : ""}
     <div class="median-card">
@@ -216,11 +291,11 @@ function renderPanel(): void {
         <div class="toggle" role="group" aria-label="Series">
           ${options.map((o) => `<button type="button" data-series="${o}" aria-pressed="${o === series}">${SERIES_BUTTON[o]}</button>`).join("")}
         </div>
-        <div class="downloads" role="group" aria-label="Downloads">
+        ${aoi ? aoiDownloads(true) : `<div class="downloads" role="group" aria-label="Downloads">
           <button type="button" id="csv" class="btn">${DOWNLOAD_ICON}Download CSV${hasRange ? " (range)" : ""}</button>
           ${state.country === "gr" ? `<a id="hotspots" class="btn btn-quiet" href="${dataUrl(state.country, `detections/${encodeURIComponent(region.id)}.csv`)}" download="burning-calendar_gr_${escapeHtml(region.id)}_hotspots.csv" title="Every detection after filters: date, time, sensor, lat/lon, FRP (2000-11 to ${index.period.end})">${DOWNLOAD_ICON}Hotspots CSV</a>` : ""}
           <button type="button" id="report" class="btn btn-quiet" title="Markdown report: this month vs the median, monthly values, validation, sources, limits, citation">${DOWNLOAD_ICON}Report</button>
-        </div>
+        </div>`}
       </div>
       ${narrow ? `<details class="range-details" ${rangeOpen || hasRange ? "open" : ""}><summary>Date range${hasRange ? `: ${state.from ?? "start"} to ${state.to ?? "end"}` : ""}</summary>${rangeHtml}</details>` : rangeHtml}
     </div>
@@ -229,10 +304,11 @@ function renderPanel(): void {
     <p class="foot">${matchMedia("(pointer: coarse)").matches ? "Tap" : "Click"} a cell or use the arrows to compare another month.${series === "harm"
       ? ` Nov 2000 to Jan 2012 back-cast from MODIS (range in the tooltip), Feb 2012 to ${endYear} VIIRS observed${provisionalNote}.`
       : ""}</p>
-    <details class="method-details" ${methodOpen ? "open" : ""}>
+    ${aoi ? `<p class="foot">Method for a custom area: every detection inside it (after the calendar's filters) keeps the factors of its NUTS2 region, fitted on Feb 2012 - Dec 2019; the validation of those regions is in their own panels. Detections more than 5 km off every region's coast are not in the files and not counted.</p>`
+      : `<details class="method-details" ${methodOpen ? "open" : ""}>
       <summary>How well the harmonization holds here</summary>
       <div id="method"></div>
-    </details>`;
+    </details>`}`;
 
   const width = chartWidth();
   lastWidth = width;
@@ -243,8 +319,10 @@ function renderPanel(): void {
     }, width),
   );
   $("#median").append(renderMedianPanel(region, ym, width, series));
-  showNow(region.id);
-  $("#method").append(renderValidation(region, state.country, width));
+  if (!aoi) {
+    showNow(region.id);
+    $("#method").append(renderValidation(region, state.country, width));
+  }
   $("#chart").addEventListener("keydown", onChartKey);
   $("#month-prev").addEventListener("click", () => stepMonth(-1));
   $("#month-next").addEventListener("click", () => stepMonth(1));
@@ -281,12 +359,18 @@ function renderPanel(): void {
     renderPanel();
   });
   $("#csv").addEventListener("click", () => void downloadCsv());
-  $("#report").addEventListener("click", () => downloadReport(ym));
+  document.querySelector("#report")?.addEventListener("click", () => downloadReport(ym));
+  wireAoiDownloads();
   if (refocus) panel.querySelector<HTMLElement>(refocus)?.focus({ preventScroll: true });
 }
 
 async function downloadCsv(): Promise<void> {
   if (!region) return;
+  if (aoiOutcome?.kind === "calendar") {
+    const range = state.from || state.to ? `_${state.from ?? "start"}_${state.to ?? "end"}` : "";
+    saveText(filterCsvByRange(monthsCsv(region), state.from, state.to), `burning-calendar_gr_area${range}.csv`, "text/csv");
+    return;
+  }
   const url = dataUrl(state.country, `regions/${encodeURIComponent(region.id)}.csv`);
   const name = csvFileName(state.country, region.id, state.from, state.to);
   let href = url;
@@ -353,7 +437,43 @@ function showNow(id: string): void {
 
 // ---------- wiring ----------
 
+/** Leaves the custom area: the map drops it and the panel shows a region again. */
+function clearAoi(): void {
+  aoiToken++;
+  aoiOutcome = null;
+  regionMap.showAoi(null);
+}
+
+async function showAoi(aoi: Aoi): Promise<void> {
+  const token = ++aoiToken;
+  if (!aoiOutcome && region && region.id !== "AOI") regionBeforeAoi = region.id;
+  regionMap.showAoi(aoi, true);
+  regionMap.setSelected(null);
+  const panel = $("#panel");
+  panel.setAttribute("aria-busy", "true");
+  panel.classList.add("loading");
+  try {
+    const outcome = await runAoi(aoi, state.country, geometry, index, (id) => loadRegion(state.country, id));
+    if (token !== aoiToken) return;
+    aoiOutcome = outcome;
+    if (outcome.kind === "calendar") {
+      region = outcome.result.file;
+      regionCountry = state.country;
+    }
+    pickedYm = null;
+    renderPanel();
+  } catch {
+    if (token === aoiToken) showError("Could not load the detections for this area. Check the connection.", () => void showAoi(aoi));
+  } finally {
+    if (token === aoiToken) {
+      panel.classList.remove("loading");
+      panel.removeAttribute("aria-busy");
+    }
+  }
+}
+
 async function selectRegion(id: string): Promise<void> {
+  if (aoiOutcome) clearAoi();
   // Same region as shown (a second Find inside it, a map click on it): nothing to reload or redraw.
   if (region?.id === id && regionCountry === state.country && state.region === id && !loading) return;
   state.region = id;
@@ -410,6 +530,7 @@ async function setCountry(country: CountryCode): Promise<void> {
   $<HTMLInputElement>("#latlon").placeholder = LATLON_EXAMPLE[country];
   fillRegionSelect();
   regionMap.showPoint(null);
+  if (aoiOutcome) clearAoi();
   $("#latlon-msg").textContent = "";
   geometry = await regionMap.setCountry(country, index);
   const known = index.regions.some((r) => r.id === state.region);
@@ -423,7 +544,15 @@ function pickRegion(id: string): void {
   void selectRegion(id);
 }
 
-const regionMap = await createRegionMap($("#map"), pickRegion, forceLocalBasemap);
+const regionMap = await createRegionMap($("#map"), pickRegion, forceLocalBasemap, {
+  onAoi: (aoi) => void showAoi(aoi),
+  onClear: () => {
+    clearAoi();
+    region = null; // force a reload of the region shown before the area
+    void selectRegion(regionBeforeAoi ?? state.region ?? index.regions[0].id);
+  },
+  onError: () => {}, // the map control shows the message next to the upload button
+});
 
 document.querySelectorAll<HTMLButtonElement>("#country button").forEach((b) =>
   b.addEventListener("click", () => {

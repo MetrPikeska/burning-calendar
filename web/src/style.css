@@ -476,6 +476,81 @@ a.btn { text-decoration: none; height: var(--control-h); box-sizing: border-box;
   #map .maplibregl-ctrl-group button { width: 40px; height: 40px; }
 }
 
+/* ---------- custom area (AOI) ---------- */
+
+#map { position: relative; }
+.aoi-ctrl {
+  width: 196px;
+  padding: var(--s2);
+  font-size: var(--fs-xs);
+  background: rgb(255 255 255 / 0.95);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.08);
+}
+.aoi-ctrl .aoi-title {
+  display: flex; align-items: center; justify-content: space-between; width: 100%; height: auto;
+  padding: 0; margin-bottom: var(--s1); font-weight: 600; font-size: var(--fs-sm); border: 0; background: none;
+}
+.aoi-ctrl .aoi-title:hover { background: none; }
+.aoi-title::after { content: "▾"; color: var(--muted); font-size: var(--fs-xs); }
+.aoi-ctrl.collapsed .aoi-title::after { content: "▸"; }
+.aoi-ctrl.collapsed { width: auto; max-width: 196px; }
+.aoi-ctrl.collapsed .aoi-tools,
+.aoi-ctrl.collapsed .aoi-radius,
+.aoi-ctrl.collapsed .aoi-upload { display: none; }
+.aoi-ctrl.collapsed .aoi-title { margin-bottom: 0; }
+.aoi-ctrl.collapsed:not(.drawing) .aoi-hint { display: none; }
+.aoi-ctrl.collapsed .aoi-actions:not(:has(button:not([hidden]):not(.aoi-upload))) { display: none; }
+.aoi-tools { display: flex; }
+.aoi-ctrl button {
+  font: inherit;
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  height: 28px;
+  padding: 0 var(--s2);
+  color: var(--fg);
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  cursor: pointer;
+}
+.aoi-ctrl button:hover { background: var(--hover); }
+.aoi-tools button { flex: 1; border-radius: 0; }
+.aoi-tools button + button { margin-left: -1px; }
+.aoi-tools button:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+.aoi-tools button:last-child { border-radius: 0 var(--radius) var(--radius) 0; }
+.aoi-tools button[aria-pressed="true"] { background: var(--anomaly-strong); border-color: var(--anomaly-strong); color: #fff; position: relative; }
+.aoi-radius { display: flex; align-items: center; gap: var(--s1); margin: var(--s2) 0; color: var(--muted); }
+.aoi-radius input { width: 56px; height: 26px; padding: 0 var(--s1); font: inherit; font-size: var(--fs-xs); }
+.aoi-actions { display: flex; flex-wrap: wrap; gap: var(--s1); }
+.aoi-actions button { border-radius: var(--radius); }
+.aoi-done { background: var(--fg) !important; color: #fff !important; border-color: var(--fg) !important; }
+.aoi-hint { margin: var(--s1) 0 0; color: var(--muted); line-height: 1.35; }
+.aoi-hint:empty { display: none; }
+.aoi-drop {
+  position: absolute;
+  inset: 8px;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  color: var(--anomaly-strong);
+  background: rgb(255 255 255 / 0.82);
+  border: 2px dashed var(--anomaly-strong);
+  border-radius: var(--radius);
+  pointer-events: none;
+}
+.aoi-drop[hidden] { display: none; }
+.aoi-note { border-color: #b7cde6; background: #eef4fb; }
+.aoi-regions { list-style: none; margin: 0 0 var(--s4); padding: 0; display: flex; flex-wrap: wrap; gap: var(--s1); }
+.aoi-downloads { margin-bottom: var(--s3); }
+.controls-row .aoi-downloads { margin-bottom: 0; }
+
+@media (max-width: 900px) {
+  .aoi-ctrl { width: 172px; }
+  .aoi-ctrl.collapsed .aoi-hint { max-width: 160px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   #panel { transition: none; }
 }
