@@ -87,6 +87,9 @@ export function cleanText(s: unknown, max = 200): string {
 
 export type LiveCaveatCode =
   | "live_upstream"
+  | "ratio_unavailable"
+  | "low_baseline"
+  | "association_not_cause"
   | "provisional"
   | "not_configured"
   | "upstream_error"

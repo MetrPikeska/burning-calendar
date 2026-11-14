@@ -4,6 +4,7 @@ import {
   addDays, fetchUpstream, type LiveCaveat, round, type SourceInfo, today, UpstreamError, upstreamError,
 } from "./core.ts";
 import { inFeatures, type LiveRegion, loadRegionFile } from "./regions.ts";
+import { SMALL_COUNT } from "../tools.ts";
 
 export const FIRMS: SourceInfo = {
   name: "NASA FIRMS near-real-time active fires (VIIRS NOAA-20, VIIRS NOAA-21, MODIS), LANCE",
@@ -138,8 +139,19 @@ export async function recentDetections(region: LiveRegion, days: number, env: No
 
   const regionFile = await loadRegionFile(region.country, region.id).catch(() => null);
   const base = regionFile ? monthBaseline(regionFile.months, Number(now.slice(5, 7))) : null;
-  const fullDays = days > 1 ? days - 1 : 1; // leave out today (incomplete) when there are other days
-  const n20 = [...byDay.entries()].filter(([d]) => days === 1 || d < now).reduce((a, [, v]) => a + v.viirs_noaa20, 0);
+  // Rates use full days only: today is incomplete. A failed source has no rate (null), never 0.
+  const full = [...byDay.entries()].filter(([d]) => d < now);
+  const rate = (src: NrtSource) =>
+    !full.length || failed.includes(src) ? null : round(full.reduce((a, [, v]) => a + v[SENSOR[src]], 0) / full.length, 2);
+  const n20 = rate("VIIRS_NOAA20_NRT");
+  const noRatio = failed.includes("VIIRS_NOAA20_NRT")
+    ? "the VIIRS NOAA-20 NRT source failed, so its rate is unknown (not 0)"
+    : !full.length ? "the window has no full day (today is incomplete); ask for days of 2 or more" : null;
+  const lowBase = base !== null && base.median_month_total < SMALL_COUNT;
+  if (base && noRatio) caveats.push({ code: "ratio_unavailable", message: `No NRT-to-baseline ratio: ${noRatio}.` });
+  else if (base && lowBase) {
+    caveats.push({ code: "low_baseline", message: `The baseline month has a median of ${base.median_month_total} detections (under ${SMALL_COUNT}), so a ratio would swing with a single fire; ratio_to_median_per_day is null. Compare the per-day counts instead.` });
+  }
 
   const byRegion = isCountry
     ? Object.entries(unique.reduce<Record<string, number>>((a, h) => ((a[h.region_id!] = (a[h.region_id!] ?? 0) + 1), a), {}))
@@ -157,9 +169,16 @@ export async function recentDetections(region: LiveRegion, days: number, env: No
     calendar_context: base && {
       ...base,
       series: "viirs (S-NPP observed, after the calendar's type and static-source filters)",
-      nrt_viirs_noaa20_per_day: round(n20 / fullDays, 2),
-      ratio_to_median_per_day: base.median_per_day ? round(n20 / fullDays / base.median_per_day, 2) : null,
-      note: "NOAA-20 per day over the full days of the window (today left out) against the median daily rate of the same calendar month in the calendar's last 10 years. Order of magnitude only (nrt_not_harmonized).",
+      full_days: full.length,
+      per_sensor_per_day: { viirs_noaa20: n20, viirs_noaa21: rate("VIIRS_NOAA21_NRT"), modis: rate("MODIS_NRT") },
+      nrt_viirs_noaa20_per_day: noRatio ? null : n20,
+      ratio_to_median_per_day: noRatio || lowBase || !base.median_per_day || n20 === null ? null : round(n20 / base.median_per_day, 2),
+      comparison: {
+        nrt: "VIIRS NOAA-20, near real-time, unfiltered (static sources and flares stay in), per full day",
+        baseline: `VIIRS S-NPP, standard processing, type and static-source filters, median of the same month ${base.years}`,
+        ratio_uses: "NOAA-20 against S-NPP only; NOAA-21 and MODIS rates are context and never enter the ratio",
+      },
+      note: "Rates are per full day of the window (today left out). A null rate means the source failed or there was no full day, not zero detections. Order of magnitude only (nrt_not_harmonized).",
     },
     top_hotspots: unique.sort((a, b) => (b.frp_mw ?? 0) - (a.frp_mw ?? 0)).slice(0, 10)
       .map((h) => ({ ...h, lat: round(h.lat, 4)!, lon: round(h.lon, 4)! })),

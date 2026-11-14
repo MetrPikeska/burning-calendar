@@ -81,7 +81,43 @@ describe("recentDetections", () => {
       { date: "2026-11-14", viirs_noaa20: 1, viirs_noaa21: 0, modis: 0 },
     ]);
     expect(r.top_hotspots[0]).toMatchObject({ frp_mw: 40, region_id: "EL64" });
-    expect(r.calendar_context).toMatchObject({ month: 11, nrt_viirs_noaa20_per_day: 1 });
+    expect(r.calendar_context).toMatchObject({
+      month: 11, full_days: 1, nrt_viirs_noaa20_per_day: 1, median_month_total: 36.5,
+      per_sensor_per_day: { viirs_noaa20: 1, viirs_noaa21: 0, modis: 1 },
+      ratio_to_median_per_day: 0.82, // 1 per day against 36.5 / 30
+    });
+    expect(r.calendar_context!.comparison.ratio_uses).toMatch(/NOAA-20 against S-NPP only/);
+  });
+
+  const failNoaa20 = async (u: URL) =>
+    u.pathname.includes("/VIIRS_NOAA20_NRT/") ? new Response("busy", { status: 503 })
+      : new Response(u.pathname.includes("/MODIS_NRT/") ? MODIS : VIIRS.split("\n")[0], { status: 200 });
+
+  it("gives a null rate and ratio, not 0, when the NOAA-20 source fails", async () => {
+    fetchMock.mockImplementation(failNoaa20);
+    const r = (await recentDetections(await resolveRegion("EL64"), 2, { FIRMS_MAP_KEY: KEY })) as Configured;
+    expect(r.sources_failed).toEqual(["VIIRS_NOAA20_NRT"]);
+    expect(r.calendar_context).toMatchObject({
+      nrt_viirs_noaa20_per_day: null, ratio_to_median_per_day: null,
+      per_sensor_per_day: { viirs_noaa20: null, viirs_noaa21: 0, modis: 1 },
+    });
+    expect(r.caveats.find((c) => c.code === "ratio_unavailable")?.message).toMatch(/NOAA-20 NRT source failed/);
+  });
+
+  it("gives no ratio for a one-day window, since today is incomplete", async () => {
+    fetchMock.mockImplementation(async (u: URL) => new Response(u.pathname.includes("/VIIRS_NOAA20_NRT/") ? VIIRS : VIIRS.split("\n")[0], { status: 200 }));
+    const r = (await recentDetections(await resolveRegion("EL64"), 1, { FIRMS_MAP_KEY: KEY })) as Configured;
+    expect(r.totals.viirs_noaa20).toBe(1);
+    expect(r.calendar_context).toMatchObject({ full_days: 0, nrt_viirs_noaa20_per_day: null, ratio_to_median_per_day: null });
+    expect(r.caveats.find((c) => c.code === "ratio_unavailable")?.message).toMatch(/no full day/);
+  });
+
+  it("drops the ratio on a baseline month under 20 detections (EL30 November median 6.5)", async () => {
+    fetchMock.mockImplementation(async (u: URL) => new Response(u.pathname.includes("/VIIRS_NOAA20_NRT/") ? VIIRS : VIIRS.split("\n")[0], { status: 200 }));
+    const r = (await recentDetections(await resolveRegion("EL30"), 2, { FIRMS_MAP_KEY: KEY })) as Configured;
+    expect(r.calendar_context).toMatchObject({ median_month_total: 6.5, nrt_viirs_noaa20_per_day: 0, ratio_to_median_per_day: null });
+    expect(r.caveats.map((c) => c.code)).toContain("low_baseline");
+    expect(r.caveats.map((c) => c.code)).not.toContain("ratio_unavailable");
   });
 
   it("masks the key in upstream errors", async () => {

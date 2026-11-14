@@ -15,7 +15,11 @@ export interface RecentBody {
   total: number;
   totals: Record<string, number>;
   sources_failed?: string[];
-  calendar_context: { month: number; years: string; median_per_day: number | null; nrt_viirs_noaa20_per_day: number | null; ratio_to_median_per_day: number | null } | null;
+  calendar_context: {
+    month: number; years: string; median_per_day: number | null; full_days: number;
+    per_sensor_per_day: { viirs_noaa20: number | null; viirs_noaa21: number | null; modis: number | null };
+    nrt_viirs_noaa20_per_day: number | null; ratio_to_median_per_day: number | null;
+  } | null;
   fetched_at: string;
   caveats: string[];
 }
@@ -40,7 +44,9 @@ export async function recentFor(id: string, env: NodeJS.ProcessEnv = process.env
     totals,
     ...("sources_failed" in d && d.sources_failed ? { sources_failed: d.sources_failed } : {}),
     calendar_context: ctx
-      ? { month: ctx.month, years: ctx.years, median_per_day: ctx.median_per_day, nrt_viirs_noaa20_per_day: ctx.nrt_viirs_noaa20_per_day, ratio_to_median_per_day: ctx.ratio_to_median_per_day }
+      ? { month: ctx.month, years: ctx.years, median_per_day: ctx.median_per_day, full_days: ctx.full_days,
+          per_sensor_per_day: ctx.per_sensor_per_day, nrt_viirs_noaa20_per_day: ctx.nrt_viirs_noaa20_per_day,
+          ratio_to_median_per_day: ctx.ratio_to_median_per_day }
       : null,
     fetched_at: new Date().toISOString(),
     caveats: d.caveats.map((c) => c.code),
