@@ -73,7 +73,7 @@ Test A reproduced exactly: EL52 2024 flags May-Aug, Aug 2024 = 208, median 19, r
 
 - FIRMS key is read only in the function (`process.env.FIRMS_MAP_KEY`); not present in `web/src` or `web/dist`. Responses contain no key.
 - Live fetches use code-built URLs on a fixed host allowlist; no user URL reaches `fetch` (no SSRF path). Inputs are zod-validated with regex region ids, bounded `days` (1-10), windows (31 / 62 days), `limit` (50).
-- Origin check runs in report-only mode (`MCP_ORIGIN_ENFORCE` unset). No rate limit: the WAF rule is written down as a proposal, not applied (bead burncal-0km). A burst of `get_recent_detections` calls spends the FIRMS MAP_KEY quota (5,000 transactions per 10 min per key). The per-instance cache only helps within one warm instance.
+- Origin check runs in report-only mode (`MCP_ORIGIN_ENFORCE` unset). Rate limit: a Vercel Firewall rule `Rate limit MCP` on `/api/mcp` (600 requests per 60 s per IP) exists with action Log only, publish not checked (log.md 14 Nov). The new `/api/recent` (15 Nov) is not covered by that rule. A burst of `get_recent_detections` calls spends the FIRMS MAP_KEY quota (5,000 transactions per 10 min per key). The per-instance cache only helps within one warm instance.
 
 ## Performance
 
