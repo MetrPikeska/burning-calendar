@@ -186,3 +186,37 @@ describe("baseline_kind", () => {
     expect(baselineKind("2012-03", null)).toBeNull();
   });
 });
+
+describe("audit round 3 checks", () => {
+  it("a country's total can exceed the sum of its regions, and the answer says why (BC3-007)", () => {
+    const yr = (id: string) => (regionSeries(region(country(id), id), { from: "2021-01", to: "2021-12", aggregate: "year" }, period).records as { viirs?: number }[])[0].viirs!;
+    const gr = yr("GR");
+    const parts = all("gr").filter((id) => id !== "GR").reduce((a, id) => a + yr(id), 0);
+    expect(gr - parts).toBeGreaterThanOrEqual(0);
+    expect(gr - parts).toBeLessThan(10);
+    const agg = aggregate([region("gr", "GR")], { from: "2021-01", to: "2021-12", top: 1 }, period);
+    expect(agg.caveats.map((c) => c.code)).toContain("country_unassigned");
+    const cmp = compareRegions([item("GR"), item("EL64")], "year_total", 2021);
+    expect(cmp.caveats.map((c) => c.code)).toContain("country_unassigned");
+    expect(compareRegions([item("EL52"), item("EL64")], "year_total", 2021).caveats.map((c) => c.code)).not.toContain("country_unassigned");
+  });
+
+  it("get_validation carries the ablation, the band coverage and the validation season window", () => {
+    const v = validationFor(region("gr", "GR")) as unknown as Record<string, unknown> & { baselines: { constant_ratio: { k: number; time_split_mdape_pct: number } }; band_coverage: { pct: number; n: number } };
+    expect(v.baselines.constant_ratio.k).toBeCloseTo(3.5, 1);
+    expect(v.baselines.constant_ratio.time_split_mdape_pct).toBe(6.0); // the audit's own recomputation
+    expect(v.band_coverage.n).toBe(72);
+    expect(typeof v.season_start_month_validation).toBe("number");
+    const el64 = validationFor(region("gr", "EL64")) as unknown as { baselines: { constant_ratio: { k: number } } };
+    expect(el64.baselines.constant_ratio.k).toBeCloseTo(2.48, 2);
+  });
+
+  it("back-cast months with a zero estimate keep an upper bound (BC3-004)", () => {
+    const zero = ["gr", "ar"].flatMap((c) => all(c as CountryCode).map((id) => region(c as CountryCode, id)))
+      .filter((r) => r.mode === "harmonized")
+      .flatMap((r) => r.months.filter((m) => m.src !== "observed" && m.harm === 0));
+    expect(zero.length).toBeGreaterThan(0);
+    expect(zero.every((m) => m.harm_hi !== null && m.harm_hi >= 0)).toBe(true);
+    expect(zero.some((m) => (m.harm_hi ?? 0) > 0)).toBe(true);
+  });
+});

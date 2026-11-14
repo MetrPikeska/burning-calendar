@@ -116,6 +116,10 @@ export function registerLiveTools(server: Server) {
         if (f < "1940-01-01") throw new InputProblem("from must be 1940-01-01 or later.");
         let r: LiveRegion | null = null;
         let point: { lat: number; lon: number };
+        if (region_id && (lat !== undefined || lon !== undefined)) {
+          // Both a region and coordinates: refuse instead of silently using one of them (audit P2-01).
+          throw new InputProblem("Give region_id or lat and lon, not both: the region's point and the coordinates may differ.");
+        }
         if (region_id) {
           r = await region(region_id);
           point = r.point;

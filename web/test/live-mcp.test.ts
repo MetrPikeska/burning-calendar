@@ -55,6 +55,13 @@ describe("live tools over MCP", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it("reject region_id together with lat/lon in get_fire_weather (audit P2-01)", async () => {
+    const r = await rpc("tools/call", { name: "get_fire_weather", arguments: { region_id: "EL64", lat: 0, lon: 0 } });
+    expect(r.isError).toBe(true);
+    expect(r.content[0].text).toMatch(/not both/);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("reject a region of the other country in get_fire_alerts (audit R2-003)", async () => {
     const r = await rpc("tools/call", { name: "get_fire_alerts", arguments: { country: "AR", region_id: "EL52" } });
     expect(r.isError).toBe(true);

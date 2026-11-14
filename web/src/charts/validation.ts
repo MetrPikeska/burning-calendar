@@ -27,6 +27,21 @@ function errRows(v: RegionValidation): { rows: ErrRow[]; loyoKind: string; testK
   return { rows: rows.sort((a, b) => a.year - b.year), loyoKind, testKind };
 }
 
+/** Ablation and band coverage in plain words (audit BC3-004, BC3-006); empty for data built before them. */
+export function checksText(v: RegionValidation): string {
+  const b = v.baselines;
+  const c = v.band_coverage;
+  const parts: string[] = [];
+  if (b?.constant_ratio && b.full_model && b.constant_ratio.time_split_mdape_pct != null && b.full_model.time_split_mdape_pct != null) {
+    const ours = b.full_model.time_split_mdape_pct, simple = b.constant_ratio.time_split_mdape_pct;
+    parts.push(`A single constant VIIRS/MODIS ratio (${b.constant_ratio.k}) gives ${pct(simple)} on the same held-out years (ours ${pct(ours)})${simple < ours ? ", so here the month and day/night factors do not beat it" : ""}.`);
+  }
+  if (c?.pct != null) {
+    parts.push(`The back-cast range held the observed VIIRS count in ${pct(c.pct)} of ${c.n} held-out months (nominal ${c.nominal_pct} %).`);
+  }
+  return parts.length ? `<p class="hint">${parts.join(" ")}</p>` : "";
+}
+
 export function renderValidation(region: RegionFile, country: CountryCode, width = 520): HTMLElement {
   const el = document.createElement("section");
   el.className = "method";
@@ -58,7 +73,8 @@ export function renderValidation(region: RegionFile, country: CountryCode, width
     <h3>How well the harmonization holds here</h3>
     <p>${verdict} Leave-one-year-out on ${loyo.years[0]}-${loyo.years[loyo.years.length - 1]}: median annual error
       <strong>${pct(loyo.annual_mdape_pct)}</strong> (limit ${MDAPE_LIMIT} %)${r != null ? `, monthly correlation ${r.toFixed(2)}` : ""}.
-      ${ts ? `Held-out years ${ts.test}: <strong>${pct(ts.annual_mdape_pct)}</strong>.` : ""}${peak}</p>`;
+      ${ts ? `Held-out years ${ts.test}: <strong>${pct(ts.annual_mdape_pct)}</strong>.` : ""}${peak}</p>
+    ${checksText(v)}`;
 
   const { rows, loyoKind, testKind } = errRows(v);
   if (rows.length) {

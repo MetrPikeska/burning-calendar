@@ -90,6 +90,26 @@ describe("show_calendar data", () => {
     expect(JSON.stringify(v)).not.toMatch(/"anomaly_months"|"anom"/);
   });
 
+  it("VIIRS before 2012: no value, a series caveat, totals of the shown series only (audit BC3-005)", () => {
+    const v = calendarData(el64, { from: "2003-01", to: "2003-02", series: "viirs" }, period);
+    expect(v.months.every((m) => m.v === null && m.src === "no_data")).toBe(true);
+    expect(v.totals).toEqual([{ year: 2003, series: "viirs", n_months: 2, partial: true, n_values: 0, total: null }]);
+    expect(v.backcast_months).toBe(0);
+    expect(v.caveats.find((c) => c.code === "series_not_available")?.message).toMatch(/20 Jan 2012/);
+    for (const [from, to, series] of [["2011-11", "2012-03", "viirs"], ["2003-01", "2003-02", "modis"], ["2012-01", "2012-02", "harm"]] as const) {
+      const d = calendarData(el64, { from, to, series }, period);
+      for (const t of d.totals) {
+        const cells = d.months.filter((m) => m.ym.startsWith(String(t.year)));
+        const vals = cells.map((m) => m.v).filter((x): x is number => x !== null);
+        expect(t.n_values).toBe(vals.length);
+        if (vals.length) expect(t.total).toBeCloseTo(vals.reduce((a, b) => a + b, 0), 0);
+        expect(Object.keys(t)).not.toContain("modis" === series ? "harm" : "modis");
+      }
+      if (series !== "viirs") expect(d.caveats.map((c) => c.code)).not.toContain("series_not_available");
+      if (series === "harm") expect(d.backcast_months).toBe(d.months.filter((m) => m.src !== "observed").length);
+    }
+  });
+
   it("strips control, bidi and zero-width characters from names", () => {
     expect(safeText("Ke\u0000ntr‮iki​ Ellada\u0085", 80)).toBe("Kentriki Ellada");
     expect(safeText("x".repeat(200))).toHaveLength(80);

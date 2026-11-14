@@ -141,3 +141,13 @@ describe("Now line", async () => {
     expect(failed).not.toContain("/day,");
   });
 });
+
+describe("validation panel checks (audit BC3-004, BC3-006)", async () => {
+  const { checksText } = await import("../src/charts/validation.ts");
+  it("says when the constant ratio beats the full model, and gives the band coverage", () => {
+    const t = checksText({ baselines: { constant_ratio: { k: 3.5, loyo_mdape_pct: 7.1, time_split_mdape_pct: 6.0 }, month_ratio: { loyo_mdape_pct: 5.3, time_split_mdape_pct: 7.6 }, full_model: { loyo_mdape_pct: 5.4, time_split_mdape_pct: 7.1 } }, band_coverage: { nominal_pct: 80, pct: 59.7, n: 72 } });
+    expect(t).toContain("gives 6.0 % on the same held-out years (ours 7.1 %), so here the month and day/night factors do not beat it");
+    expect(t).toContain("59.7 % of 72 held-out months (nominal 80 %)");
+    expect(checksText({})).toBe("");
+  });
+});

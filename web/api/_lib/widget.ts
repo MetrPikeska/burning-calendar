@@ -41,7 +41,8 @@ function cell(m: MonthRecord, series: Series, mode: RegionFile["mode"], showAnom
     ym: m.ym,
     v,
     ...(backcast ? { lo: r1(m.harm_lo), hi: r1(m.harm_hi) } : {}),
-    src: m.src,
+    // src describes the value shown: raw MODIS / VIIRS counts are observed or missing, never "backcast" (audit BC3-005).
+    src: series === "harm" ? m.src : v === null ? "no_data" : "observed",
     ...(showAnom && m.anom ? { anom: true } : {}),
     ...(outage ? { outage } : {}),
   };
@@ -85,11 +86,27 @@ export function calendarData(region: RegionFile, p: { from?: string; to?: string
   const cells = months.map((m) => cell(m, series, region.mode, showAnom));
   const values = cells.map((c) => c.v).filter((v): v is number => v !== null);
   const explicit = p.from !== undefined || p.to !== undefined;
-  // Calendar-year totals carry anomaly_months of the region's own series; drop them with the cell flags (audit R2-001).
-  const totals = showAnom ? records : (records as Record<string, unknown>[]).map(({ anomaly_months: _a, ...t }) => t);
+  // Calendar-year totals of the series shown only (audit BC3-005: harm and modis totals next to empty VIIRS cells
+  // read as VIIRS); anomaly_months only on the region's own series (audit R2-001).
+  const byYear = new Map<number, typeof cells>();
+  for (const c of cells) byYear.set(Number(c.ym.slice(0, 4)), [...(byYear.get(Number(c.ym.slice(0, 4))) ?? []), c]);
+  const anomByYear = new Map((records as { year: number; anomaly_months?: string[] }[]).map((r) => [r.year, r.anomaly_months]));
+  const totals = [...byYear.entries()].map(([year, cs]) => {
+    const vals = cs.map((c) => c.v).filter((v): v is number => v !== null);
+    return {
+      year, series, n_months: cs.length, partial: cs.length < 12, n_values: vals.length,
+      total: vals.length ? r1(vals.reduce((a, b) => a + b, 0)) : null,
+      ...(series === "harm" ? { backcast_months: cs.filter((c) => c.src !== "observed").length } : {}),
+      ...(showAnom ? { anomaly_months: anomByYear.get(year) ?? [] } : {}),
+    };
+  });
+  const missing = cells.filter((c) => c.v === null).map((c) => c.ym);
+  const seriesGap: Caveat[] = series === "viirs" && missing.length
+    ? [{ code: "series_not_available", message: `VIIRS S-NPP starts on 20 Jan 2012: ${missing.length} month(s) (${missing[0]} to ${missing[missing.length - 1]}) have no VIIRS value (v null, total null), which is not zero detections. For those years use series "harm" (VIIRS-equivalent estimate) or "modis".` }]
+    : [];
   return {
     ...rest,
-    caveats: caveatsForSeries(rest.caveats, cells, series, anomalySeries),
+    caveats: [...caveatsForSeries(rest.caveats, cells, series, anomalySeries), ...seriesGap],
     name: safeText(region.name),
     unit: `${SCALE[series]} per month`,
     series,
