@@ -22,6 +22,10 @@
     "api/mcp.ts": {
       "includeFiles": "public/data/**",
       "maxDuration": 10
+    },
+    "api/recent.ts": {
+      "includeFiles": "public/data/**",
+      "maxDuration": 10
     }
   }
 }
