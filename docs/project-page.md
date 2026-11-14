@@ -12,7 +12,7 @@ Burning Calendar joins 25 years of NASA fire detections into one consistent reco
 
 ## Link to Project Demo
 
-TODO: slides PDF or 30 s video link (no password, permission or registration).
+TODO: public link to the slides PDF (at most 7 slides incl. title; no password, permission or registration).
 
 ## Link to Final Project
 
