@@ -1,6 +1,6 @@
 // Year x month burning calendar with Observable Plot.
 import * as Plot from "@observablehq/plot";
-import type { MonthRecord, RegionFile, Series } from "../lib/contract.ts";
+import { outageNote, type MonthRecord, type RegionFile, type Series } from "../lib/contract.ts";
 import { COLOR_SCHEME, NO_SCALE_GREY, countTick, rampLegend } from "./ramp.ts";
 
 export { COLOR_SCHEME };
@@ -46,7 +46,9 @@ function title(c: Cell, series: Series): string {
   lines.push(`MODIS ${fmt(r.modis)}  VIIRS ${fmt(r.viirs)}`);
   if (r.anom_pct != null) lines.push(`percentile vs preceding 10 years: ${Math.round(r.anom_pct)}`);
   if (r.anom) lines.push("ANOMALY: above the baseline 90th percentile");
-  if (showsOutage(c, series)) lines.push(`known MODIS outage: ${r.outage_days} days`);
+  const gap = cellOutage(c, series);
+  if (gap) lines.push(gap);
+  if (r.provisional) lines.push("provisional: near real-time data, may change");
   return lines.join("\n");
 }
 
@@ -59,10 +61,12 @@ function inRange(ym: string, r: Range): boolean {
   return (!r.from || ym >= r.from) && (!r.to || ym <= r.to);
 }
 
-/** The outage cross only where the shown series depends on MODIS (data/outages.csv lists Aqua only). */
-function showsOutage(c: Cell, series: Series): boolean {
-  return !!c.rec.outage && (series === "modis" || (series === "harm" && c.rec.src !== "observed"));
+/** The known gap of the satellite behind the shown value: VIIRS for observed VIIRS, MODIS otherwise. */
+function cellOutage(c: Cell, series: Series): string | null {
+  return outageNote(c.rec, series === "viirs" || (series === "harm" && c.rec.src === "observed"));
 }
+
+const showsOutage = (c: Cell, series: Series) => cellOutage(c, series) !== null;
 
 /**
  * Colour legend + calendar, `width` px wide. Cells outside `range` are dimmed, not removed,
@@ -119,7 +123,7 @@ export function renderHeatmap(
       Plot.cell(cells.filter((c) => c.rec.anom && inRange(c.rec.ym, range)), {
         x: "month", y: "year", fill: null, stroke: ANOMALY_STROKE, strokeWidth: 1.5, inset: 1.5,
       }),
-      // Known MODIS outages: a cross with a white halo, readable on every ramp colour.
+      // Known satellite outages: a cross with a white halo, readable on every ramp colour.
       Plot.text(cells.filter((c) => showsOutage(c, series)), {
         x: "month", y: "year", text: () => "×", fill: OUTAGE_FILL, stroke: "white", strokeWidth: 3, paintOrder: "stroke", fontSize: 13, fontWeight: 600,
       }),
@@ -177,7 +181,7 @@ const swatch = (inner: string) =>
   `<svg width="${SW}" height="${SW}" viewBox="0 0 ${SW} ${SW}" aria-hidden="true">${inner}</svg>`;
 
 /** Key for the calendar marks; items appear only when they can occur for this view. */
-export function marksKey(series: Series, hasRange: boolean): string {
+export function marksKey(hasRange: boolean): string {
   const pale = "#fbe7a6";
   const items: [string, string][] = [
     [swatch(`<rect x="1" y="1" width="12" height="12" fill="#c33b4c"/><rect x="2.25" y="2.25" width="9.5" height="9.5" fill="none" stroke="${ANOMALY_STROKE}" stroke-width="1.5"/>`),
@@ -185,10 +189,8 @@ export function marksKey(series: Series, hasRange: boolean): string {
     [swatch(`<rect x="1" y="1" width="12" height="12" fill="${pale}"/><rect x="1.25" y="1.25" width="11.5" height="11.5" fill="none" stroke="${RING_OUTER}" stroke-width="2.5"/><rect x="3.4" y="3.4" width="7.2" height="7.2" fill="none" stroke="${RING_INNER}" stroke-width="1.5"/>`),
       "Month compared with its median"],
   ];
-  if (series !== "viirs") {
-    items.push([swatch(`<rect x="1" y="1" width="12" height="12" fill="${pale}"/><text x="7" y="11" text-anchor="middle" font-size="12" font-weight="600" fill="${OUTAGE_FILL}">×</text>`),
-      "Known MODIS outage"]);
-  }
+  items.push([swatch(`<rect x="1" y="1" width="12" height="12" fill="${pale}"/><text x="7" y="11" text-anchor="middle" font-size="12" font-weight="600" fill="${OUTAGE_FILL}">×</text>`),
+    "Known satellite outage"]);
   items.push([swatch(`<rect x="1" y="1" width="12" height="12" fill="${NO_SCALE_GREY}"/>`), "No value"]);
   if (hasRange) items.push([swatch(`<rect x="1" y="1" width="12" height="12" fill="#c33b4c" opacity="0.16"/>`), "Outside the date range"]);
   return `<ul class="key">${items.map(([s, t]) => `<li>${s}<span>${t}</span></li>`).join("")}</ul>`;

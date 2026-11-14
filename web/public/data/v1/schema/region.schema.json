@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Burning calendar region detail (data/v1/{country}/regions/{id}.json)",
-  "description": "Monthly series Nov 2000 to Dec 2025, per-season-year metrics, fitted factors, uncertainty band and validation for one region. Field meanings: docs/wiki/data-contract.md.",
+  "description": "Monthly series Nov 2000 to Oct 2026 (Jan-Oct 2026 from the FIRMS area API, NRT months provisional), per-season-year metrics, fitted factors, uncertainty band and validation for one region. Field meanings: docs/wiki/data-contract.md.",
   "type": "object",
   "required": [
     "schema_version",
@@ -256,6 +256,20 @@
           "minimum": 0,
           "maximum": 31,
           "description": "Days of the month with at least one VIIRS detection after filters; null before 2012"
+        },
+        "outage_days_viirs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 31,
+          "description": "Days of the month covered by a known VIIRS S-NPP gap in data/outages.csv (outage_days counts MODIS gaps)"
+        },
+        "outage_viirs": {
+          "type": "boolean",
+          "description": "outage_days_viirs >= 3"
+        },
+        "provisional": {
+          "type": "boolean",
+          "description": "Month from period.provisional_from on: built partly from FIRMS near real-time (NRT) data, may change when standard processing replaces it"
         }
       }
     },

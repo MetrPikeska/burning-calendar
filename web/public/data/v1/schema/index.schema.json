@@ -44,6 +44,17 @@
         },
         "end": {
           "$ref": "#/$defs/ym"
+        },
+        "provisional_from": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ym"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "First month built partly from FIRMS NRT data; null when all months are standard processing"
         }
       }
     },

@@ -1,7 +1,7 @@
 ---
 title: Findings, Greece
 updated: 2026-11-14
-verified_by: uv run python pipeline/build.py --country GR; numbers from web/public/data/v1/gr/validation.json (method v1-region-month-dn-loyo)
+verified_by: uv run python pipeline/download_firms_api.py; uv run python pipeline/build.py --refresh --country GR; numbers from web/public/data/v1/gr/validation.json (method v1-region-month-dn-loyo)
 sources: [../../pipeline/build.py, ../../pipeline/validate.py, ../../pipeline/harmonize.py]
 ---
 
@@ -44,3 +44,22 @@ All numbers recomputed on 14 Nov 2026 from FIRMS SP country CSVs (MODIS C6.1 200
 - Peak hit rates use 7 or 8 season years, so one year moves the rate by 0.125-0.143. Under the original rule (13 Nov) EL51, EL61 and EL64 were `relative` because of a single season year; the amended rule (14 Nov, [decisions.md](decisions.md)) allows one year of difference.
 - EL42 sits exactly at the 25 % threshold and stays `harmonized`.
 - Regional VIIRS/MODIS fit-window ratios range from 2.49 (EL64) to 4.21 (EL42).
+
+## 2026, Jan-Oct (area API)
+
+National VIIRS counts after filters, against the median of the same month in 2016-2025 (`web/public/data/v1/gr/regions/GR.json`, built 14 Nov 2026). Aug-Oct are NRT and provisional.
+
+| Month | VIIRS | Median 2016-2025 | Percentile |
+|---|---|---|---|
+| Jan | 45 | 107.5 | 10 |
+| Feb | 119 | 253.5 | 10 |
+| Mar | 288 | 282.0 | 50 |
+| Apr | 85 | 133.5 | 20 |
+| May | 54 | 50.0 | 75 |
+| Jun | 95 | 109.5 | 50 |
+| Jul | 688 | 422.5 | 70 |
+| Aug (NRT) | 1,172 | 1,011.5 | 70 |
+| Sep (NRT) | 222 | 304.0 | 30 |
+| Oct (NRT) | 524 | 618.5 | 40 |
+
+No month of 2026 is an anomaly at the national level. March, April and July lose 3, 3 and 6 days to S-NPP gaps (`outage_viirs`). Adding 2026 left every month to Dec 2025 and every validation number unchanged; `annual_mean` moved in some regions because season year 2025 became complete.

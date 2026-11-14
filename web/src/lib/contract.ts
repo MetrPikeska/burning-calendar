@@ -40,7 +40,8 @@ export interface IndexFile {
   generated_at: string;
   country: string;
   country_name: string;
-  period: { start: string; end: string };
+  /** provisional_from: first month built partly from FIRMS near real-time data (null when none). */
+  period: { start: string; end: string; provisional_from?: string | null };
   units: string;
   fixture: boolean;
   method_version: string;
@@ -59,8 +60,14 @@ export interface MonthRecord {
   fit_level: FitLevel | null;
   anom_pct: number | null;
   anom: boolean;
+  /** Known MODIS gap days (data/outages.csv). */
   outage_days: number;
   outage: boolean;
+  /** Known VIIRS S-NPP gap days; absent in data built before 2026 was added. */
+  outage_days_viirs?: number;
+  outage_viirs?: boolean;
+  /** Built partly from FIRMS near real-time data; may change when standard processing replaces it. */
+  provisional?: boolean;
   /** Median of the same calendar month over the baseline years, same series as anom_pct. Null with < 5 values. */
   baseline_median: number | null;
   baseline_p90: number | null;
@@ -158,4 +165,13 @@ export function shownSeries(mode: Mode, chosen: Series): Series {
 /** Value the anomaly baseline is computed on: harm in harmonized mode, modis in relative mode. */
 export function baselineValue(rec: MonthRecord, mode: Mode): number | null {
   return mode === "harmonized" ? rec.harm : rec.modis;
+}
+
+/**
+ * The known satellite gap behind a shown value, or null: VIIRS S-NPP gaps where the value is
+ * observed VIIRS (the viirs series, or harm in observed months), MODIS gaps everywhere else.
+ */
+export function outageNote(rec: MonthRecord, usesViirs: boolean): string | null {
+  if (usesViirs) return rec.outage_viirs ? `known VIIRS S-NPP outage: ${rec.outage_days_viirs} days` : null;
+  return rec.outage ? `known MODIS outage: ${rec.outage_days} days` : null;
 }

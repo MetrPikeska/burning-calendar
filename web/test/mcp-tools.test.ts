@@ -191,24 +191,46 @@ describe("outage scope and anomaly threshold", () => {
 describe("coverage", () => {
   it("adds coverage and the S-NPP caveat to any result", () => {
     const r = withCoverage({ a: 1 }, period);
-    expect(r.coverage).toEqual({ start: "2000-11", end: "2025-12" });
+    expect(r.coverage).toEqual({ start: "2000-11", end: "2026-10" });
     expect(r.caveats.map((c) => c.code)).toEqual(["coverage"]);
     expect(r.caveats[0].message).toMatch(/S-NPP.*NOAA-20/);
   });
 
   it("clips a range that runs past the end", () => {
-    const r = regionSeries(er, { from: "2025-11", to: "2026-03", aggregate: "month" }, period);
-    expect(monthly(r).records.map((x) => x.ym)).toEqual(["2025-11", "2025-12"]);
-    expect(r.returned).toEqual({ from: "2025-11", to: "2025-12" });
+    const r = regionSeries(er, { from: "2026-09", to: "2027-03", aggregate: "month" }, period);
+    expect(monthly(r).records.map((x) => x.ym)).toEqual(["2026-09", "2026-10"]);
+    expect(r.returned).toEqual({ from: "2026-09", to: "2026-10" });
     expect(r.caveats.map((c) => c.code)).toContain("out_of_coverage");
   });
 
   it("returns an empty series with an explanation after the end", () => {
-    const r = regionSeries(er, { from: "2026-05", to: "2026-10", aggregate: "month" }, period);
+    const r = regionSeries(er, { from: "2027-01", to: "2027-06", aggregate: "month" }, period);
     expect(r.records).toEqual([]);
     expect(r.returned).toBeNull();
     expect(r.caveats.map((c) => c.code)).toContain("out_of_coverage");
-    expect(anomaliesFor(er, 2026, period).caveats.map((c) => c.code)).toContain("out_of_coverage");
+    expect(anomaliesFor(er, 2027, period).caveats.map((c) => c.code)).toContain("out_of_coverage");
+  });
+});
+
+// burncal-ap5: 2026 from the FIRMS area API, NRT months provisional, S-NPP gaps
+describe("2026", () => {
+  it("flags NRT months as provisional with a caveat", () => {
+    const r = anomaliesFor(er, 2026, period);
+    const prov = r.months.filter((m) => "provisional" in m).map((m) => m.ym);
+    expect(prov).toEqual(["2026-08", "2026-09", "2026-10"]);
+    expect(r.caveats.map((c) => c.code)).toContain("provisional");
+  });
+
+  it("attributes a gap in observed months to VIIRS S-NPP", () => {
+    const r = anomaliesFor(er, 2026, period);
+    const jul = r.months.find((m) => m.ym === "2026-07")!;
+    expect(jul.outage_affects).toBe("viirs");
+    expect(r.caveats.find((c) => c.code === "outage")?.message).toMatch(/2026-07 \(VIIRS S-NPP\)/);
+  });
+
+  it("keeps the 2020 Aqua gap off observed harmonized months", () => {
+    const aug = anomaliesFor(er, 2020, period).months.find((m) => m.ym === "2020-08")!;
+    expect("outage" in aug).toBe(false);
   });
 });
 
@@ -395,8 +417,8 @@ describe("aggregate", () => {
   });
 
   it("clips to coverage", () => {
-    const r = aggregate([er], { from: "2025-06", to: "2026-06", top: 3 }, period);
-    expect(r.regions[0].n_months).toBe(7);
+    const r = aggregate([er], { from: "2026-06", to: "2027-06", top: 3 }, period);
+    expect(r.regions[0].n_months).toBe(5);
     expect(r.caveats.map((c) => c.code)).toContain("out_of_coverage");
   });
 });
@@ -528,26 +550,26 @@ describe("back-cast and incomplete season years", () => {
     expect(s.years[0]).not.toHaveProperty("total_lo");
   });
 
-  it("lists regions without a complete season year 2025 instead of dropping them", () => {
-    const r = rankRegions(grItems, "season_total", { year: 2025, top: 20, order: "desc" });
+  it("lists regions without a complete season year 2026 instead of dropping them", () => {
+    const r = rankRegions(grItems, "season_total", { year: 2026, top: 20, order: "desc" });
     const ranked = r.ranked.map((x) => x.id);
     const missing = r.incomplete_season!.map((x) => x.id);
     expect(missing).toEqual(expect.arrayContaining(["EL41", "EL42", "EL51", "EL52", "EL53", "EL54"]));
     expect(ranked.filter((id) => missing.includes(id))).toEqual([]);
     expect(r.excluded_relative.map((x) => x.id).filter((id) => missing.includes(id))).toEqual([]);
     expect(ranked.length + r.excluded_relative.length + missing.length).toBe(13);
-    expect(r.incomplete_season!.find((x) => x.id === "EL52")!.season_window).toEqual({ from: "2025-04", to: "2026-03" });
+    expect(r.incomplete_season!.find((x) => x.id === "EL52")!.season_window).toEqual({ from: "2026-04", to: "2027-03" });
     const oc = r.caveats.find((c) => c.code === "out_of_coverage")!;
     expect(oc.message).toMatch(/EL52/);
   });
 
   it("does not allow a ranking in compare_regions when a season_total is missing", () => {
-    const c = compareRegions(grItems.filter((x) => ["EL30", "EL52"].includes(x.entry.id)), "season_total", 2025);
+    const c = compareRegions(grItems.filter((x) => ["EL30", "EL52"].includes(x.entry.id)), "season_total", 2026);
     expect(c.ranking_allowed).toBe(false);
     expect(codes(c)).toContain("out_of_coverage");
     const el52row = c.rows.find((x) => x.id === "EL52")!;
     expect(el52row.value).toBeUndefined();
-    expect(el52row.incomplete_season).toMatch(/2026-03/);
+    expect(el52row.incomplete_season).toMatch(/2027-03/);
   });
 
   it("keeps backcast and backcast_terra for a Terra-only aggregate and gives a total range", () => {

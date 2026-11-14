@@ -1,303 +1,313 @@
-region_id,mode,ym,modis,viirs,harm,harm_lo,harm_hi,src,fit_level,anom_pct,anom,outage_days,outage,baseline_median,baseline_p90,baseline_years,days_modis,days_viirs
-82,harmonized,2000-11,175,,1258.2,1026.7,1530.0,backcast_terra,region_month_dn,50.0,false,0,false,1280.7,2113.6,2002-2011,22,
-82,harmonized,2000-12,116,,902.8,360.2,1456.2,backcast_terra,region_month_dn,50.0,false,0,false,895.8,1979.5,2002-2011,19,
-82,harmonized,2001-01,84,,437.9,174.7,706.3,backcast_terra,region_month_dn,10.0,false,0,false,773.1,1410.0,2002-2011,15,
-82,harmonized,2001-02,65,,545.3,217.6,879.6,backcast_terra,region_month_dn,20.0,false,0,false,1087.3,2186.6,2002-2011,15,
-82,harmonized,2001-03,52,,537.2,435.1,641.9,backcast_terra,region_month_dn,50.0,false,0,false,976.2,2768.1,2002-2011,17,
-82,harmonized,2001-04,17,,188.1,152.4,224.8,backcast_terra,region_month_dn,0.0,false,0,false,469.8,2490.6,2002-2011,8,
-82,harmonized,2001-05,31,,432.9,350.7,517.3,backcast_terra,region_season_dn,30.0,false,0,false,689.0,1799.9,2002-2011,9,
-82,harmonized,2001-06,2,,38.4,34.8,43.3,backcast_terra,region_month_dn,0.0,false,0,false,746.2,4353.8,2002-2011,2,
-82,harmonized,2001-07,156,,2582.7,2342.5,2910.7,backcast_terra,region_month_dn,20.0,false,0,false,3590.0,8897.6,2002-2011,15,
-82,harmonized,2001-08,657,,7803.2,7077.5,8794.2,backcast_terra,region_month_dn,50.0,false,0,false,8320.5,9885.6,2002-2011,22,
-82,harmonized,2001-09,318,,2547.6,2078.8,3097.9,backcast_terra,region_month_dn,10.0,false,0,false,5995.9,10371.7,2002-2011,16,
-82,harmonized,2001-10,166,,1389.4,1133.8,1689.6,backcast_terra,region_month_dn,10.0,false,0,false,2433.7,3877.1,2002-2011,20,
-82,harmonized,2001-11,139,,982.7,801.9,1195.0,backcast_terra,region_month_dn,20.0,false,0,false,1280.7,2113.6,2002-2011,19,
-82,harmonized,2001-12,77,,605.7,241.7,977.1,backcast_terra,region_month_dn,20.0,false,0,false,895.8,1979.5,2002-2011,22,
-82,harmonized,2002-01,299,,1559.0,622.0,2514.6,backcast_terra,region_month_dn,100.0,true,0,false,717.2,1248.8,2002-2011 without 2002,24,
-82,harmonized,2002-02,296,,2488.6,993.0,4014.2,backcast_terra,region_month_dn,100.0,true,0,false,1003.2,1743.7,2002-2011 without 2002,23,
-82,harmonized,2002-03,186,,1935.8,1568.0,2313.3,backcast_terra,region_month_dn,77.8,false,0,false,530.6,2779.8,2002-2011 without 2002,11,
-82,harmonized,2002-04,40,,434.3,351.8,519.0,backcast_terra,region_month_dn,44.4,false,0,false,505.2,2614.9,2002-2011 without 2002,7,
-82,harmonized,2002-05,24,,338.5,274.2,404.6,backcast_terra,region_season_dn,22.2,false,0,false,713.9,1921.5,2002-2011 without 2002,13,
-82,harmonized,2002-06,14,,271.7,246.4,306.2,backcast_terra,region_month_dn,11.1,false,0,false,844.3,4442.4,2002-2011 without 2002,8,
-82,harmonized,2002-07,326,,1074.2,974.3,1210.7,backcast,region_month_dn,0.0,false,0,false,3900.4,9067.3,2002-2011 without 2002,18,
-82,harmonized,2002-08,1310,,4054.0,3677.0,4568.9,backcast,region_month_dn,0.0,false,0,false,8888.0,9895.0,2002-2011 without 2002,27,
-82,harmonized,2002-09,1222,,3789.0,3091.8,4607.4,backcast,region_month_dn,11.1,false,0,false,6606.3,10610.5,2002-2011 without 2002,26,
-82,harmonized,2002-10,169,,630.0,514.1,766.1,backcast,region_month_dn,0.0,false,0,false,2513.3,4053.3,2002-2011 without 2002,22,
-82,harmonized,2002-11,274,,965.9,788.2,1174.5,backcast,region_month_dn,11.1,false,0,false,1315.2,2192.1,2002-2011 without 2002,26,
-82,harmonized,2002-12,88,,336.9,134.4,543.4,backcast,region_month_dn,11.1,false,0,false,903.2,2016.9,2002-2011 without 2002,19,
-82,harmonized,2003-01,254,,654.0,261.0,1054.9,backcast,region_month_dn,22.2,false,0,false,829.0,1426.6,2002-2011 without 2003,22,
-82,harmonized,2003-02,299,,1171.5,467.4,1889.7,backcast,region_month_dn,55.6,false,0,false,1003.2,2220.2,2002-2011 without 2003,22,
-82,harmonized,2003-03,113,,450.7,365.1,538.6,backcast,region_month_dn,22.2,false,0,false,1421.8,2779.8,2002-2011 without 2003,18,
-82,harmonized,2003-04,75,,278.0,225.2,332.3,backcast,region_month_dn,22.2,false,0,false,505.2,2614.9,2002-2011 without 2003,13,
-82,harmonized,2003-05,96,,331.8,268.7,396.5,backcast,region_season_dn,11.1,false,0,false,713.9,1921.5,2002-2011 without 2003,17,
-82,harmonized,2003-06,159,,648.2,588.0,730.6,backcast,region_month_dn,44.4,false,0,false,844.3,4442.4,2002-2011 without 2003,23,
-82,harmonized,2003-07,1206,,3900.4,3537.7,4395.8,backcast,region_month_dn,55.6,false,0,false,3279.6,9067.3,2002-2011 without 2003,26,
-82,harmonized,2003-08,3271,,9790.8,8880.3,11034.3,backcast,region_month_dn,77.8,false,0,false,7753.1,9895.0,2002-2011 without 2003,27,
-82,harmonized,2003-09,2767,,8876.8,7243.5,10794.2,backcast,region_month_dn,77.8,false,0,false,5385.4,10610.5,2002-2011 without 2003,30,
-82,harmonized,2003-10,474,,1748.5,1426.7,2126.1,backcast,region_month_dn,22.2,false,0,false,2513.3,4053.3,2002-2011 without 2003,25,
-82,harmonized,2003-11,366,,1406.1,1147.4,1709.8,backcast,region_month_dn,66.7,false,0,false,1246.1,2192.1,2002-2011 without 2003,28,
-82,harmonized,2003-12,230,,888.3,354.4,1432.8,backcast,region_month_dn,44.4,false,0,false,903.2,2016.9,2002-2011 without 2003,25,
-82,harmonized,2004-01,366,,941.8,375.8,1519.2,backcast,region_month_dn,66.7,false,0,false,717.2,1426.6,2002-2011 without 2004,30,
-82,harmonized,2004-02,432,,1641.4,654.9,2647.5,backcast,region_month_dn,77.8,false,0,false,1003.2,2220.2,2002-2011 without 2004,25,
-82,harmonized,2004-03,714,,2756.5,2232.8,3294.1,backcast,region_month_dn,88.9,true,0,false,530.6,2123.2,2002-2011 without 2004,27,
-82,harmonized,2004-04,218,,805.8,652.7,962.9,backcast,region_month_dn,77.8,false,0,false,434.3,2614.9,2002-2011 without 2004,18,
-82,harmonized,2004-05,391,,1346.8,1090.9,1609.4,backcast,region_season_dn,77.8,false,0,false,664.1,1921.5,2002-2011 without 2004,26,
-82,harmonized,2004-06,1367,,5151.2,4672.1,5805.3,backcast,region_month_dn,100.0,true,0,false,648.2,1837.5,2002-2011 without 2004,26,
-82,harmonized,2004-07,2231,,7881.0,7148.0,8881.8,backcast,region_month_dn,77.8,false,0,false,3279.6,9067.3,2002-2011 without 2004,30,
-82,harmonized,2004-08,2739,,8888.0,8061.4,10016.8,backcast,region_month_dn,55.6,false,0,false,7753.1,9895.0,2002-2011 without 2004,27,
-82,harmonized,2004-09,2756,,10132.8,8268.4,12321.5,backcast,region_month_dn,88.9,true,0,false,5385.4,9605.7,2002-2011 without 2004,29,
-82,harmonized,2004-10,1385,,5462.7,4457.5,6642.6,backcast,region_month_dn,100.0,true,0,false,2354.0,3700.0,2002-2011 without 2004,31,
-82,harmonized,2004-11,338,,1225.4,1000.0,1490.1,backcast,region_month_dn,33.3,false,0,false,1315.2,2192.1,2002-2011 without 2004,26,
-82,harmonized,2004-12,340,,1347.2,537.5,2173.0,backcast,region_month_dn,77.8,false,0,false,888.3,2016.9,2002-2011 without 2004,26,
-82,harmonized,2005-01,470,,1212.6,483.8,1955.9,backcast,region_month_dn,77.8,false,0,false,717.2,1426.6,2002-2011 without 2005,28,
-82,harmonized,2005-02,131,,496.3,198.0,800.6,backcast,region_month_dn,11.1,false,0,false,1171.5,2220.2,2002-2011 without 2005,24,
-82,harmonized,2005-03,437,,1784.5,1445.4,2132.5,backcast,region_month_dn,66.7,false,0,false,530.6,2779.8,2002-2011 without 2005,25,
-82,harmonized,2005-04,56,,203.5,164.8,243.2,backcast,region_month_dn,0.0,false,0,false,505.2,2614.9,2002-2011 without 2005,16,
-82,harmonized,2005-05,131,,459.6,372.3,549.2,backcast,region_season_dn,33.3,false,0,false,713.9,1921.5,2002-2011 without 2005,19,
-82,harmonized,2005-06,68,,213.0,193.2,240.1,backcast,region_month_dn,0.0,false,0,false,844.3,4442.4,2002-2011 without 2005,14,
-82,harmonized,2005-07,877,,2891.6,2622.6,3258.8,backcast,region_month_dn,22.2,false,0,false,3900.4,9067.3,2002-2011 without 2005,29,
-82,harmonized,2005-08,1458,,4584.1,4157.8,5166.3,backcast,region_month_dn,11.1,false,0,false,8888.0,9895.0,2002-2011 without 2005,28,
-82,harmonized,2005-09,1721,,5385.4,4394.5,6548.7,backcast,region_month_dn,44.4,false,0,false,6606.3,10610.5,2002-2011 without 2005,30,
-82,harmonized,2005-10,1019,,3699.8,3019.1,4499.0,backcast,region_month_dn,77.8,false,0,false,2354.0,4053.3,2002-2011 without 2005,27,
-82,harmonized,2005-11,526,,2035.2,1660.7,2474.7,backcast,region_month_dn,88.9,true,0,false,1246.1,1706.5,2002-2011 without 2005,27,
-82,harmonized,2005-12,231,,903.2,360.4,1456.9,backcast,region_month_dn,55.6,false,0,false,888.3,2016.9,2002-2011 without 2005,27,
-82,harmonized,2006-01,515,,1393.5,556.0,2247.7,backcast,region_month_dn,88.9,true,0,false,717.2,1281.9,2002-2011 without 2006,30,
-82,harmonized,2006-02,501,,2153.1,859.1,3472.9,backcast,region_month_dn,88.9,true,0,false,1003.2,1810.8,2002-2011 without 2006,26,
-82,harmonized,2006-03,135,,515.5,417.6,616.0,backcast,region_month_dn,33.3,false,0,false,1421.8,2779.8,2002-2011 without 2006,21,
-82,harmonized,2006-04,133,,505.2,409.2,603.8,backcast,region_month_dn,55.6,false,0,false,434.3,2614.9,2002-2011 without 2006,19,
-82,harmonized,2006-05,482,,1678.3,1359.4,2005.6,backcast,region_season_dn,88.9,true,0,false,664.1,1656.3,2002-2011 without 2006,29,
-82,harmonized,2006-06,156,,510.2,462.7,574.9,backcast,region_month_dn,33.3,false,0,false,844.3,4442.4,2002-2011 without 2006,21,
-82,harmonized,2006-07,589,,1987.1,1802.3,2239.4,backcast,region_month_dn,11.1,false,0,false,3900.4,9067.3,2002-2011 without 2006,27,
-82,harmonized,2006-08,3136,,9970.6,9043.3,11236.8,backcast,region_month_dn,100.0,true,0,false,7753.1,9807.9,2002-2011 without 2006,30,
-82,harmonized,2006-09,3784,,12521.4,10217.5,15226.0,backcast,region_month_dn,100.0,true,0,false,5385.4,9128.0,2002-2011 without 2006,30,
-82,harmonized,2006-10,650,,2513.3,2050.9,3056.2,backcast,region_month_dn,55.6,false,0,false,2354.0,4053.3,2002-2011 without 2006,28,
-82,harmonized,2006-11,354,,1315.2,1073.2,1599.3,backcast,region_month_dn,55.6,false,0,false,1246.1,2192.1,2002-2011 without 2006,25,
-82,harmonized,2006-12,193,,777.0,310.0,1253.3,backcast,region_month_dn,22.2,false,0,false,903.2,2016.9,2002-2011 without 2006,25,
-82,harmonized,2007-01,145,,369.5,147.4,595.9,backcast,region_month_dn,0.0,false,0,false,829.0,1426.6,2002-2011 without 2007,25,
-82,harmonized,2007-02,259,,1003.2,400.3,1618.1,backcast,region_month_dn,44.4,false,0,false,1171.5,2220.2,2002-2011 without 2007,27,
-82,harmonized,2007-03,78,,303.6,245.9,362.8,backcast,region_month_dn,11.1,false,0,false,1421.8,2779.8,2002-2011 without 2007,21,
-82,harmonized,2007-04,72,,270.6,219.2,323.4,backcast,region_month_dn,11.1,false,0,false,505.2,2614.9,2002-2011 without 2007,17,
-82,harmonized,2007-05,340,,1177.0,953.3,1406.5,backcast,region_season_dn,66.7,false,0,false,664.1,1921.5,2002-2011 without 2007,26,
-82,harmonized,2007-06,362,,1230.6,1116.1,1386.9,backcast,region_month_dn,77.8,false,0,false,648.2,4442.4,2002-2011 without 2007,25,
-82,harmonized,2007-07,2499,,8728.0,7916.3,9836.5,backcast,region_month_dn,88.9,true,0,false,3279.6,8389.7,2002-2011 without 2007,28,
-82,harmonized,2007-08,2331,,7753.1,7032.1,8737.8,backcast,region_month_dn,44.4,false,0,false,8888.0,9895.0,2002-2011 without 2007,28,
-82,harmonized,2007-09,1933,,6606.3,5390.7,8033.2,backcast,region_month_dn,55.6,false,0,false,5385.4,10610.5,2002-2011 without 2007,26,
-82,harmonized,2007-10,432,,1740.1,1419.9,2116.0,backcast,region_month_dn,11.1,false,0,false,2513.3,4053.3,2002-2011 without 2007,25,
-82,harmonized,2007-11,331,,1246.1,1016.9,1515.3,backcast,region_month_dn,44.4,false,0,false,1315.2,2192.1,2002-2011 without 2007,27,
-82,harmonized,2007-12,181,,782.2,312.1,1261.7,backcast,region_month_dn,33.3,false,0,false,903.2,2016.9,2002-2011 without 2007,27,
-82,harmonized,2008-01,278,,717.2,286.1,1156.8,backcast,region_month_dn,44.4,false,0,false,829.0,1426.6,2002-2011 without 2008,25,
-82,harmonized,2008-02,409,,1563.1,623.7,2521.2,backcast,region_month_dn,66.7,false,0,false,1003.2,2220.2,2002-2011 without 2008,26,
-82,harmonized,2008-03,652,,2872.8,2327.0,3433.0,backcast,region_month_dn,100.0,true,0,false,530.6,2099.9,2002-2011 without 2008,28,
-82,harmonized,2008-04,943,,3609.3,2923.5,4313.1,backcast,region_month_dn,100.0,true,0,false,434.3,1117.9,2002-2011 without 2008,26,
-82,harmonized,2008-05,810,,2894.1,2344.2,3458.5,backcast,region_season_dn,100.0,true,0,false,664.1,1413.1,2002-2011 without 2008,27,
-82,harmonized,2008-06,1204,,4265.2,3868.5,4806.8,backcast,region_month_dn,88.9,true,0,false,648.2,2014.7,2002-2011 without 2008,25,
-82,harmonized,2008-07,2696,,10424.4,9454.9,11748.3,backcast,region_month_dn,100.0,true,0,false,3279.6,8050.4,2002-2011 without 2008,28,
-82,harmonized,2008-08,3044,,9876.1,8957.6,11130.3,backcast,region_month_dn,88.9,true,0,false,7753.1,9826.8,2002-2011 without 2008,31,
-82,harmonized,2008-09,1582,,5334.1,4352.6,6486.2,backcast,region_month_dn,33.3,false,0,false,6606.3,10610.5,2002-2011 without 2008,29,
-82,harmonized,2008-10,689,,2602.8,2123.8,3164.9,backcast,region_month_dn,66.7,false,0,false,2354.0,4053.3,2002-2011 without 2008,27,
-82,harmonized,2008-11,384,,1428.2,1165.4,1736.6,backcast,region_month_dn,77.8,false,0,false,1246.1,2192.1,2002-2011 without 2008,26,
-82,harmonized,2008-12,305,,1288.2,514.0,2077.9,backcast,region_month_dn,66.7,false,0,false,888.3,2016.9,2002-2011 without 2008,29,
-82,harmonized,2009-01,316,,829.0,330.8,1337.1,backcast,region_month_dn,55.6,false,0,false,717.2,1426.6,2002-2011 without 2009,23,
-82,harmonized,2009-02,143,,568.1,226.7,916.3,backcast,region_month_dn,33.3,false,0,false,1171.5,2220.2,2002-2011 without 2009,22,
-82,harmonized,2009-03,129,,530.6,429.8,634.1,backcast,region_month_dn,44.4,false,0,false,1421.8,2779.8,2002-2011 without 2009,28,
-82,harmonized,2009-04,143,,531.1,430.2,634.6,backcast,region_month_dn,66.7,false,0,false,434.3,2614.9,2002-2011 without 2009,22,
-82,harmonized,2009-05,208,,713.9,578.3,853.2,backcast,region_season_dn,55.6,false,0,false,664.1,1921.5,2002-2011 without 2009,24,
-82,harmonized,2009-06,283,,908.0,823.6,1023.3,backcast,region_month_dn,66.7,false,0,false,648.2,4442.4,2002-2011 without 2009,27,
-82,harmonized,2009-07,880,,2921.6,2649.9,3292.7,backcast,region_month_dn,33.3,false,0,false,3900.4,9067.3,2002-2011 without 2009,28,
-82,harmonized,2009-08,1955,,6423.3,5825.9,7239.1,backcast,region_month_dn,33.3,false,0,false,8888.0,9895.0,2002-2011 without 2009,31,
-82,harmonized,2009-09,738,,2476.8,2021.0,3011.8,backcast,region_month_dn,0.0,false,0,false,6606.3,10610.5,2002-2011 without 2009,25,
-82,harmonized,2009-10,643,,2354.0,1920.9,2862.5,backcast,region_month_dn,44.4,false,0,false,2513.3,4053.3,2002-2011 without 2009,30,
-82,harmonized,2009-11,112,,419.4,342.3,510.0,backcast,region_month_dn,0.0,false,0,false,1315.2,2192.1,2002-2011 without 2009,20,
-82,harmonized,2009-12,77,,317.9,126.8,512.7,backcast,region_month_dn,0.0,false,0,false,903.2,2016.9,2002-2011 without 2009,18,
-82,harmonized,2010-01,224,,576.7,230.1,930.2,backcast,region_month_dn,11.1,false,0,false,829.0,1426.6,2002-2011 without 2010,26,
-82,harmonized,2010-02,82,,307.2,122.6,495.5,backcast,region_month_dn,0.0,false,0,false,1171.5,2220.2,2002-2011 without 2010,19,
-82,harmonized,2010-03,55,,214.7,173.9,256.5,backcast,region_month_dn,0.0,false,0,false,1421.8,2779.8,2002-2011 without 2010,20,
-82,harmonized,2010-04,80,,295.9,239.7,353.6,backcast,region_month_dn,33.3,false,0,false,505.2,2614.9,2002-2011 without 2010,18,
-82,harmonized,2010-05,78,,266.2,215.6,318.1,backcast,region_season_dn,0.0,false,0,false,713.9,1921.5,2002-2011 without 2010,15,
-82,harmonized,2010-06,110,,344.6,312.6,388.4,backcast,region_month_dn,22.2,false,0,false,844.3,4442.4,2002-2011 without 2010,17,
-82,harmonized,2010-07,949,,3279.6,2974.6,3696.1,backcast,region_month_dn,44.4,false,0,false,3900.4,9067.3,2002-2011 without 2010,28,
-82,harmonized,2010-08,1451,,4708.2,4270.3,5306.1,backcast,region_month_dn,22.2,false,0,false,8888.0,9895.0,2002-2011 without 2010,31,
-82,harmonized,2010-09,1581,,5020.2,4096.5,6104.6,backcast,region_month_dn,22.2,false,0,false,6606.3,10610.5,2002-2011 without 2010,27,
-82,harmonized,2010-10,940,,3700.9,3019.9,4500.3,backcast,region_month_dn,88.9,false,0,false,2354.0,4052.4,2002-2011 without 2010,30,
-82,harmonized,2010-11,711,,2819.7,2300.8,3428.7,backcast,region_month_dn,100.0,true,0,false,1246.1,1549.6,2002-2011 without 2010,28,
-82,harmonized,2010-12,440,,1942.1,774.9,3132.6,backcast,region_month_dn,88.9,true,0,false,888.3,1541.0,2002-2011 without 2010,30,
-82,harmonized,2011-01,271,,714.7,285.1,1152.7,backcast,region_month_dn,33.3,false,0,false,829.0,1426.6,2002-2011 without 2011,24,
-82,harmonized,2011-02,145,,566.2,225.9,913.2,backcast,region_month_dn,22.2,false,0,false,1171.5,2220.2,2002-2011 without 2011,21,
-82,harmonized,2011-03,355,,1421.8,1151.7,1699.1,backcast,region_month_dn,55.6,false,0,false,530.6,2779.8,2002-2011 without 2011,25,
-82,harmonized,2011-04,562,,2366.3,1916.7,2827.7,backcast,region_month_dn,88.9,true,0,false,434.3,1366.5,2002-2011 without 2011,22,
-82,harmonized,2011-05,186,,664.1,537.9,793.6,backcast,region_season_dn,44.4,false,0,false,713.9,1921.5,2002-2011 without 2011,22,
-82,harmonized,2011-06,225,,844.3,765.8,951.5,backcast,region_month_dn,55.6,false,0,false,648.2,4442.4,2002-2011 without 2011,20,
-82,harmonized,2011-07,1164,,4297.4,3897.7,4843.2,backcast,region_month_dn,66.7,false,0,false,3279.6,9067.3,2002-2011 without 2011,26,
-82,harmonized,2011-08,2877,,9401.6,8527.3,10595.7,backcast,region_month_dn,66.7,false,0,false,7753.1,9895.0,2002-2011 without 2011,29,
-82,harmonized,2011-09,2378,,8132.6,6636.2,9889.2,backcast,region_month_dn,66.7,false,0,false,5385.4,10610.5,2002-2011 without 2011,30,
-82,harmonized,2011-10,444,,1819.4,1484.6,2212.4,backcast,region_month_dn,33.3,false,0,false,2513.3,4053.3,2002-2011 without 2011,24,
-82,harmonized,2011-11,324,,1217.1,993.2,1480.0,backcast,region_month_dn,22.2,false,0,false,1315.2,2192.1,2002-2011 without 2011,26,
-82,harmonized,2011-12,523,,2316.2,924.2,3736.0,backcast,region_month_dn,100.0,true,0,false,888.3,1466.2,2002-2011 without 2011,29,
-82,harmonized,2012-01,647,541,541.0,,,observed,,10.0,false,0,false,773.1,1410.0,2002-2011,29,11
-82,harmonized,2012-02,325,1198,1198.0,,,observed,,60.0,false,0,false,1087.3,2186.6,2002-2011,24,27
-82,harmonized,2012-03,231,810,810.0,,,observed,,50.0,false,0,false,976.2,2768.1,2002-2011,27,29
-82,harmonized,2012-04,76,432,432.0,,,observed,,40.0,false,0,false,469.8,2490.6,2002-2011,18,27
-82,harmonized,2012-05,220,917,917.0,,,observed,,60.0,false,0,false,689.0,1799.9,2002-2011,23,25
-82,harmonized,2012-06,560,1884,1884.0,,,observed,,80.0,false,0,false,746.2,4353.8,2002-2011,27,29
-82,harmonized,2012-07,1606,4746,4746.0,,,observed,,70.0,false,0,false,3590.0,8897.6,2002-2011,28,30
-82,harmonized,2012-08,1190,4148,4148.0,,,observed,,10.0,false,0,false,8320.5,9885.6,2002-2011,27,28
-82,harmonized,2012-09,694,2313,2313.0,,,observed,,0.0,false,0,false,5995.9,10371.7,2002-2011,28,29
-82,harmonized,2012-10,179,884,884.0,,,observed,,10.0,false,0,false,2433.7,3877.1,2002-2011,23,28
-82,harmonized,2012-11,166,661,661.0,,,observed,,10.0,false,0,false,1280.7,2113.6,2002-2011,26,28
-82,harmonized,2012-12,148,361,361.0,,,observed,,20.0,false,0,false,895.8,1979.5,2002-2011,26,29
-82,harmonized,2013-01,206,559,559.0,,,observed,,20.0,false,0,false,716.0,1230.7,2003-2012,26,30
-82,harmonized,2013-02,169,648,648.0,,,observed,,40.0,false,0,false,1087.3,1692.6,2003-2012,20,22
-82,harmonized,2013-03,175,647,647.0,,,observed,,50.0,false,0,false,670.3,2768.1,2003-2012,20,28
-82,harmonized,2013-04,203,835,835.0,,,observed,,80.0,false,0,false,468.6,2490.6,2003-2012,24,25
-82,harmonized,2013-05,167,620,620.0,,,observed,,30.0,false,0,false,815.5,1799.9,2003-2012,18,24
-82,harmonized,2013-06,282,925,925.0,,,observed,,60.0,false,0,false,876.1,4353.8,2003-2012,23,28
-82,harmonized,2013-07,649,2362,2362.0,,,observed,,10.0,false,0,false,4098.9,8897.6,2003-2012,26,28
-82,harmonized,2013-08,2121,6452,6452.0,,,observed,,40.0,false,0,false,8320.5,9885.6,2003-2012,30,31
-82,harmonized,2013-09,2053,6366,6366.0,,,observed,,50.0,false,0,false,5995.9,10371.7,2003-2012,27,27
-82,harmonized,2013-10,940,4044,4044.0,,,observed,,90.0,true,0,false,2433.7,3877.1,2003-2012,26,30
-82,harmonized,2013-11,318,997,997.0,,,observed,,20.0,false,0,false,1280.7,2113.6,2003-2012,24,25
-82,harmonized,2013-12,122,658,658.0,,,observed,,20.0,false,0,false,895.8,1979.5,2003-2012,24,30
-82,harmonized,2014-01,294,1205,1205.0,,,observed,,80.0,false,0,false,716.0,1230.7,2004-2013,27,26
-82,harmonized,2014-02,82,225,225.0,,,observed,,0.0,false,0,false,825.6,1692.6,2004-2013,15,20
-82,harmonized,2014-03,72,302,302.0,,,observed,,10.0,false,0,false,728.5,2768.1,2004-2013,17,25
-82,harmonized,2014-04,99,311,311.0,,,observed,,30.0,false,0,false,518.1,2490.6,2004-2013,21,27
-82,harmonized,2014-05,37,141,141.0,,,observed,,0.0,false,0,false,815.5,1799.9,2004-2013,7,17
-82,harmonized,2014-06,89,331,331.0,,,observed,,10.0,false,0,false,916.5,4353.8,2004-2013,17,28
-82,harmonized,2014-07,201,695,695.0,,,observed,,0.0,false,0,false,3788.5,8897.6,2004-2013,22,26
-82,harmonized,2014-08,985,3216,3216.0,,,observed,,0.0,false,0,false,7102.6,9885.6,2004-2013,31,31
-82,harmonized,2014-09,428,1068,1068.0,,,observed,,0.0,false,0,false,5875.7,10371.7,2004-2013,25,28
-82,harmonized,2014-10,348,1591,1591.0,,,observed,,10.0,false,0,false,2558.1,4185.9,2004-2013,23,29
-82,harmonized,2014-11,375,1632,1632.0,,,observed,,80.0,false,0,false,1235.8,2113.6,2004-2013,24,25
-82,harmonized,2014-12,198,632,632.0,,,observed,,20.0,false,0,false,842.7,1979.5,2004-2013,24,27
-82,harmonized,2015-01,214,170,170.0,,,observed,,0.0,false,0,false,716.0,1230.7,2005-2014,24,25
-82,harmonized,2015-02,108,217,217.0,,,observed,,0.0,false,0,false,608.0,1622.1,2005-2014,22,24
-82,harmonized,2015-03,142,569,569.0,,,observed,,50.0,false,0,false,588.8,1893.3,2005-2014,26,26
-82,harmonized,2015-04,528,2310,2310.0,,,observed,,80.0,false,0,false,468.6,2490.6,2005-2014,27,30
-82,harmonized,2015-05,396,1388,1388.0,,,observed,,80.0,false,0,false,689.0,1799.9,2005-2014,23,28
-82,harmonized,2015-06,754,2539,2539.0,,,observed,,90.0,true,0,false,876.1,2122.1,2005-2014,25,28
-82,harmonized,2015-07,2105,7699,7699.0,,,observed,,80.0,false,0,false,3100.6,8897.6,2005-2014,29,31
-82,harmonized,2015-08,1576,4647,4647.0,,,observed,,30.0,false,0,false,6437.6,9885.6,2005-2014,24,25
-82,harmonized,2015-09,1433,4558,4558.0,,,observed,,30.0,false,0,false,5359.8,8571.5,2005-2014,27,28
-82,harmonized,2015-10,491,1679,1679.0,,,observed,,20.0,false,0,false,2433.7,3735.2,2005-2014,26,29
-82,harmonized,2015-11,187,610,610.0,,,observed,,10.0,false,0,false,1280.7,2113.6,2005-2014,22,26
-82,harmonized,2015-12,165,291,291.0,,,observed,,0.0,false,0,false,779.6,1979.5,2005-2014,24,22
-82,harmonized,2016-01,286,784,784.0,,,observed,,70.0,false,0,false,645.7,1223.8,2006-2015,27,29
-82,harmonized,2016-02,132,469,469.0,,,observed,,30.0,false,0,false,608.0,1622.1,2006-2015,26,27
-82,harmonized,2016-03,338,1415,1415.0,,,observed,,80.0,false,0,false,549.8,1566.9,2006-2015,22,27
-82,harmonized,2016-04,72,205,205.0,,,observed,,0.0,false,0,false,518.1,2490.6,2006-2015,10,15
-82,harmonized,2016-05,68,281,281.0,,,observed,,20.0,false,0,false,815.5,1799.9,2006-2015,18,21
-82,harmonized,2016-06,292,1020,1020.0,,,observed,,60.0,false,0,false,916.5,2711.6,2006-2015,22,26
-82,harmonized,2016-07,670,2080,2080.0,,,observed,,20.0,false,0,false,3788.5,8897.6,2006-2015,22,26
-82,harmonized,2016-08,1821,5545,5545.0,,,observed,,40.0,false,0,false,6437.6,9885.6,2006-2015,30,30
-82,harmonized,2016-09,1546,4834,4834.0,,,observed,,40.0,false,0,false,5177.1,8571.5,2006-2015,26,29
-82,harmonized,2016-10,256,685,685.0,,,observed,,0.0,false,0,false,2086.7,3735.2,2006-2015,23,26
-82,harmonized,2016-11,248,740,740.0,,,observed,,30.0,false,0,false,1231.6,1750.8,2006-2015,24,27
-82,harmonized,2016-12,143,347,347.0,,,observed,,20.0,false,0,false,717.5,1979.5,2006-2015,26,28
-82,harmonized,2017-01,212,234,234.0,,,observed,,10.0,false,0,false,645.7,866.6,2007-2016,22,24
-82,harmonized,2017-02,90,146,146.0,,,observed,,0.0,false,0,false,567.2,1234.5,2007-2016,22,25
-82,harmonized,2017-03,101,307,307.0,,,observed,,30.0,false,0,false,608.0,1566.9,2007-2016,19,25
-82,harmonized,2017-04,145,604,604.0,,,observed,,60.0,false,0,false,481.6,2490.6,2007-2016,19,23
-82,harmonized,2017-05,100,351,351.0,,,observed,,30.0,false,0,false,689.0,1538.6,2007-2016,14,20
-82,harmonized,2017-06,442,1327,1327.0,,,observed,,70.0,false,0,false,972.5,2711.6,2007-2016,20,23
-82,harmonized,2017-07,1046,3423,3423.0,,,observed,,50.0,false,0,false,3788.5,8897.6,2007-2016,23,24
-82,harmonized,2017-08,1233,3860,3860.0,,,observed,,10.0,false,0,false,5984.1,9449.1,2007-2016,27,27
-82,harmonized,2017-09,625,1866,1866.0,,,observed,,10.0,false,0,false,4927.1,6758.9,2007-2016,19,26
-82,harmonized,2017-10,375,1288,1288.0,,,observed,,20.0,false,0,false,1779.8,3735.2,2007-2016,25,28
-82,harmonized,2017-11,744,2764,2764.0,,,observed,,90.0,true,0,false,1107.0,1750.8,2007-2016,30,28
-82,harmonized,2017-12,491,2628,2628.0,,,observed,,100.0,true,0,false,645.0,1979.5,2007-2016,30,30
-82,harmonized,2018-01,546,2928,2928.0,,,observed,,100.0,true,0,false,645.7,866.6,2008-2017,28,28
-82,harmonized,2018-02,725,3679,3679.0,,,observed,,100.0,true,0,false,517.6,1234.5,2008-2017,27,28
-82,harmonized,2018-03,887,3804,3804.0,,,observed,,100.0,true,0,false,608.0,1566.9,2008-2017,29,30
-82,harmonized,2018-04,729,2482,2482.0,,,observed,,90.0,false,0,false,567.5,2490.6,2008-2017,27,29
-82,harmonized,2018-05,134,474,474.0,,,observed,,40.0,false,0,false,642.0,1538.6,2008-2017,15,22
-82,harmonized,2018-06,494,1561,1561.0,,,observed,,70.0,false,0,false,972.5,2711.6,2008-2017,23,28
-82,harmonized,2018-07,569,1841,1841.0,,,observed,,10.0,false,0,false,3351.3,7971.5,2008-2017,21,27
-82,harmonized,2018-08,2708,8310,8310.0,,,observed,,80.0,false,0,false,5126.6,9449.1,2008-2017,29,31
-82,harmonized,2018-09,1252,4381,4381.0,,,observed,,40.0,false,0,false,4696.0,6542.7,2008-2017,25,29
-82,harmonized,2018-10,319,1195,1195.0,,,observed,,20.0,false,0,false,1749.2,3735.2,2008-2017,26,29
-82,harmonized,2018-11,192,809,809.0,,,observed,,40.0,false,0,false,1107.0,2769.6,2008-2017,21,25
-82,harmonized,2018-12,196,975,975.0,,,observed,,60.0,false,0,false,645.0,2347.4,2008-2017,22,28
-82,harmonized,2019-01,27,39,39.0,,,observed,,0.0,false,0,false,645.7,1377.3,2009-2018,10,12
-82,harmonized,2019-02,65,192,192.0,,,observed,,10.0,false,0,false,517.6,1446.1,2009-2018,17,23
-82,harmonized,2019-03,52,210,210.0,,,observed,,0.0,false,0,false,608.0,1660.0,2009-2018,17,22
-82,harmonized,2019-04,84,301,301.0,,,observed,,20.0,false,0,false,567.5,2377.9,2009-2018,16,21
-82,harmonized,2019-05,34,106,106.0,,,observed,,0.0,false,0,false,547.0,964.1,2009-2018,11,16
-82,harmonized,2019-06,134,484,484.0,,,observed,,20.0,false,0,false,972.5,1949.5,2009-2018,19,20
-82,harmonized,2019-07,424,1409,1409.0,,,observed,,10.0,false,0,false,3100.6,5041.3,2009-2018,20,25
-82,harmonized,2019-08,1494,4761,4761.0,,,observed,,50.0,false,0,false,5126.6,8419.2,2009-2018,28,30
-82,harmonized,2019-09,1494,4994,4994.0,,,observed,,70.0,false,0,false,4469.5,6542.7,2009-2018,29,30
-82,harmonized,2019-10,371,1328,1328.0,,,observed,,40.0,false,0,false,1635.0,3735.2,2009-2018,21,24
-82,harmonized,2019-11,130,603,603.0,,,observed,,10.0,false,0,false,903.0,2769.6,2009-2018,22,26
-82,harmonized,2019-12,181,818,818.0,,,observed,,60.0,false,0,false,645.0,2347.4,2009-2018,23,29
-82,harmonized,2020-01,167,878,878.0,,,observed,,80.0,false,0,false,567.9,1377.3,2010-2019,24,28
-82,harmonized,2020-02,603,2820,2820.0,,,observed,,90.0,true,0,false,388.1,1446.1,2010-2019,24,28
-82,harmonized,2020-03,1302,5504,5504.0,,,observed,,100.0,true,0,false,608.0,1660.0,2010-2019,27,27
-82,harmonized,2020-04,1426,5740,5740.0,,,observed,,100.0,true,0,false,518.0,2377.9,2010-2019,27,29
-82,harmonized,2020-05,1617,6403,6403.0,,,observed,,100.0,true,0,false,412.5,964.1,2010-2019,29,29
-82,harmonized,2020-06,1030,3907,3907.0,,,observed,,100.0,true,0,false,972.5,1949.5,2010-2019,28,30
-82,harmonized,2020-07,2775,11036,11036.0,,,observed,,100.0,true,0,false,2820.8,5041.3,2010-2019,28,29
-82,harmonized,2020-08,6246,22423,22423.0,,,observed,,100.0,true,16,true,4734.6,8419.2,2010-2019,30,31
-82,harmonized,2020-09,4073,14073,14073.0,,,observed,,100.0,true,2,false,4696.0,6542.7,2010-2019,28,28
-82,harmonized,2020-10,1480,5441,5441.0,,,observed,,100.0,true,0,false,1459.5,3735.2,2010-2019,30,30
-82,harmonized,2020-11,704,3035,3035.0,,,observed,,100.0,true,0,false,903.0,2769.6,2010-2019,27,30
-82,harmonized,2020-12,361,1588,1588.0,,,observed,,70.0,false,0,false,738.0,2347.4,2010-2019,30,31
-82,harmonized,2021-01,250,1378,1378.0,,,observed,,90.0,true,0,false,636.9,1377.3,2011-2020,26,28
-82,harmonized,2021-02,238,951,951.0,,,observed,,70.0,false,0,false,517.6,2905.9,2011-2020,25,26
-82,harmonized,2021-03,195,923,923.0,,,observed,,60.0,false,0,false,728.5,3974.0,2011-2020,23,29
-82,harmonized,2021-04,152,615,615.0,,,observed,,50.0,false,0,false,719.5,2807.8,2011-2020,24,27
-82,harmonized,2021-05,312,956,956.0,,,observed,,80.0,false,0,false,547.0,1889.5,2011-2020,24,28
-82,harmonized,2021-06,170,670,670.0,,,observed,,20.0,false,0,false,1173.5,2675.8,2011-2020,20,27
-82,harmonized,2021-07,1528,5237,5237.0,,,observed,,80.0,false,0,false,2892.5,8032.7,2011-2020,30,30
-82,harmonized,2021-08,2629,8626,8626.0,,,observed,,80.0,false,0,false,5153.0,10703.7,2011-2020,31,31
-82,harmonized,2021-09,1249,4834,4834.0,,,observed,,55.0,false,0,false,4696.0,8726.6,2011-2020,28,30
-82,harmonized,2021-10,927,3643,3643.0,,,observed,,80.0,false,0,false,1459.5,4183.7,2011-2020,29,31
-82,harmonized,2021-11,245,1045,1045.0,,,observed,,60.0,false,0,false,903.0,2791.1,2011-2020,22,26
-82,harmonized,2021-12,633,3901,3901.0,,,observed,,100.0,true,0,false,738.0,2347.4,2011-2020,27,30
-82,harmonized,2022-01,1289,7536,7536.0,,,observed,,100.0,true,0,false,671.5,1533.0,2012-2021,29,31
-82,harmonized,2022-02,837,4941,4941.0,,,observed,,100.0,true,0,false,558.5,2905.9,2012-2021,27,28
-82,harmonized,2022-03,138,638,638.0,,,observed,,40.0,false,0,false,728.5,3974.0,2012-2021,24,25
-82,harmonized,2022-04,101,568,568.0,,,observed,,40.0,false,0,false,609.5,2807.8,2012-2021,16,26
-82,harmonized,2022-05,205,823,823.0,,,observed,,60.0,false,0,false,547.0,1889.5,2012-2021,24,29
-82,harmonized,2022-06,431,1568,1568.0,,,observed,,70.0,false,0,false,1173.5,2675.8,2012-2021,23,27
-82,harmonized,2022-07,899,1950,1950.0,,,observed,,30.0,false,0,false,2892.5,8032.7,2012-2021,28,26
-82,harmonized,2022-08,1840,5707,5707.0,,,observed,,60.0,false,0,false,5153.0,10005.7,2012-2021,30,21
-82,harmonized,2022-09,2097,7719,7719.0,,,observed,,90.0,true,0,false,4696.0,7136.7,2012-2021,28,30
-82,harmonized,2022-10,897,3745,3745.0,,,observed,,80.0,false,0,false,1459.5,4183.7,2012-2021,27,31
-82,harmonized,2022-11,735,3613,3613.0,,,observed,,100.0,true,0,false,903.0,2791.1,2012-2021,29,30
-82,harmonized,2022-12,284,2174,2174.0,,,observed,,80.0,false,0,false,738.0,2755.3,2012-2021,27,31
-82,harmonized,2023-01,243,1792,1792.0,,,observed,,80.0,false,0,false,831.0,3388.8,2013-2022,29,31
-82,harmonized,2023-02,226,1460,1460.0,,,observed,,70.0,false,0,false,558.5,3805.2,2013-2022,25,28
-82,harmonized,2023-03,199,925,925.0,,,observed,,70.0,false,0,false,642.5,3974.0,2013-2022,28,30
-82,harmonized,2023-04,245,737,737.0,,,observed,,60.0,false,0,false,609.5,2807.8,2013-2022,24,25
-82,harmonized,2023-05,282,843,843.0,,,observed,,70.0,false,0,false,547.0,1889.5,2013-2022,21,26
-82,harmonized,2023-06,254,784,784.0,,,observed,,30.0,false,0,false,1173.5,2675.8,2013-2022,26,29
-82,harmonized,2023-07,388,1387,1387.0,,,observed,,10.0,false,0,false,2221.0,8032.7,2013-2022,24,21
-82,harmonized,2023-08,1538,4761,4761.0,,,observed,,35.0,false,0,false,5626.0,10005.7,2013-2022,30,31
-82,harmonized,2023-09,612,2049,2049.0,,,observed,,20.0,false,0,false,4834.0,8354.4,2013-2022,24,28
-82,harmonized,2023-10,549,2096,2096.0,,,observed,,60.0,false,0,false,1635.0,4183.7,2013-2022,27,31
-82,harmonized,2023-11,209,715,715.0,,,observed,,20.0,false,0,false,1021.0,3092.8,2013-2022,23,25
-82,harmonized,2023-12,87,306,306.0,,,observed,,10.0,false,0,false,896.5,2755.3,2013-2022,16,19
-82,harmonized,2024-01,79,363,363.0,,,observed,,30.0,false,0,false,1041.5,3388.8,2014-2023,15,26
-82,harmonized,2024-02,82,509,509.0,,,observed,,50.0,false,0,false,710.0,3805.2,2014-2023,17,23
-82,harmonized,2024-03,86,361,361.0,,,observed,,30.0,false,0,false,780.5,3974.0,2014-2023,23,29
-82,harmonized,2024-04,34,173,173.0,,,observed,,0.0,false,0,false,609.5,2807.8,2014-2023,8,16
-82,harmonized,2024-05,97,287,287.0,,,observed,,30.0,false,0,false,648.5,1889.5,2014-2023,14,23
-82,harmonized,2024-06,264,705,705.0,,,observed,,30.0,false,0,false,1173.5,2675.8,2014-2023,20,22
-82,harmonized,2024-07,699,1357,1357.0,,,observed,,10.0,false,0,false,2015.0,8032.7,2014-2023,28,19
-82,harmonized,2024-08,2058,6261,6261.0,,,observed,,70.0,false,0,false,5153.0,10005.7,2014-2023,28,29
-82,harmonized,2024-09,2358,7742,7742.0,,,observed,,90.0,false,0,false,4696.0,8354.4,2014-2023,29,28
-82,harmonized,2024-10,1282,4361,4361.0,,,observed,,90.0,true,0,false,1635.0,3914.6,2014-2023,29,30
-82,harmonized,2024-11,428,1796,1796.0,,,observed,,70.0,false,0,false,927.0,3092.8,2014-2023,24,23
-82,harmonized,2024-12,277,1468,1468.0,,,observed,,60.0,false,0,false,896.5,2755.3,2014-2023,28,30
-82,harmonized,2025-01,724,5556,5556.0,,,observed,,90.0,true,0,false,831.0,3388.8,2015-2024,29,30
-82,harmonized,2025-02,844,4819,4819.0,,,observed,,90.0,true,0,false,730.0,3805.2,2015-2024,27,27
-82,harmonized,2025-03,551,2515,2515.0,,,observed,,80.0,false,0,false,780.5,3974.0,2015-2024,27,31
-82,harmonized,2025-04,553,2034,2034.0,,,observed,,70.0,false,0,false,609.5,2807.8,2015-2024,23,27
-82,harmonized,2025-05,329,1280,1280.0,,,observed,,80.0,false,0,false,648.5,1889.5,2015-2024,21,26
-82,harmonized,2025-06,463,1389,1389.0,,,observed,,60.0,false,0,false,1173.5,2675.8,2015-2024,20,25
-82,harmonized,2025-07,1203,3865,3865.0,,,observed,,70.0,false,0,false,2015.0,8032.7,2015-2024,27,29
-82,harmonized,2025-08,2290,7649,7649.0,,,observed,,70.0,false,0,false,5626.0,10005.7,2015-2024,30,30
-82,harmonized,2025-09,1041,3195,3195.0,,,observed,,20.0,false,0,false,4834.0,8375.1,2015-2024,29,29
-82,harmonized,2025-10,708,2404,2404.0,,,observed,,60.0,false,0,false,1887.5,4469.0,2015-2024,28,29
-82,harmonized,2025-11,282,820,820.0,,,observed,,50.0,false,0,false,927.0,3092.8,2015-2024,25,26
-82,harmonized,2025-12,111,511,511.0,,,observed,,30.0,false,0,false,1221.5,2755.3,2015-2024,21,26
+region_id,mode,ym,modis,viirs,harm,harm_lo,harm_hi,src,fit_level,anom_pct,anom,outage_days,outage,baseline_median,baseline_p90,baseline_years,days_modis,days_viirs,outage_days_viirs,outage_viirs,provisional
+82,harmonized,2000-11,175,,1258.2,1026.7,1530.0,backcast_terra,region_month_dn,50.0,false,0,false,1280.7,2113.6,2002-2011,22,,0,false,false
+82,harmonized,2000-12,116,,902.8,360.2,1456.2,backcast_terra,region_month_dn,50.0,false,0,false,895.8,1979.5,2002-2011,19,,0,false,false
+82,harmonized,2001-01,84,,437.9,174.7,706.3,backcast_terra,region_month_dn,10.0,false,0,false,773.1,1410.0,2002-2011,15,,0,false,false
+82,harmonized,2001-02,65,,545.3,217.6,879.6,backcast_terra,region_month_dn,20.0,false,0,false,1087.3,2186.6,2002-2011,15,,0,false,false
+82,harmonized,2001-03,52,,537.2,435.1,641.9,backcast_terra,region_month_dn,50.0,false,0,false,976.2,2768.1,2002-2011,17,,0,false,false
+82,harmonized,2001-04,17,,188.1,152.4,224.8,backcast_terra,region_month_dn,0.0,false,0,false,469.8,2490.6,2002-2011,8,,0,false,false
+82,harmonized,2001-05,31,,432.9,350.7,517.3,backcast_terra,region_season_dn,30.0,false,0,false,689.0,1799.9,2002-2011,9,,0,false,false
+82,harmonized,2001-06,2,,38.4,34.8,43.3,backcast_terra,region_month_dn,0.0,false,0,false,746.2,4353.8,2002-2011,2,,0,false,false
+82,harmonized,2001-07,156,,2582.7,2342.5,2910.7,backcast_terra,region_month_dn,20.0,false,0,false,3590.0,8897.6,2002-2011,15,,0,false,false
+82,harmonized,2001-08,657,,7803.2,7077.5,8794.2,backcast_terra,region_month_dn,50.0,false,0,false,8320.5,9885.6,2002-2011,22,,0,false,false
+82,harmonized,2001-09,318,,2547.6,2078.8,3097.9,backcast_terra,region_month_dn,10.0,false,0,false,5995.9,10371.7,2002-2011,16,,0,false,false
+82,harmonized,2001-10,166,,1389.4,1133.8,1689.6,backcast_terra,region_month_dn,10.0,false,0,false,2433.7,3877.1,2002-2011,20,,0,false,false
+82,harmonized,2001-11,139,,982.7,801.9,1195.0,backcast_terra,region_month_dn,20.0,false,0,false,1280.7,2113.6,2002-2011,19,,0,false,false
+82,harmonized,2001-12,77,,605.7,241.7,977.1,backcast_terra,region_month_dn,20.0,false,0,false,895.8,1979.5,2002-2011,22,,0,false,false
+82,harmonized,2002-01,299,,1559.0,622.0,2514.6,backcast_terra,region_month_dn,100.0,true,0,false,717.2,1248.8,2002-2011 without 2002,24,,0,false,false
+82,harmonized,2002-02,296,,2488.6,993.0,4014.2,backcast_terra,region_month_dn,100.0,true,0,false,1003.2,1743.7,2002-2011 without 2002,23,,0,false,false
+82,harmonized,2002-03,186,,1935.8,1568.0,2313.3,backcast_terra,region_month_dn,77.8,false,0,false,530.6,2779.8,2002-2011 without 2002,11,,0,false,false
+82,harmonized,2002-04,40,,434.3,351.8,519.0,backcast_terra,region_month_dn,44.4,false,0,false,505.2,2614.9,2002-2011 without 2002,7,,0,false,false
+82,harmonized,2002-05,24,,338.5,274.2,404.6,backcast_terra,region_season_dn,22.2,false,0,false,713.9,1921.5,2002-2011 without 2002,13,,0,false,false
+82,harmonized,2002-06,14,,271.7,246.4,306.2,backcast_terra,region_month_dn,11.1,false,0,false,844.3,4442.4,2002-2011 without 2002,8,,0,false,false
+82,harmonized,2002-07,326,,1074.2,974.3,1210.7,backcast,region_month_dn,0.0,false,0,false,3900.4,9067.3,2002-2011 without 2002,18,,0,false,false
+82,harmonized,2002-08,1310,,4054.0,3677.0,4568.9,backcast,region_month_dn,0.0,false,0,false,8888.0,9895.0,2002-2011 without 2002,27,,0,false,false
+82,harmonized,2002-09,1222,,3789.0,3091.8,4607.4,backcast,region_month_dn,11.1,false,0,false,6606.3,10610.5,2002-2011 without 2002,26,,0,false,false
+82,harmonized,2002-10,169,,630.0,514.1,766.1,backcast,region_month_dn,0.0,false,0,false,2513.3,4053.3,2002-2011 without 2002,22,,0,false,false
+82,harmonized,2002-11,274,,965.9,788.2,1174.5,backcast,region_month_dn,11.1,false,0,false,1315.2,2192.1,2002-2011 without 2002,26,,0,false,false
+82,harmonized,2002-12,88,,336.9,134.4,543.4,backcast,region_month_dn,11.1,false,0,false,903.2,2016.9,2002-2011 without 2002,19,,0,false,false
+82,harmonized,2003-01,254,,654.0,261.0,1054.9,backcast,region_month_dn,22.2,false,0,false,829.0,1426.6,2002-2011 without 2003,22,,0,false,false
+82,harmonized,2003-02,299,,1171.5,467.4,1889.7,backcast,region_month_dn,55.6,false,0,false,1003.2,2220.2,2002-2011 without 2003,22,,0,false,false
+82,harmonized,2003-03,113,,450.7,365.1,538.6,backcast,region_month_dn,22.2,false,0,false,1421.8,2779.8,2002-2011 without 2003,18,,0,false,false
+82,harmonized,2003-04,75,,278.0,225.2,332.3,backcast,region_month_dn,22.2,false,0,false,505.2,2614.9,2002-2011 without 2003,13,,0,false,false
+82,harmonized,2003-05,96,,331.8,268.7,396.5,backcast,region_season_dn,11.1,false,0,false,713.9,1921.5,2002-2011 without 2003,17,,0,false,false
+82,harmonized,2003-06,159,,648.2,588.0,730.6,backcast,region_month_dn,44.4,false,0,false,844.3,4442.4,2002-2011 without 2003,23,,0,false,false
+82,harmonized,2003-07,1206,,3900.4,3537.7,4395.8,backcast,region_month_dn,55.6,false,0,false,3279.6,9067.3,2002-2011 without 2003,26,,0,false,false
+82,harmonized,2003-08,3271,,9790.8,8880.3,11034.3,backcast,region_month_dn,77.8,false,0,false,7753.1,9895.0,2002-2011 without 2003,27,,0,false,false
+82,harmonized,2003-09,2767,,8876.8,7243.5,10794.2,backcast,region_month_dn,77.8,false,0,false,5385.4,10610.5,2002-2011 without 2003,30,,0,false,false
+82,harmonized,2003-10,474,,1748.5,1426.7,2126.1,backcast,region_month_dn,22.2,false,0,false,2513.3,4053.3,2002-2011 without 2003,25,,0,false,false
+82,harmonized,2003-11,366,,1406.1,1147.4,1709.8,backcast,region_month_dn,66.7,false,0,false,1246.1,2192.1,2002-2011 without 2003,28,,0,false,false
+82,harmonized,2003-12,230,,888.3,354.4,1432.8,backcast,region_month_dn,44.4,false,0,false,903.2,2016.9,2002-2011 without 2003,25,,0,false,false
+82,harmonized,2004-01,366,,941.8,375.8,1519.2,backcast,region_month_dn,66.7,false,0,false,717.2,1426.6,2002-2011 without 2004,30,,0,false,false
+82,harmonized,2004-02,432,,1641.4,654.9,2647.5,backcast,region_month_dn,77.8,false,0,false,1003.2,2220.2,2002-2011 without 2004,25,,0,false,false
+82,harmonized,2004-03,714,,2756.5,2232.8,3294.1,backcast,region_month_dn,88.9,true,0,false,530.6,2123.2,2002-2011 without 2004,27,,0,false,false
+82,harmonized,2004-04,218,,805.8,652.7,962.9,backcast,region_month_dn,77.8,false,0,false,434.3,2614.9,2002-2011 without 2004,18,,0,false,false
+82,harmonized,2004-05,391,,1346.8,1090.9,1609.4,backcast,region_season_dn,77.8,false,0,false,664.1,1921.5,2002-2011 without 2004,26,,0,false,false
+82,harmonized,2004-06,1367,,5151.2,4672.1,5805.3,backcast,region_month_dn,100.0,true,0,false,648.2,1837.5,2002-2011 without 2004,26,,0,false,false
+82,harmonized,2004-07,2231,,7881.0,7148.0,8881.8,backcast,region_month_dn,77.8,false,0,false,3279.6,9067.3,2002-2011 without 2004,30,,0,false,false
+82,harmonized,2004-08,2739,,8888.0,8061.4,10016.8,backcast,region_month_dn,55.6,false,0,false,7753.1,9895.0,2002-2011 without 2004,27,,0,false,false
+82,harmonized,2004-09,2756,,10132.8,8268.4,12321.5,backcast,region_month_dn,88.9,true,0,false,5385.4,9605.7,2002-2011 without 2004,29,,0,false,false
+82,harmonized,2004-10,1385,,5462.7,4457.5,6642.6,backcast,region_month_dn,100.0,true,0,false,2354.0,3700.0,2002-2011 without 2004,31,,0,false,false
+82,harmonized,2004-11,338,,1225.4,1000.0,1490.1,backcast,region_month_dn,33.3,false,0,false,1315.2,2192.1,2002-2011 without 2004,26,,0,false,false
+82,harmonized,2004-12,340,,1347.2,537.5,2173.0,backcast,region_month_dn,77.8,false,0,false,888.3,2016.9,2002-2011 without 2004,26,,0,false,false
+82,harmonized,2005-01,470,,1212.6,483.8,1955.9,backcast,region_month_dn,77.8,false,0,false,717.2,1426.6,2002-2011 without 2005,28,,0,false,false
+82,harmonized,2005-02,131,,496.3,198.0,800.6,backcast,region_month_dn,11.1,false,0,false,1171.5,2220.2,2002-2011 without 2005,24,,0,false,false
+82,harmonized,2005-03,437,,1784.5,1445.4,2132.5,backcast,region_month_dn,66.7,false,0,false,530.6,2779.8,2002-2011 without 2005,25,,0,false,false
+82,harmonized,2005-04,56,,203.5,164.8,243.2,backcast,region_month_dn,0.0,false,0,false,505.2,2614.9,2002-2011 without 2005,16,,0,false,false
+82,harmonized,2005-05,131,,459.6,372.3,549.2,backcast,region_season_dn,33.3,false,0,false,713.9,1921.5,2002-2011 without 2005,19,,0,false,false
+82,harmonized,2005-06,68,,213.0,193.2,240.1,backcast,region_month_dn,0.0,false,0,false,844.3,4442.4,2002-2011 without 2005,14,,0,false,false
+82,harmonized,2005-07,877,,2891.6,2622.6,3258.8,backcast,region_month_dn,22.2,false,0,false,3900.4,9067.3,2002-2011 without 2005,29,,0,false,false
+82,harmonized,2005-08,1458,,4584.1,4157.8,5166.3,backcast,region_month_dn,11.1,false,0,false,8888.0,9895.0,2002-2011 without 2005,28,,0,false,false
+82,harmonized,2005-09,1721,,5385.4,4394.5,6548.7,backcast,region_month_dn,44.4,false,0,false,6606.3,10610.5,2002-2011 without 2005,30,,0,false,false
+82,harmonized,2005-10,1019,,3699.8,3019.1,4499.0,backcast,region_month_dn,77.8,false,0,false,2354.0,4053.3,2002-2011 without 2005,27,,0,false,false
+82,harmonized,2005-11,526,,2035.2,1660.7,2474.7,backcast,region_month_dn,88.9,true,0,false,1246.1,1706.5,2002-2011 without 2005,27,,0,false,false
+82,harmonized,2005-12,231,,903.2,360.4,1456.9,backcast,region_month_dn,55.6,false,0,false,888.3,2016.9,2002-2011 without 2005,27,,0,false,false
+82,harmonized,2006-01,515,,1393.5,556.0,2247.7,backcast,region_month_dn,88.9,true,0,false,717.2,1281.9,2002-2011 without 2006,30,,0,false,false
+82,harmonized,2006-02,501,,2153.1,859.1,3472.9,backcast,region_month_dn,88.9,true,0,false,1003.2,1810.8,2002-2011 without 2006,26,,0,false,false
+82,harmonized,2006-03,135,,515.5,417.6,616.0,backcast,region_month_dn,33.3,false,0,false,1421.8,2779.8,2002-2011 without 2006,21,,0,false,false
+82,harmonized,2006-04,133,,505.2,409.2,603.8,backcast,region_month_dn,55.6,false,0,false,434.3,2614.9,2002-2011 without 2006,19,,0,false,false
+82,harmonized,2006-05,482,,1678.3,1359.4,2005.6,backcast,region_season_dn,88.9,true,0,false,664.1,1656.3,2002-2011 without 2006,29,,0,false,false
+82,harmonized,2006-06,156,,510.2,462.7,574.9,backcast,region_month_dn,33.3,false,0,false,844.3,4442.4,2002-2011 without 2006,21,,0,false,false
+82,harmonized,2006-07,589,,1987.1,1802.3,2239.4,backcast,region_month_dn,11.1,false,0,false,3900.4,9067.3,2002-2011 without 2006,27,,0,false,false
+82,harmonized,2006-08,3136,,9970.6,9043.3,11236.8,backcast,region_month_dn,100.0,true,0,false,7753.1,9807.9,2002-2011 without 2006,30,,0,false,false
+82,harmonized,2006-09,3784,,12521.4,10217.5,15226.0,backcast,region_month_dn,100.0,true,0,false,5385.4,9128.0,2002-2011 without 2006,30,,0,false,false
+82,harmonized,2006-10,650,,2513.3,2050.9,3056.2,backcast,region_month_dn,55.6,false,0,false,2354.0,4053.3,2002-2011 without 2006,28,,0,false,false
+82,harmonized,2006-11,354,,1315.2,1073.2,1599.3,backcast,region_month_dn,55.6,false,0,false,1246.1,2192.1,2002-2011 without 2006,25,,0,false,false
+82,harmonized,2006-12,193,,777.0,310.0,1253.3,backcast,region_month_dn,22.2,false,0,false,903.2,2016.9,2002-2011 without 2006,25,,0,false,false
+82,harmonized,2007-01,145,,369.5,147.4,595.9,backcast,region_month_dn,0.0,false,0,false,829.0,1426.6,2002-2011 without 2007,25,,0,false,false
+82,harmonized,2007-02,259,,1003.2,400.3,1618.1,backcast,region_month_dn,44.4,false,0,false,1171.5,2220.2,2002-2011 without 2007,27,,0,false,false
+82,harmonized,2007-03,78,,303.6,245.9,362.8,backcast,region_month_dn,11.1,false,0,false,1421.8,2779.8,2002-2011 without 2007,21,,0,false,false
+82,harmonized,2007-04,72,,270.6,219.2,323.4,backcast,region_month_dn,11.1,false,0,false,505.2,2614.9,2002-2011 without 2007,17,,0,false,false
+82,harmonized,2007-05,340,,1177.0,953.3,1406.5,backcast,region_season_dn,66.7,false,0,false,664.1,1921.5,2002-2011 without 2007,26,,0,false,false
+82,harmonized,2007-06,362,,1230.6,1116.1,1386.9,backcast,region_month_dn,77.8,false,0,false,648.2,4442.4,2002-2011 without 2007,25,,0,false,false
+82,harmonized,2007-07,2499,,8728.0,7916.3,9836.5,backcast,region_month_dn,88.9,true,0,false,3279.6,8389.7,2002-2011 without 2007,28,,0,false,false
+82,harmonized,2007-08,2331,,7753.1,7032.1,8737.8,backcast,region_month_dn,44.4,false,0,false,8888.0,9895.0,2002-2011 without 2007,28,,0,false,false
+82,harmonized,2007-09,1933,,6606.3,5390.7,8033.2,backcast,region_month_dn,55.6,false,0,false,5385.4,10610.5,2002-2011 without 2007,26,,0,false,false
+82,harmonized,2007-10,432,,1740.1,1419.9,2116.0,backcast,region_month_dn,11.1,false,0,false,2513.3,4053.3,2002-2011 without 2007,25,,0,false,false
+82,harmonized,2007-11,331,,1246.1,1016.9,1515.3,backcast,region_month_dn,44.4,false,0,false,1315.2,2192.1,2002-2011 without 2007,27,,0,false,false
+82,harmonized,2007-12,181,,782.2,312.1,1261.7,backcast,region_month_dn,33.3,false,0,false,903.2,2016.9,2002-2011 without 2007,27,,0,false,false
+82,harmonized,2008-01,278,,717.2,286.1,1156.8,backcast,region_month_dn,44.4,false,0,false,829.0,1426.6,2002-2011 without 2008,25,,0,false,false
+82,harmonized,2008-02,409,,1563.1,623.7,2521.2,backcast,region_month_dn,66.7,false,0,false,1003.2,2220.2,2002-2011 without 2008,26,,0,false,false
+82,harmonized,2008-03,652,,2872.8,2327.0,3433.0,backcast,region_month_dn,100.0,true,0,false,530.6,2099.9,2002-2011 without 2008,28,,0,false,false
+82,harmonized,2008-04,943,,3609.3,2923.5,4313.1,backcast,region_month_dn,100.0,true,0,false,434.3,1117.9,2002-2011 without 2008,26,,0,false,false
+82,harmonized,2008-05,810,,2894.1,2344.2,3458.5,backcast,region_season_dn,100.0,true,0,false,664.1,1413.1,2002-2011 without 2008,27,,0,false,false
+82,harmonized,2008-06,1204,,4265.2,3868.5,4806.8,backcast,region_month_dn,88.9,true,0,false,648.2,2014.7,2002-2011 without 2008,25,,0,false,false
+82,harmonized,2008-07,2696,,10424.4,9454.9,11748.3,backcast,region_month_dn,100.0,true,0,false,3279.6,8050.4,2002-2011 without 2008,28,,0,false,false
+82,harmonized,2008-08,3044,,9876.1,8957.6,11130.3,backcast,region_month_dn,88.9,true,0,false,7753.1,9826.8,2002-2011 without 2008,31,,0,false,false
+82,harmonized,2008-09,1582,,5334.1,4352.6,6486.2,backcast,region_month_dn,33.3,false,0,false,6606.3,10610.5,2002-2011 without 2008,29,,0,false,false
+82,harmonized,2008-10,689,,2602.8,2123.8,3164.9,backcast,region_month_dn,66.7,false,0,false,2354.0,4053.3,2002-2011 without 2008,27,,0,false,false
+82,harmonized,2008-11,384,,1428.2,1165.4,1736.6,backcast,region_month_dn,77.8,false,0,false,1246.1,2192.1,2002-2011 without 2008,26,,0,false,false
+82,harmonized,2008-12,305,,1288.2,514.0,2077.9,backcast,region_month_dn,66.7,false,0,false,888.3,2016.9,2002-2011 without 2008,29,,0,false,false
+82,harmonized,2009-01,316,,829.0,330.8,1337.1,backcast,region_month_dn,55.6,false,0,false,717.2,1426.6,2002-2011 without 2009,23,,0,false,false
+82,harmonized,2009-02,143,,568.1,226.7,916.3,backcast,region_month_dn,33.3,false,0,false,1171.5,2220.2,2002-2011 without 2009,22,,0,false,false
+82,harmonized,2009-03,129,,530.6,429.8,634.1,backcast,region_month_dn,44.4,false,0,false,1421.8,2779.8,2002-2011 without 2009,28,,0,false,false
+82,harmonized,2009-04,143,,531.1,430.2,634.6,backcast,region_month_dn,66.7,false,0,false,434.3,2614.9,2002-2011 without 2009,22,,0,false,false
+82,harmonized,2009-05,208,,713.9,578.3,853.2,backcast,region_season_dn,55.6,false,0,false,664.1,1921.5,2002-2011 without 2009,24,,0,false,false
+82,harmonized,2009-06,283,,908.0,823.6,1023.3,backcast,region_month_dn,66.7,false,0,false,648.2,4442.4,2002-2011 without 2009,27,,0,false,false
+82,harmonized,2009-07,880,,2921.6,2649.9,3292.7,backcast,region_month_dn,33.3,false,0,false,3900.4,9067.3,2002-2011 without 2009,28,,0,false,false
+82,harmonized,2009-08,1955,,6423.3,5825.9,7239.1,backcast,region_month_dn,33.3,false,0,false,8888.0,9895.0,2002-2011 without 2009,31,,0,false,false
+82,harmonized,2009-09,738,,2476.8,2021.0,3011.8,backcast,region_month_dn,0.0,false,0,false,6606.3,10610.5,2002-2011 without 2009,25,,0,false,false
+82,harmonized,2009-10,643,,2354.0,1920.9,2862.5,backcast,region_month_dn,44.4,false,0,false,2513.3,4053.3,2002-2011 without 2009,30,,0,false,false
+82,harmonized,2009-11,112,,419.4,342.3,510.0,backcast,region_month_dn,0.0,false,0,false,1315.2,2192.1,2002-2011 without 2009,20,,0,false,false
+82,harmonized,2009-12,77,,317.9,126.8,512.7,backcast,region_month_dn,0.0,false,0,false,903.2,2016.9,2002-2011 without 2009,18,,0,false,false
+82,harmonized,2010-01,224,,576.7,230.1,930.2,backcast,region_month_dn,11.1,false,0,false,829.0,1426.6,2002-2011 without 2010,26,,0,false,false
+82,harmonized,2010-02,82,,307.2,122.6,495.5,backcast,region_month_dn,0.0,false,0,false,1171.5,2220.2,2002-2011 without 2010,19,,0,false,false
+82,harmonized,2010-03,55,,214.7,173.9,256.5,backcast,region_month_dn,0.0,false,0,false,1421.8,2779.8,2002-2011 without 2010,20,,0,false,false
+82,harmonized,2010-04,80,,295.9,239.7,353.6,backcast,region_month_dn,33.3,false,0,false,505.2,2614.9,2002-2011 without 2010,18,,0,false,false
+82,harmonized,2010-05,78,,266.2,215.6,318.1,backcast,region_season_dn,0.0,false,0,false,713.9,1921.5,2002-2011 without 2010,15,,0,false,false
+82,harmonized,2010-06,110,,344.6,312.6,388.4,backcast,region_month_dn,22.2,false,0,false,844.3,4442.4,2002-2011 without 2010,17,,0,false,false
+82,harmonized,2010-07,949,,3279.6,2974.6,3696.1,backcast,region_month_dn,44.4,false,0,false,3900.4,9067.3,2002-2011 without 2010,28,,0,false,false
+82,harmonized,2010-08,1451,,4708.2,4270.3,5306.1,backcast,region_month_dn,22.2,false,0,false,8888.0,9895.0,2002-2011 without 2010,31,,0,false,false
+82,harmonized,2010-09,1581,,5020.2,4096.5,6104.6,backcast,region_month_dn,22.2,false,0,false,6606.3,10610.5,2002-2011 without 2010,27,,0,false,false
+82,harmonized,2010-10,940,,3700.9,3019.9,4500.3,backcast,region_month_dn,88.9,false,0,false,2354.0,4052.4,2002-2011 without 2010,30,,0,false,false
+82,harmonized,2010-11,711,,2819.7,2300.8,3428.7,backcast,region_month_dn,100.0,true,0,false,1246.1,1549.6,2002-2011 without 2010,28,,0,false,false
+82,harmonized,2010-12,440,,1942.1,774.9,3132.6,backcast,region_month_dn,88.9,true,0,false,888.3,1541.0,2002-2011 without 2010,30,,0,false,false
+82,harmonized,2011-01,271,,714.7,285.1,1152.7,backcast,region_month_dn,33.3,false,0,false,829.0,1426.6,2002-2011 without 2011,24,,0,false,false
+82,harmonized,2011-02,145,,566.2,225.9,913.2,backcast,region_month_dn,22.2,false,0,false,1171.5,2220.2,2002-2011 without 2011,21,,0,false,false
+82,harmonized,2011-03,355,,1421.8,1151.7,1699.1,backcast,region_month_dn,55.6,false,0,false,530.6,2779.8,2002-2011 without 2011,25,,0,false,false
+82,harmonized,2011-04,562,,2366.3,1916.7,2827.7,backcast,region_month_dn,88.9,true,0,false,434.3,1366.5,2002-2011 without 2011,22,,0,false,false
+82,harmonized,2011-05,186,,664.1,537.9,793.6,backcast,region_season_dn,44.4,false,0,false,713.9,1921.5,2002-2011 without 2011,22,,0,false,false
+82,harmonized,2011-06,225,,844.3,765.8,951.5,backcast,region_month_dn,55.6,false,0,false,648.2,4442.4,2002-2011 without 2011,20,,0,false,false
+82,harmonized,2011-07,1164,,4297.4,3897.7,4843.2,backcast,region_month_dn,66.7,false,0,false,3279.6,9067.3,2002-2011 without 2011,26,,0,false,false
+82,harmonized,2011-08,2877,,9401.6,8527.3,10595.7,backcast,region_month_dn,66.7,false,0,false,7753.1,9895.0,2002-2011 without 2011,29,,0,false,false
+82,harmonized,2011-09,2378,,8132.6,6636.2,9889.2,backcast,region_month_dn,66.7,false,0,false,5385.4,10610.5,2002-2011 without 2011,30,,0,false,false
+82,harmonized,2011-10,444,,1819.4,1484.6,2212.4,backcast,region_month_dn,33.3,false,0,false,2513.3,4053.3,2002-2011 without 2011,24,,0,false,false
+82,harmonized,2011-11,324,,1217.1,993.2,1480.0,backcast,region_month_dn,22.2,false,0,false,1315.2,2192.1,2002-2011 without 2011,26,,0,false,false
+82,harmonized,2011-12,523,,2316.2,924.2,3736.0,backcast,region_month_dn,100.0,true,0,false,888.3,1466.2,2002-2011 without 2011,29,,0,false,false
+82,harmonized,2012-01,647,541,541.0,,,observed,,10.0,false,0,false,773.1,1410.0,2002-2011,29,11,0,false,false
+82,harmonized,2012-02,325,1198,1198.0,,,observed,,60.0,false,0,false,1087.3,2186.6,2002-2011,24,27,0,false,false
+82,harmonized,2012-03,231,810,810.0,,,observed,,50.0,false,0,false,976.2,2768.1,2002-2011,27,29,0,false,false
+82,harmonized,2012-04,76,432,432.0,,,observed,,40.0,false,0,false,469.8,2490.6,2002-2011,18,27,0,false,false
+82,harmonized,2012-05,220,917,917.0,,,observed,,60.0,false,0,false,689.0,1799.9,2002-2011,23,25,0,false,false
+82,harmonized,2012-06,560,1884,1884.0,,,observed,,80.0,false,0,false,746.2,4353.8,2002-2011,27,29,0,false,false
+82,harmonized,2012-07,1606,4746,4746.0,,,observed,,70.0,false,0,false,3590.0,8897.6,2002-2011,28,30,0,false,false
+82,harmonized,2012-08,1190,4148,4148.0,,,observed,,10.0,false,0,false,8320.5,9885.6,2002-2011,27,28,0,false,false
+82,harmonized,2012-09,694,2313,2313.0,,,observed,,0.0,false,0,false,5995.9,10371.7,2002-2011,28,29,0,false,false
+82,harmonized,2012-10,179,884,884.0,,,observed,,10.0,false,0,false,2433.7,3877.1,2002-2011,23,28,0,false,false
+82,harmonized,2012-11,166,661,661.0,,,observed,,10.0,false,0,false,1280.7,2113.6,2002-2011,26,28,0,false,false
+82,harmonized,2012-12,148,361,361.0,,,observed,,20.0,false,0,false,895.8,1979.5,2002-2011,26,29,0,false,false
+82,harmonized,2013-01,206,559,559.0,,,observed,,20.0,false,0,false,716.0,1230.7,2003-2012,26,30,0,false,false
+82,harmonized,2013-02,169,648,648.0,,,observed,,40.0,false,0,false,1087.3,1692.6,2003-2012,20,22,0,false,false
+82,harmonized,2013-03,175,647,647.0,,,observed,,50.0,false,0,false,670.3,2768.1,2003-2012,20,28,0,false,false
+82,harmonized,2013-04,203,835,835.0,,,observed,,80.0,false,0,false,468.6,2490.6,2003-2012,24,25,0,false,false
+82,harmonized,2013-05,167,620,620.0,,,observed,,30.0,false,0,false,815.5,1799.9,2003-2012,18,24,0,false,false
+82,harmonized,2013-06,282,925,925.0,,,observed,,60.0,false,0,false,876.1,4353.8,2003-2012,23,28,0,false,false
+82,harmonized,2013-07,649,2362,2362.0,,,observed,,10.0,false,0,false,4098.9,8897.6,2003-2012,26,28,0,false,false
+82,harmonized,2013-08,2121,6452,6452.0,,,observed,,40.0,false,0,false,8320.5,9885.6,2003-2012,30,31,0,false,false
+82,harmonized,2013-09,2053,6366,6366.0,,,observed,,50.0,false,0,false,5995.9,10371.7,2003-2012,27,27,0,false,false
+82,harmonized,2013-10,940,4044,4044.0,,,observed,,90.0,true,0,false,2433.7,3877.1,2003-2012,26,30,0,false,false
+82,harmonized,2013-11,318,997,997.0,,,observed,,20.0,false,0,false,1280.7,2113.6,2003-2012,24,25,0,false,false
+82,harmonized,2013-12,122,658,658.0,,,observed,,20.0,false,0,false,895.8,1979.5,2003-2012,24,30,0,false,false
+82,harmonized,2014-01,294,1205,1205.0,,,observed,,80.0,false,0,false,716.0,1230.7,2004-2013,27,26,0,false,false
+82,harmonized,2014-02,82,225,225.0,,,observed,,0.0,false,0,false,825.6,1692.6,2004-2013,15,20,0,false,false
+82,harmonized,2014-03,72,302,302.0,,,observed,,10.0,false,0,false,728.5,2768.1,2004-2013,17,25,0,false,false
+82,harmonized,2014-04,99,311,311.0,,,observed,,30.0,false,0,false,518.1,2490.6,2004-2013,21,27,0,false,false
+82,harmonized,2014-05,37,141,141.0,,,observed,,0.0,false,0,false,815.5,1799.9,2004-2013,7,17,0,false,false
+82,harmonized,2014-06,89,331,331.0,,,observed,,10.0,false,0,false,916.5,4353.8,2004-2013,17,28,0,false,false
+82,harmonized,2014-07,201,695,695.0,,,observed,,0.0,false,0,false,3788.5,8897.6,2004-2013,22,26,0,false,false
+82,harmonized,2014-08,985,3216,3216.0,,,observed,,0.0,false,0,false,7102.6,9885.6,2004-2013,31,31,0,false,false
+82,harmonized,2014-09,428,1068,1068.0,,,observed,,0.0,false,0,false,5875.7,10371.7,2004-2013,25,28,0,false,false
+82,harmonized,2014-10,348,1591,1591.0,,,observed,,10.0,false,0,false,2558.1,4185.9,2004-2013,23,29,0,false,false
+82,harmonized,2014-11,375,1632,1632.0,,,observed,,80.0,false,0,false,1235.8,2113.6,2004-2013,24,25,0,false,false
+82,harmonized,2014-12,198,632,632.0,,,observed,,20.0,false,0,false,842.7,1979.5,2004-2013,24,27,0,false,false
+82,harmonized,2015-01,214,170,170.0,,,observed,,0.0,false,0,false,716.0,1230.7,2005-2014,24,25,0,false,false
+82,harmonized,2015-02,108,217,217.0,,,observed,,0.0,false,0,false,608.0,1622.1,2005-2014,22,24,0,false,false
+82,harmonized,2015-03,142,569,569.0,,,observed,,50.0,false,0,false,588.8,1893.3,2005-2014,26,26,0,false,false
+82,harmonized,2015-04,528,2310,2310.0,,,observed,,80.0,false,0,false,468.6,2490.6,2005-2014,27,30,0,false,false
+82,harmonized,2015-05,396,1388,1388.0,,,observed,,80.0,false,0,false,689.0,1799.9,2005-2014,23,28,0,false,false
+82,harmonized,2015-06,754,2539,2539.0,,,observed,,90.0,true,0,false,876.1,2122.1,2005-2014,25,28,0,false,false
+82,harmonized,2015-07,2105,7699,7699.0,,,observed,,80.0,false,0,false,3100.6,8897.6,2005-2014,29,31,0,false,false
+82,harmonized,2015-08,1576,4647,4647.0,,,observed,,30.0,false,0,false,6437.6,9885.6,2005-2014,24,25,0,false,false
+82,harmonized,2015-09,1433,4558,4558.0,,,observed,,30.0,false,0,false,5359.8,8571.5,2005-2014,27,28,0,false,false
+82,harmonized,2015-10,491,1679,1679.0,,,observed,,20.0,false,0,false,2433.7,3735.2,2005-2014,26,29,0,false,false
+82,harmonized,2015-11,187,610,610.0,,,observed,,10.0,false,0,false,1280.7,2113.6,2005-2014,22,26,0,false,false
+82,harmonized,2015-12,165,291,291.0,,,observed,,0.0,false,0,false,779.6,1979.5,2005-2014,24,22,0,false,false
+82,harmonized,2016-01,286,784,784.0,,,observed,,70.0,false,0,false,645.7,1223.8,2006-2015,27,29,0,false,false
+82,harmonized,2016-02,132,469,469.0,,,observed,,30.0,false,0,false,608.0,1622.1,2006-2015,26,27,0,false,false
+82,harmonized,2016-03,338,1415,1415.0,,,observed,,80.0,false,0,false,549.8,1566.9,2006-2015,22,27,0,false,false
+82,harmonized,2016-04,72,205,205.0,,,observed,,0.0,false,0,false,518.1,2490.6,2006-2015,10,15,0,false,false
+82,harmonized,2016-05,68,281,281.0,,,observed,,20.0,false,0,false,815.5,1799.9,2006-2015,18,21,0,false,false
+82,harmonized,2016-06,292,1020,1020.0,,,observed,,60.0,false,0,false,916.5,2711.6,2006-2015,22,26,0,false,false
+82,harmonized,2016-07,670,2080,2080.0,,,observed,,20.0,false,0,false,3788.5,8897.6,2006-2015,22,26,0,false,false
+82,harmonized,2016-08,1821,5545,5545.0,,,observed,,40.0,false,0,false,6437.6,9885.6,2006-2015,30,30,0,false,false
+82,harmonized,2016-09,1546,4834,4834.0,,,observed,,40.0,false,0,false,5177.1,8571.5,2006-2015,26,29,0,false,false
+82,harmonized,2016-10,256,685,685.0,,,observed,,0.0,false,0,false,2086.7,3735.2,2006-2015,23,26,0,false,false
+82,harmonized,2016-11,248,740,740.0,,,observed,,30.0,false,0,false,1231.6,1750.8,2006-2015,24,27,0,false,false
+82,harmonized,2016-12,143,347,347.0,,,observed,,20.0,false,0,false,717.5,1979.5,2006-2015,26,28,0,false,false
+82,harmonized,2017-01,212,234,234.0,,,observed,,10.0,false,0,false,645.7,866.6,2007-2016,22,24,0,false,false
+82,harmonized,2017-02,90,146,146.0,,,observed,,0.0,false,0,false,567.2,1234.5,2007-2016,22,25,0,false,false
+82,harmonized,2017-03,101,307,307.0,,,observed,,30.0,false,0,false,608.0,1566.9,2007-2016,19,25,0,false,false
+82,harmonized,2017-04,145,604,604.0,,,observed,,60.0,false,0,false,481.6,2490.6,2007-2016,19,23,0,false,false
+82,harmonized,2017-05,100,351,351.0,,,observed,,30.0,false,0,false,689.0,1538.6,2007-2016,14,20,0,false,false
+82,harmonized,2017-06,442,1327,1327.0,,,observed,,70.0,false,0,false,972.5,2711.6,2007-2016,20,23,0,false,false
+82,harmonized,2017-07,1046,3423,3423.0,,,observed,,50.0,false,0,false,3788.5,8897.6,2007-2016,23,24,0,false,false
+82,harmonized,2017-08,1233,3860,3860.0,,,observed,,10.0,false,0,false,5984.1,9449.1,2007-2016,27,27,0,false,false
+82,harmonized,2017-09,625,1866,1866.0,,,observed,,10.0,false,0,false,4927.1,6758.9,2007-2016,19,26,0,false,false
+82,harmonized,2017-10,375,1288,1288.0,,,observed,,20.0,false,0,false,1779.8,3735.2,2007-2016,25,28,0,false,false
+82,harmonized,2017-11,744,2764,2764.0,,,observed,,90.0,true,0,false,1107.0,1750.8,2007-2016,30,28,0,false,false
+82,harmonized,2017-12,491,2628,2628.0,,,observed,,100.0,true,0,false,645.0,1979.5,2007-2016,30,30,0,false,false
+82,harmonized,2018-01,546,2928,2928.0,,,observed,,100.0,true,0,false,645.7,866.6,2008-2017,28,28,0,false,false
+82,harmonized,2018-02,725,3679,3679.0,,,observed,,100.0,true,0,false,517.6,1234.5,2008-2017,27,28,0,false,false
+82,harmonized,2018-03,887,3804,3804.0,,,observed,,100.0,true,0,false,608.0,1566.9,2008-2017,29,30,0,false,false
+82,harmonized,2018-04,729,2482,2482.0,,,observed,,90.0,false,0,false,567.5,2490.6,2008-2017,27,29,0,false,false
+82,harmonized,2018-05,134,474,474.0,,,observed,,40.0,false,0,false,642.0,1538.6,2008-2017,15,22,0,false,false
+82,harmonized,2018-06,494,1561,1561.0,,,observed,,70.0,false,0,false,972.5,2711.6,2008-2017,23,28,0,false,false
+82,harmonized,2018-07,569,1841,1841.0,,,observed,,10.0,false,0,false,3351.3,7971.5,2008-2017,21,27,0,false,false
+82,harmonized,2018-08,2708,8310,8310.0,,,observed,,80.0,false,0,false,5126.6,9449.1,2008-2017,29,31,0,false,false
+82,harmonized,2018-09,1252,4381,4381.0,,,observed,,40.0,false,0,false,4696.0,6542.7,2008-2017,25,29,0,false,false
+82,harmonized,2018-10,319,1195,1195.0,,,observed,,20.0,false,0,false,1749.2,3735.2,2008-2017,26,29,0,false,false
+82,harmonized,2018-11,192,809,809.0,,,observed,,40.0,false,0,false,1107.0,2769.6,2008-2017,21,25,0,false,false
+82,harmonized,2018-12,196,975,975.0,,,observed,,60.0,false,0,false,645.0,2347.4,2008-2017,22,28,0,false,false
+82,harmonized,2019-01,27,39,39.0,,,observed,,0.0,false,0,false,645.7,1377.3,2009-2018,10,12,0,false,false
+82,harmonized,2019-02,65,192,192.0,,,observed,,10.0,false,0,false,517.6,1446.1,2009-2018,17,23,0,false,false
+82,harmonized,2019-03,52,210,210.0,,,observed,,0.0,false,0,false,608.0,1660.0,2009-2018,17,22,0,false,false
+82,harmonized,2019-04,84,301,301.0,,,observed,,20.0,false,0,false,567.5,2377.9,2009-2018,16,21,0,false,false
+82,harmonized,2019-05,34,106,106.0,,,observed,,0.0,false,0,false,547.0,964.1,2009-2018,11,16,0,false,false
+82,harmonized,2019-06,134,484,484.0,,,observed,,20.0,false,0,false,972.5,1949.5,2009-2018,19,20,0,false,false
+82,harmonized,2019-07,424,1409,1409.0,,,observed,,10.0,false,0,false,3100.6,5041.3,2009-2018,20,25,0,false,false
+82,harmonized,2019-08,1494,4761,4761.0,,,observed,,50.0,false,0,false,5126.6,8419.2,2009-2018,28,30,0,false,false
+82,harmonized,2019-09,1494,4994,4994.0,,,observed,,70.0,false,0,false,4469.5,6542.7,2009-2018,29,30,0,false,false
+82,harmonized,2019-10,371,1328,1328.0,,,observed,,40.0,false,0,false,1635.0,3735.2,2009-2018,21,24,0,false,false
+82,harmonized,2019-11,130,603,603.0,,,observed,,10.0,false,0,false,903.0,2769.6,2009-2018,22,26,0,false,false
+82,harmonized,2019-12,181,818,818.0,,,observed,,60.0,false,0,false,645.0,2347.4,2009-2018,23,29,0,false,false
+82,harmonized,2020-01,167,878,878.0,,,observed,,80.0,false,0,false,567.9,1377.3,2010-2019,24,28,0,false,false
+82,harmonized,2020-02,603,2820,2820.0,,,observed,,90.0,true,0,false,388.1,1446.1,2010-2019,24,28,0,false,false
+82,harmonized,2020-03,1302,5504,5504.0,,,observed,,100.0,true,0,false,608.0,1660.0,2010-2019,27,27,0,false,false
+82,harmonized,2020-04,1426,5740,5740.0,,,observed,,100.0,true,0,false,518.0,2377.9,2010-2019,27,29,0,false,false
+82,harmonized,2020-05,1617,6403,6403.0,,,observed,,100.0,true,0,false,412.5,964.1,2010-2019,29,29,0,false,false
+82,harmonized,2020-06,1030,3907,3907.0,,,observed,,100.0,true,0,false,972.5,1949.5,2010-2019,28,30,0,false,false
+82,harmonized,2020-07,2775,11036,11036.0,,,observed,,100.0,true,0,false,2820.8,5041.3,2010-2019,28,29,0,false,false
+82,harmonized,2020-08,6246,22423,22423.0,,,observed,,100.0,true,16,true,4734.6,8419.2,2010-2019,30,31,0,false,false
+82,harmonized,2020-09,4073,14073,14073.0,,,observed,,100.0,true,2,false,4696.0,6542.7,2010-2019,28,28,0,false,false
+82,harmonized,2020-10,1480,5441,5441.0,,,observed,,100.0,true,0,false,1459.5,3735.2,2010-2019,30,30,0,false,false
+82,harmonized,2020-11,704,3035,3035.0,,,observed,,100.0,true,0,false,903.0,2769.6,2010-2019,27,30,0,false,false
+82,harmonized,2020-12,361,1588,1588.0,,,observed,,70.0,false,0,false,738.0,2347.4,2010-2019,30,31,0,false,false
+82,harmonized,2021-01,250,1378,1378.0,,,observed,,90.0,true,0,false,636.9,1377.3,2011-2020,26,28,0,false,false
+82,harmonized,2021-02,238,951,951.0,,,observed,,70.0,false,0,false,517.6,2905.9,2011-2020,25,26,0,false,false
+82,harmonized,2021-03,195,923,923.0,,,observed,,60.0,false,0,false,728.5,3974.0,2011-2020,23,29,0,false,false
+82,harmonized,2021-04,152,615,615.0,,,observed,,50.0,false,0,false,719.5,2807.8,2011-2020,24,27,0,false,false
+82,harmonized,2021-05,312,956,956.0,,,observed,,80.0,false,0,false,547.0,1889.5,2011-2020,24,28,0,false,false
+82,harmonized,2021-06,170,670,670.0,,,observed,,20.0,false,0,false,1173.5,2675.8,2011-2020,20,27,0,false,false
+82,harmonized,2021-07,1528,5237,5237.0,,,observed,,80.0,false,0,false,2892.5,8032.7,2011-2020,30,30,0,false,false
+82,harmonized,2021-08,2629,8626,8626.0,,,observed,,80.0,false,0,false,5153.0,10703.7,2011-2020,31,31,0,false,false
+82,harmonized,2021-09,1249,4834,4834.0,,,observed,,55.0,false,0,false,4696.0,8726.6,2011-2020,28,30,0,false,false
+82,harmonized,2021-10,927,3643,3643.0,,,observed,,80.0,false,0,false,1459.5,4183.7,2011-2020,29,31,0,false,false
+82,harmonized,2021-11,245,1045,1045.0,,,observed,,60.0,false,0,false,903.0,2791.1,2011-2020,22,26,0,false,false
+82,harmonized,2021-12,633,3901,3901.0,,,observed,,100.0,true,0,false,738.0,2347.4,2011-2020,27,30,0,false,false
+82,harmonized,2022-01,1289,7536,7536.0,,,observed,,100.0,true,0,false,671.5,1533.0,2012-2021,29,31,0,false,false
+82,harmonized,2022-02,837,4941,4941.0,,,observed,,100.0,true,0,false,558.5,2905.9,2012-2021,27,28,0,false,false
+82,harmonized,2022-03,138,638,638.0,,,observed,,40.0,false,0,false,728.5,3974.0,2012-2021,24,25,0,false,false
+82,harmonized,2022-04,101,568,568.0,,,observed,,40.0,false,0,false,609.5,2807.8,2012-2021,16,26,0,false,false
+82,harmonized,2022-05,205,823,823.0,,,observed,,60.0,false,0,false,547.0,1889.5,2012-2021,24,29,0,false,false
+82,harmonized,2022-06,431,1568,1568.0,,,observed,,70.0,false,0,false,1173.5,2675.8,2012-2021,23,27,0,false,false
+82,harmonized,2022-07,899,1950,1950.0,,,observed,,30.0,false,0,false,2892.5,8032.7,2012-2021,28,26,0,false,false
+82,harmonized,2022-08,1840,5707,5707.0,,,observed,,60.0,false,0,false,5153.0,10005.7,2012-2021,30,21,0,false,false
+82,harmonized,2022-09,2097,7719,7719.0,,,observed,,90.0,true,0,false,4696.0,7136.7,2012-2021,28,30,0,false,false
+82,harmonized,2022-10,897,3745,3745.0,,,observed,,80.0,false,0,false,1459.5,4183.7,2012-2021,27,31,0,false,false
+82,harmonized,2022-11,735,3613,3613.0,,,observed,,100.0,true,0,false,903.0,2791.1,2012-2021,29,30,0,false,false
+82,harmonized,2022-12,284,2174,2174.0,,,observed,,80.0,false,0,false,738.0,2755.3,2012-2021,27,31,0,false,false
+82,harmonized,2023-01,243,1792,1792.0,,,observed,,80.0,false,0,false,831.0,3388.8,2013-2022,29,31,0,false,false
+82,harmonized,2023-02,226,1460,1460.0,,,observed,,70.0,false,0,false,558.5,3805.2,2013-2022,25,28,0,false,false
+82,harmonized,2023-03,199,925,925.0,,,observed,,70.0,false,0,false,642.5,3974.0,2013-2022,28,30,0,false,false
+82,harmonized,2023-04,245,737,737.0,,,observed,,60.0,false,0,false,609.5,2807.8,2013-2022,24,25,0,false,false
+82,harmonized,2023-05,282,843,843.0,,,observed,,70.0,false,0,false,547.0,1889.5,2013-2022,21,26,0,false,false
+82,harmonized,2023-06,254,784,784.0,,,observed,,30.0,false,0,false,1173.5,2675.8,2013-2022,26,29,0,false,false
+82,harmonized,2023-07,388,1387,1387.0,,,observed,,10.0,false,0,false,2221.0,8032.7,2013-2022,24,21,0,false,false
+82,harmonized,2023-08,1538,4761,4761.0,,,observed,,35.0,false,0,false,5626.0,10005.7,2013-2022,30,31,0,false,false
+82,harmonized,2023-09,612,2049,2049.0,,,observed,,20.0,false,0,false,4834.0,8354.4,2013-2022,24,28,0,false,false
+82,harmonized,2023-10,549,2096,2096.0,,,observed,,60.0,false,0,false,1635.0,4183.7,2013-2022,27,31,0,false,false
+82,harmonized,2023-11,209,715,715.0,,,observed,,20.0,false,0,false,1021.0,3092.8,2013-2022,23,25,0,false,false
+82,harmonized,2023-12,87,306,306.0,,,observed,,10.0,false,0,false,896.5,2755.3,2013-2022,16,19,0,false,false
+82,harmonized,2024-01,79,363,363.0,,,observed,,30.0,false,0,false,1041.5,3388.8,2014-2023,15,26,0,false,false
+82,harmonized,2024-02,82,509,509.0,,,observed,,50.0,false,0,false,710.0,3805.2,2014-2023,17,23,0,false,false
+82,harmonized,2024-03,86,361,361.0,,,observed,,30.0,false,0,false,780.5,3974.0,2014-2023,23,29,0,false,false
+82,harmonized,2024-04,34,173,173.0,,,observed,,0.0,false,0,false,609.5,2807.8,2014-2023,8,16,0,false,false
+82,harmonized,2024-05,97,287,287.0,,,observed,,30.0,false,0,false,648.5,1889.5,2014-2023,14,23,0,false,false
+82,harmonized,2024-06,264,705,705.0,,,observed,,30.0,false,0,false,1173.5,2675.8,2014-2023,20,22,0,false,false
+82,harmonized,2024-07,699,1357,1357.0,,,observed,,10.0,false,0,false,2015.0,8032.7,2014-2023,28,19,0,false,false
+82,harmonized,2024-08,2058,6261,6261.0,,,observed,,70.0,false,0,false,5153.0,10005.7,2014-2023,28,29,0,false,false
+82,harmonized,2024-09,2358,7742,7742.0,,,observed,,90.0,false,0,false,4696.0,8354.4,2014-2023,29,28,0,false,false
+82,harmonized,2024-10,1282,4361,4361.0,,,observed,,90.0,true,0,false,1635.0,3914.6,2014-2023,29,30,0,false,false
+82,harmonized,2024-11,428,1796,1796.0,,,observed,,70.0,false,0,false,927.0,3092.8,2014-2023,24,23,0,false,false
+82,harmonized,2024-12,277,1468,1468.0,,,observed,,60.0,false,0,false,896.5,2755.3,2014-2023,28,30,0,false,false
+82,harmonized,2025-01,724,5556,5556.0,,,observed,,90.0,true,0,false,831.0,3388.8,2015-2024,29,30,0,false,false
+82,harmonized,2025-02,844,4819,4819.0,,,observed,,90.0,true,0,false,730.0,3805.2,2015-2024,27,27,0,false,false
+82,harmonized,2025-03,551,2515,2515.0,,,observed,,80.0,false,0,false,780.5,3974.0,2015-2024,27,31,0,false,false
+82,harmonized,2025-04,553,2034,2034.0,,,observed,,70.0,false,0,false,609.5,2807.8,2015-2024,23,27,0,false,false
+82,harmonized,2025-05,329,1280,1280.0,,,observed,,80.0,false,0,false,648.5,1889.5,2015-2024,21,26,0,false,false
+82,harmonized,2025-06,463,1389,1389.0,,,observed,,60.0,false,0,false,1173.5,2675.8,2015-2024,20,25,0,false,false
+82,harmonized,2025-07,1203,3865,3865.0,,,observed,,70.0,false,0,false,2015.0,8032.7,2015-2024,27,29,0,false,false
+82,harmonized,2025-08,2290,7649,7649.0,,,observed,,70.0,false,0,false,5626.0,10005.7,2015-2024,30,30,0,false,false
+82,harmonized,2025-09,1041,3195,3195.0,,,observed,,20.0,false,0,false,4834.0,8375.1,2015-2024,29,29,0,false,false
+82,harmonized,2025-10,708,2404,2404.0,,,observed,,60.0,false,0,false,1887.5,4469.0,2015-2024,28,29,0,false,false
+82,harmonized,2025-11,282,820,820.0,,,observed,,50.0,false,0,false,927.0,3092.8,2015-2024,25,26,0,false,false
+82,harmonized,2025-12,111,511,511.0,,,observed,,30.0,false,0,false,1221.5,2755.3,2015-2024,21,26,0,false,false
+82,harmonized,2026-01,125,533,533.0,,,observed,,30.0,false,0,false,1128.0,5754.0,2016-2025,21,29,0,false,false
+82,harmonized,2026-02,105,521,521.0,,,observed,,40.0,false,0,false,1205.5,4831.2,2016-2025,19,28,0,false,false
+82,harmonized,2026-03,182,522,522.0,,,observed,,30.0,false,0,false,924.0,3974.0,2016-2025,22,24,3,true,false
+82,harmonized,2026-04,41,175,175.0,,,observed,,10.0,false,0,false,609.5,2807.8,2016-2025,12,15,3,true,false
+82,harmonized,2026-05,110,581,581.0,,,observed,,50.0,false,0,false,648.5,1792.3,2016-2025,19,27,0,false,false
+82,harmonized,2026-06,57,294,294.0,,,observed,,0.0,false,0,false,1173.5,1801.9,2016-2025,16,20,2,false,false
+82,harmonized,2026-07,164,665,665.0,,,observed,,0.0,false,0,false,2015.0,5816.9,2016-2025,15,19,6,true,false
+82,harmonized,2026-08,139,591,591.0,,,observed,,0.0,false,0,false,5984.0,10005.7,2016-2025,14,22,0,false,true
+82,harmonized,2026-09,657,3038,3038.0,,,observed,,20.0,false,0,false,4834.0,8375.1,2016-2025,29,30,0,false,true
+82,harmonized,2026-10,206,783,783.0,,,observed,,10.0,false,0,false,2250.0,4469.0,2016-2025,17,22,0,false,true

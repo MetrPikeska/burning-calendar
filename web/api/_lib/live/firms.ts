@@ -78,9 +78,10 @@ export function parseFirmsCsv(csv: string, source: NrtSource): Hotspot[] {
 }
 
 /** Median of observed VIIRS S-NPP counts for one calendar month over the last 10 years of the static calendar. */
-export function monthBaseline(months: Pick<MonthRecord, "ym" | "viirs">[], month: number) {
+export function monthBaseline(months: Pick<MonthRecord, "ym" | "viirs" | "provisional">[], month: number) {
   const mm = String(month).padStart(2, "0");
-  const vals = months.filter((m) => m.ym.endsWith(`-${mm}`) && m.viirs !== null).slice(-10);
+  // Provisional (NRT) calendar months are left out: the baseline stays on standard-processing S-NPP.
+  const vals = months.filter((m) => m.ym.endsWith(`-${mm}`) && m.viirs !== null && !m.provisional).slice(-10);
   if (!vals.length) return null;
   const v = vals.map((m) => m.viirs as number).sort((a, b) => a - b);
   const median = v.length % 2 ? v[(v.length - 1) / 2] : (v[v.length / 2 - 1] + v[v.length / 2]) / 2;

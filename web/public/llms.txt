@@ -1,13 +1,14 @@
 # Burning Calendar: harmonized MODIS + VIIRS fire activity, Greece and Argentina
 
-> Monthly active fire detection counts from NASA FIRMS for Greece (13 NUTS2 regions) and Argentina (24 provinces), November 2000 to December 2025, on one scale: VIIRS S-NPP 375 m equivalent detections. VIIRS counts are used as observed from 2012; earlier months are MODIS counts times a factor fitted per region, calendar month and day/night on 2012-2019. Each region also has a fire season calendar (peak month, onset, end, season length) and monthly anomalies against the preceding 10 years. Static JSON and CSV, no API key, CORS open.
+> Monthly active fire detection counts from NASA FIRMS for Greece (13 NUTS2 regions) and Argentina (24 provinces), November 2000 to October 2026, on one scale: VIIRS S-NPP 375 m equivalent detections. VIIRS counts are used as observed from 2012; earlier months are MODIS counts times a factor fitted per region, calendar month and day/night on 2012-2019. Each region also has a fire season calendar (peak month, onset, end, season length) and monthly anomalies against the preceding 10 years. Static JSON and CSV, no API key, CORS open.
 
 Read before using the numbers:
 
 - A region with `mode: "relative"` failed validation (leave-one-year-out annual error above 25 %, or the harmonized series missed the VIIRS peak month in at least two more held-out season years than raw MODIS). Its `harm` is null and its calendar and anomalies come from MODIS counts alone. Do not compare its counts with harmonized regions.
 - Months with `src` `backcast` or `backcast_terra` (before 2012) are modelled, not observed. Quote them with the `harm_lo` to `harm_hi` range (10th to 90th percentile of out-of-sample errors).
 - Counts are detections, not fires and not burned area. One fire can produce many detections.
-- `outage: true` marks months with at least 3 days of known satellite data gaps.
+- `outage: true` marks months with at least 3 days of known MODIS data gaps (Aqua Aug-Sep 2020); `outage_viirs: true` the same for VIIRS S-NPP (Mar, Apr and Jul 2026). Observed months (2012 on) depend on VIIRS, back-cast months on MODIS.
+- Jan-Oct 2026 come from the FIRMS area API, not the yearly country files. Months with `provisional: true` (from `period.provisional_from` in the index, Aug 2026) use near real-time data and may change. Near real-time rows have no `type` field, so static sources are removed with a cell mask from the 2023-2026 standard record.
 - National validation: leave-one-year-out median absolute error of annual totals 5.4 % for Greece and 1.5 % for Argentina. The VIIRS/MODIS night ratio in Greece falls 3.3 % per year over 2012-2025, so back-cast night counts carry extra uncertainty.
 
 ## Data
@@ -16,7 +17,7 @@ Read before using the numbers:
 - [Argentina index](/data/v1/ar/index.json): all Argentine provinces, same fields
 - [Region detail, JSON](/data/v1/gr/regions/EL52.json): pattern `/data/v1/{gr|ar}/regions/{id}.json`, monthly series, season years, factors, band, validation
 - [Region detail, CSV](/data/v1/ar/regions/30.csv): pattern `/data/v1/{gr|ar}/regions/{id}.csv`, one row per month
-- [Hotspots, CSV](/data/v1/gr/detections/EL64.csv): Greece only, pattern `/data/v1/gr/detections/{id}.csv` (`GR.csv` for the whole country), one row per FIRMS detection after the filters: date, UTC time, sensor, satellite, lat/lon, FRP, confidence. Argentina: download from NASA FIRMS
+- [Hotspots, CSV](/data/v1/gr/detections/EL64.csv): Greece only, pattern `/data/v1/gr/detections/{id}.csv` (`GR.csv` for the whole country), one row per FIRMS detection after the filters: date, UTC time, sensor, satellite, lat/lon, FRP, confidence, provisional (near real-time). Argentina: download from NASA FIRMS
 - [Greece geometry](/data/v1/gr/regions.geojson): GeoJSON, property `id` matches the index
 - [Argentina geometry](/data/v1/ar/regions.geojson): GeoJSON, IGN province id `in1` as `id`
 - [Validation, Greece](/data/v1/gr/validation.json) and [Validation, Argentina](/data/v1/ar/validation.json): per-region LOYO, time split, ratio trend, mode reasons

@@ -1,7 +1,7 @@
 ---
 title: Findings, Argentina
 updated: 2026-11-14
-verified_by: uv run python pipeline/build.py --country AR; numbers from web/public/data/v1/ar/validation.json (method v1-region-month-dn-loyo)
+verified_by: uv run python pipeline/download_firms_api.py; uv run python pipeline/build.py --refresh --country AR; numbers from web/public/data/v1/ar/validation.json (method v1-region-month-dn-loyo)
 sources: [../../pipeline/build.py, ../../pipeline/validate.py, ../../pipeline/regions.py]
 ---
 
@@ -57,3 +57,22 @@ All numbers computed on 14 Nov 2026 from FIRMS SP country CSVs (MODIS 2000-2025,
 
 - Entre Ríos (Paraná Delta), season year 2020 (Dec 2019 to Nov 2020): 39,311 VIIRS detections, the highest of the record; next highest 2022 with 22,422. Every month from Feb to Dec 2020 is flagged as an anomaly (above the 90th percentile of the preceding 10 years); August 2020 alone has 16,492.
 - Corrientes 2022: January (16,292 VIIRS; 3,435 MODIS) and February (26,213 VIIRS; 6,526 MODIS) 2022 flagged as anomalies.
+
+## 2026, Jan-Oct (area API)
+
+National VIIRS counts after filters, against the median of the same month in 2016-2025 (`web/public/data/v1/ar/regions/AR.json`, built 14 Nov 2026). Aug-Oct are NRT and provisional.
+
+| Month | VIIRS | Median 2016-2025 | Percentile |
+|---|---|---|---|
+| Jan | 12,349 | 12,966 | 50 |
+| Feb | 8,228 | 10,256 | 40 |
+| Mar | 5,068 | 9,033 | 10 |
+| Apr | 1,846 | 3,582 | 20 |
+| May | 4,289 | 3,789 | 70 |
+| Jun | 3,393 | 5,504 | 10 |
+| Jul | 6,696 | 10,529 | 0 |
+| Aug (NRT) | 8,904 | 35,841 | 0 |
+| Sep (NRT) | 25,382 | 36,529.5 | 30 |
+| Oct (NRT) | 5,161 | 20,512 | 0 |
+
+The 2026 winter-spring season is the weakest of the record in July, August and October. July loses 6 days to the S-NPP gap; August and October have no gap in both countries, and the NRT file has 91 of 92 days. Not yet checked against SNMF reports. Months to Dec 2025 and all validation numbers are unchanged by the 2026 addition.

@@ -51,10 +51,12 @@ def is_bimodal(clim: np.ndarray) -> bool:
     return False
 
 
-def season_metrics(s: pd.Series, start_month: int | None = None) -> tuple[dict, list[dict]]:
+def season_metrics(s: pd.Series, start_month: int | None = None,
+                   clim_end: str | None = None) -> tuple[dict, list[dict]]:
     """Climatology summary and per-season-year metrics for a monthly series.
-    start_month defaults to the climatological minimum of `s`."""
-    clim = climatology(s)
+    start_month defaults to the climatological minimum of `s`. clim_end (YYYY-MM) limits the
+    climatology to months up to it; season years are still listed for the whole series."""
+    clim = climatology(s[s.index <= clim_end] if clim_end else s)
     start = start_month or int(np.nanargmin(clim)) + 1
     order = [(start - 1 + i) % 12 + 1 for i in range(12)]
     on, end, length = onset_end(clim[[m - 1 for m in order]], start)
@@ -111,7 +113,7 @@ def anomalies(s: pd.Series, baseline_floor: int = 2002, baseline_n: int = 10) ->
 
 
 def outage_days(yms: pd.Index, outages: pd.DataFrame) -> pd.Series:
-    """Days per month covered by any listed outage."""
+    """Days per month covered by any listed outage (pass the rows of one sensor)."""
     days = pd.Series(0, index=yms)
     for _, o in outages.iterrows():
         for d in pd.date_range(o["start"], o["end"], freq="D"):

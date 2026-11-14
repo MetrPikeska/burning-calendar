@@ -112,7 +112,7 @@ export interface SourceInfo {
 
 export const LIVE: LiveCaveat = {
   code: "live_upstream",
-  message: "Fetched live from a third-party service at fetched_at; not part of the burning calendar release (2000-11 to 2025-12) and not validated by us. Values can change or disappear upstream.",
+  message: "Fetched live from a third-party service at fetched_at; not part of the burning calendar release (2000-11 to 2026-10) and not validated by us. Values can change or disappear upstream.",
 };
 
 export const UNTRUSTED: LiveCaveat = {

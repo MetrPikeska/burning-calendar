@@ -50,7 +50,7 @@ export function registerLiveTools(server: Server) {
       description:
         "LIVE, third-party: current wildfire events for Greece or Argentina from GDACS (GWIS burnt-area events with alert level and hectares) " +
         "and Copernicus EMS rapid mapping activations, over the last `days` days, newest first, each matched to a calendar region when its point falls inside one. " +
-        "Give country, or region_id to keep only events in that region. Titles are third-party text. Not part of the 2000-2025 calendar.",
+        "Give country, or region_id to keep only events in that region. Titles are third-party text. Not part of the 2000-2026 calendar.",
       inputSchema: z.object({
         caveats: caveatMode,
         country: z.enum(["GR", "AR"]).optional(),

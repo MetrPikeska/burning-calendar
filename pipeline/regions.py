@@ -74,6 +74,14 @@ def assign(det: pd.DataFrame, polys: gpd.GeoDataFrame) -> tuple[pd.Series, dict]
     return region, stats
 
 
+def clip_to_country(df: pd.DataFrame, country: str) -> pd.DataFrame:
+    """Rows that assign() places in a region of `country` (inside, or <= NEAREST_MAX_M from it).
+    Used for the 2026 bounding-box API files, which also hold neighbouring countries."""
+    polys, _ = region_table(country)
+    region, _ = assign(df, polys)
+    return df[region.notna().to_numpy()].reset_index(drop=True)
+
+
 def _assign_points(lon: pd.Series, lat: pd.Series, polys: gpd.GeoDataFrame) -> tuple[pd.Series, int]:
     pts = gpd.GeoDataFrame(geometry=gpd.points_from_xy(lon, lat), crs="EPSG:4326")
     j = gpd.sjoin(pts, polys, how="left", predicate="within")

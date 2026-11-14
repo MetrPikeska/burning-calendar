@@ -176,6 +176,9 @@ function renderPanel(): void {
   // A relative region shows MODIS without overwriting the choice, which comes back on a harmonized region.
   const series = shownSeries(region.mode, state.series);
   const { min, max } = rangeBounds();
+  const endYear = index.period.end.slice(0, 4);
+  const provFrom = index.period.provisional_from;
+  const provisionalNote = provFrom ? ` (from ${provFrom} near real-time, provisional)` : "";
 
   const hasRange = !!(state.from || state.to);
   const refocus = focusSelector(document.activeElement);
@@ -196,7 +199,7 @@ function renderPanel(): void {
       ${seasonStrip(s.onset, s.end, s.peak_month)}
     </div>
     ${region.mode === "relative"
-      ? `<p class="note">Relative mode: harmonization did not pass validation here, so the calendar shows MODIS 2000-2025 and VIIRS as separate series.</p>`
+      ? `<p class="note">Relative mode: harmonization did not pass validation here, so the calendar shows MODIS 2000-${endYear} and VIIRS as separate series.</p>`
       : ""}
     <div class="median-card">
       <div class="stepper" role="group" aria-label="Compared month">
@@ -215,9 +218,9 @@ function renderPanel(): void {
       ${narrow ? `<details class="range-details" ${rangeOpen || hasRange ? "open" : ""}><summary>Date range${hasRange ? `: ${state.from ?? "start"} to ${state.to ?? "end"}` : ""}</summary>${rangeHtml}</details>` : rangeHtml}
     </div>
     <div id="chart" tabindex="0" role="group" aria-label="Burning calendar, years by months. Arrow keys change the compared month."></div>
-    ${marksKey(series, hasRange)}
+    ${marksKey(hasRange)}
     <p class="foot">${matchMedia("(pointer: coarse)").matches ? "Tap" : "Click"} a cell or use the arrows to compare another month.${series === "harm"
-      ? " 2000-2011 back-cast from MODIS (range in the tooltip), 2012-2025 VIIRS observed."
+      ? ` 2000-2011 back-cast from MODIS (range in the tooltip), 2012-${endYear} VIIRS observed${provisionalNote}.`
       : ""}</p>
     <details class="method-details" ${methodOpen ? "open" : ""}>
       <summary>How well the harmonization holds here</summary>

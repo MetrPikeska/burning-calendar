@@ -2,7 +2,7 @@
 
 NASA Space Apps Challenge 2026, Thessaloniki. Challenge: "Harmonization of MODIS and VIIRS Hot Spots" (CONAE). Team Spearow: Petr, Vita.
 
-A web app and an MCP server that join MODIS (from Nov 2000) and VIIRS (from 2012) active fire detections from NASA FIRMS into one burning activity calendar per region, for Greece and Argentina, Nov 2000 to Dec 2025.
+A web app and an MCP server that join MODIS (from Nov 2000) and VIIRS (from 2012) active fire detections from NASA FIRMS into one burning activity calendar per region, for Greece and Argentina, Nov 2000 to Oct 2026.
 
 - Web app: https://burning-calendar.vercel.app
 - MCP server for AI agents: `https://burning-calendar.vercel.app/api/mcp`
@@ -55,7 +55,7 @@ Leave-one-year-out (LOYO) over 2012-2019: fit on seven years, predict the eighth
 - **Orbit drift.** In Greece the time-split error grows after 2022 (2023 +22.9 %, 2025 +17.9 %), and the night ratio falls 3.3 % a year from 2012 to 2025. Argentina shows no such trend.
 - **The 25 % threshold** for `relative` mode is our own choice, with no literature anchor.
 - **Monthly resolution** only; one month is the smallest shift in onset or peak that the calendar can show. Dates are UTC, so some night detections in Argentina fall on the next day.
-- **Data end in Dec 2025.** S-NPP production stopped on 2 Nov 2026; the NOAA-20 splice is on the roadmap below.
+- **Data end in Oct 2026.** Jan-Oct 2026 come from the FIRMS area API, not the yearly country files. Aug-Oct 2026 use near real-time data and are marked provisional; near real-time rows have no `type` field, so a cell mask from the standard record removes static sources. S-NPP production stopped on 2 Nov 2026 and had 14 days without data in Mar-Jul 2026; the NOAA-20 splice is on the roadmap below.
 - **Outages:** the outage list covers Aqua gaps only.
 
 ## AI agents (MCP)
@@ -75,10 +75,11 @@ Requirements: Python 3.12 with [uv](https://docs.astral.sh/uv/), Node 20+.
 ```sh
 uv sync
 uv run python pipeline/download_firms.py              # FIRMS country CSVs into data/raw/firms/ (about 370 MB)
+uv run python pipeline/download_firms_api.py          # Jan-Oct 2026 from the area API; needs FIRMS_MAP_KEY=... in .env (free key)
 # boundaries into data/raw/boundaries/, URLs in pipeline/regions.py
 uv run python pipeline/basemap.py                     # offline basemap
-uv run python pipeline/build.py --country GR          # writes web/public/data/v1/gr/
-uv run python pipeline/build.py --country AR
+uv run python pipeline/build.py --country GR --refresh # writes web/public/data/v1/gr/
+uv run python pipeline/build.py --country AR --refresh
 uv run pytest
 
 cd web
@@ -101,7 +102,7 @@ Also cite NASA FIRMS for the source detections, with the acknowledgement and met
 
 ## Next steps
 
-Release v1 covers Nov 2000 to Dec 2025, by month, for Greek NUTS2 regions and Argentine provinces. Two target users tested the web and the MCP server on 14 Nov 2026, an early warning analyst and a research scientist ([feedback](docs/notes/2026-11-14-feedback-early-warning-research.md)). Their priorities set this order:
+Release v1 covers Nov 2000 to Oct 2026, by month, for Greek NUTS2 regions and Argentine provinces. Two target users tested the web and the MCP server on 14 Nov 2026, an early warning analyst and a research scientist ([feedback](docs/notes/2026-11-14-feedback-early-warning-research.md)). Their priorities set this order:
 
 1. **Near-real-time.** S-NPP FIRMS production ended on 2 Nov 2026. Splice VIIRS to NOAA-20, which overlaps S-NPP since Apr 2018, with a factor per region and day/night fitted on Apr 2018 to Oct 2026, then to NOAA-21. Add FIRMS NRT detections, and return the last update date and the delay status in every API and MCP answer.
 2. **Daily series and finer tiles.** Daily counts and days with a detection per region. A grid or municipalities instead of NUTS2: Attica or the Peloponnese hide local hotspots.

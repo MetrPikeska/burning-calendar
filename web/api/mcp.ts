@@ -101,10 +101,10 @@ function fail(e: unknown) {
 
 const RO = { readOnlyHint: true, openWorldHint: false, idempotentHint: true } as const;
 const regionId = z.string().regex(/^(GR|AR|EL\d\d|\d\d)$/).describe("Region id: GR, AR, NUTS2 code like EL52, or IGN province code like 30");
-const ym = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/).describe("Month as YYYY-MM, 2000-11 to 2025-12");
+const ym = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/).describe("Month as YYYY-MM, 2000-11 to 2026-10");
 const caveatMode = z.enum(["full", "codes"]).default("full")
   .describe("full: caveat texts (use on the first call); codes: only caveat codes, to save tokens on later calls");
-const year = z.number().int().min(2000).max(2100).describe("Calendar year; data cover 2000-11 to 2025-12");
+const year = z.number().int().min(2000).max(2100).describe("Calendar year; data cover 2000-11 to 2026-10");
 
 const handler = createMcpHandler(
   (server) => {

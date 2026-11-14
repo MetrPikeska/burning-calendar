@@ -59,4 +59,4 @@ def test_detection_days_counts_distinct_dates_per_sensor():
     assert d.loc["2005-07", "days_modis"] == 1
     assert pd.isna(d.loc["2005-07", "days_viirs"])  # no VIIRS before 2012
     assert d.loc["2016-01", "days_viirs"] == 0
-    assert len(d) == 302
+    assert len(d) == 312  # 2000-11 .. 2026-10

@@ -19,7 +19,7 @@ from load import COUNTRIES, USECOLS, cell_key, read_csvs
 from regions import assign, region_table
 
 FIELDS = ["region_id", "sensor", "satellite", "acq_date", "acq_time", "daynight",
-          "latitude", "longitude", "frp", "confidence", "version"]
+          "latitude", "longitude", "frp", "confidence", "version", "provisional"]
 EXPORTED = ("GR",)
 
 
@@ -36,6 +36,7 @@ def detections(country: str) -> pd.DataFrame:
     print("assignment:", stats)
     kept["acq_date"] = kept["acq_date"].dt.strftime("%Y-%m-%d")
     kept["acq_time"] = kept["acq_time"].str.zfill(4)
+    kept["provisional"] = kept["provisional"].map({True: "true", False: "false"})
     return kept.sort_values(["acq_date", "acq_time", "sensor", "latitude", "longitude"]).reset_index(drop=True)
 
 

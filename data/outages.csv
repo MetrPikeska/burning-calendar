@@ -1,2 +1,6 @@
 satellite,start,end,note,source
 Aqua,2020-08-16,2020-09-02,Aqua MODIS outage,docs/wiki/calendar-and-anomalies.md
+S-NPP,2026-03-10,2026-03-12,VIIRS S-NPP: no detections worldwide in FIRMS SP (checked 2026-03-11),docs/wiki/data-firms.md
+S-NPP,2026-04-28,2026-04-30,VIIRS S-NPP: no detections in Greece or Argentina in FIRMS SP,docs/wiki/data-firms.md
+S-NPP,2026-06-01,2026-06-02,VIIRS S-NPP: no detections in Greece or Argentina in FIRMS SP,docs/wiki/data-firms.md
+S-NPP,2026-07-11,2026-07-16,VIIRS S-NPP: no detections worldwide in FIRMS SP (checked 2026-07-13),docs/wiki/data-firms.md

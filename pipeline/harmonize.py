@@ -6,7 +6,7 @@ is accepted when its MODIS total over the window is >= MIN_TOTAL and >= MIN_PER_
 Back-cast: 2002-07..2011-12 = sum_dn F * MODIS.
 Terra-only months (2000-11..2002-06): chained G[month, dn] = (Terra+Aqua)/Terra fitted on
 2003-2011 with the same chain, then F * G * Terra.
-From 2012 the series is observed VIIRS. Uncertainty bands come from validate.loyo_band.
+From 2012 the series is observed VIIRS (to END; 2026 from the area API, NRT months provisional). Uncertainty bands come from validate.loyo_band.
 """
 
 import numpy as np
@@ -15,8 +15,9 @@ import pandas as pd
 FIT_YEARS = tuple(range(2012, 2020))
 FULL_YEARS = tuple(range(2012, 2026))
 CHAIN_YEARS = tuple(range(2003, 2012))
-START, END = "2000-11", "2025-12"
+START, END = "2000-11", "2026-10"  # 2026 from the FIRMS area API, S-NPP ended 2 Nov 2026
 AQUA_START = "2002-07"
+CLIM_END = "2025-12"  # climatology (calendar, season start) uses complete calendar years only
 VIIRS_START = "2012-01"
 MIN_PER_YEAR = 5
 MIN_TOTAL = 30

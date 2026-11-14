@@ -57,6 +57,6 @@ describe("defaultMonth", async () => {
     expect(defaultMonth(entreRios, "2020-01", "2020-12")).toBe("2020-08");
   });
   it("without a range picks the strongest of the last 12 months, not the latest month", () => {
-    expect(defaultMonth(entreRios, null, null)).toBe("2025-08");
+    expect(defaultMonth(entreRios, null, null)).toBe("2026-09");
   });
 });

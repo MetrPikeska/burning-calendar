@@ -43,7 +43,7 @@ Feature freeze Sun 15 Nov 12:00. Local submission Sun 15:00, pitch 16:00 (7 min 
 ## Nice-to-have
 
 - [ ] NOAA-20 splice after S-NPP
-- [ ] 2026 data (NRT)
+- [x] 2026 data (NRT): Jan-Oct 2026 from the FIRMS area API, NRT months provisional
 - [ ] Departments / NUTS3 display level
 - [ ] FRP layer
 - [ ] CORINE split of the factor

@@ -4,7 +4,7 @@ The code is under the MIT licence ([LICENSE](LICENSE)). This file covers the dat
 
 ## Our harmonized data
 
-The monthly series, factors, validation results and anomaly flags in `web/public/data/v1/` (JSON and CSV) are licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Cite them as in [CITATION.cff](CITATION.cff) and name the version: `schema_version` 1, `method_version` `v1-region-month-dn-loyo`, period Nov 2000 to Dec 2025.
+The monthly series, factors, validation results and anomaly flags in `web/public/data/v1/` (JSON and CSV) are licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Cite them as in [CITATION.cff](CITATION.cff) and name the version: `schema_version` 1, `method_version` `v1-region-month-dn-loyo`, period Nov 2000 to Oct 2026 (Aug-Oct 2026 provisional).
 
 The region polygons in `regions.geojson` are not relicensed. They keep the terms of their sources below.
 

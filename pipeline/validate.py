@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 
 from calendar_metrics import climatology, season_metrics
-from harmonize import FIT_YEARS, FULL_YEARS, SEASON, VIIRS_START, fit, model
+from harmonize import CLIM_END, FIT_YEARS, FULL_YEARS, SEASON, VIIRS_START, fit, model
 
 MDAPE_MAX = 25.0
 PEAK_MARGIN = 1  # season years
@@ -39,7 +39,7 @@ def loyo(m: pd.DataFrame, national: pd.DataFrame | None) -> pd.DataFrame:
 def time_split(m: pd.DataFrame, national: pd.DataFrame | None) -> pd.DataFrame:
     F, G = fit(m, national, years=FIT_YEARS)
     mod = model(m, F, G)
-    sel = m["year"] >= 2020
+    sel = (m["year"] >= 2020) & (m["year"] <= FULL_YEARS[-1])  # 2026 (partial, provisional) stays out
     return pd.DataFrame({"pred": mod.loc[sel, "model"], "obs": _obs(m)[sel],
                          "modis": (m["modis_D"] + m["modis_N"])[sel], "year": m.loc[sel, "year"],
                          "month": m.loc[sel, "month"]})
@@ -179,4 +179,4 @@ def validate(m: pd.DataFrame, national: pd.DataFrame | None, start_month: int) -
 def raw_start_month(m: pd.DataFrame) -> int:
     """Climatological minimum month of the MODIS series (scale-free; used before harm exists)."""
     s = (m["modis_D"] + m["modis_N"]).astype(float)
-    return int(np.nanargmin(climatology(s))) + 1
+    return int(np.nanargmin(climatology(s[s.index <= CLIM_END]))) + 1

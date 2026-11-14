@@ -18,3 +18,6 @@ sources: [sources/2026-11-13-research-harmonization-validation.md, sources/2026-
 - **Aqua today.** Is Aqua still collecting, and what is its crossing time in Nov 2026? No 2026 primary source was found.
 - **Ratio vs fire size.** No paper publishes the count ratio as a function of FRP or fire size.
 - **NOAA-21 start date.** The FIRMS FAQ gives 17 Jan 2024; the Download tool gives 1 Mar 2023.
+- **NRT vs SP for 2026.** FIRMS keeps S-NPP and MODIS NRT only from the day after SP ends, so our Aug-Oct 2026 NRT counts cannot be compared with SP yet. NOAA-21 has both (NRT from Jan 2024, SP to Jul 2026) and could give a proxy NRT/SP ratio. Re-download when SP for Aug-Oct 2026 appears.
+- **Argentina 2026 low season.** July, August and October 2026 are at the 0th percentile of 2016-2025 (findings-argentina.md). Check against SNMF reports before the pitch uses it.
+

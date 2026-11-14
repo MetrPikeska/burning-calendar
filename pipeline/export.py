@@ -32,7 +32,7 @@ def write_json(path: Path, obj) -> None:
 
 CSV_FIELDS = ["ym", "modis", "viirs", "harm", "harm_lo", "harm_hi", "src", "fit_level",
               "anom_pct", "anom", "outage_days", "outage", "baseline_median", "baseline_p90", "baseline_years",
-              "days_modis", "days_viirs"]
+              "days_modis", "days_viirs", "outage_days_viirs", "outage_viirs", "provisional"]
 
 
 def write_csv(path: Path, region_id: str, mode: str, months: list[dict]) -> None:
@@ -47,7 +47,8 @@ def write_csv(path: Path, region_id: str, mode: str, months: list[dict]) -> None
 
 
 def export_country(country: str, country_name: str, regions: list[dict], meta: dict) -> Path:
-    """regions: list of {'entry': index entry, 'detail': regions/{id}.json body}."""
+    """regions: list of {'entry': index entry, 'detail': regions/{id}.json body}.
+    meta carries `period` ({start, end, provisional_from}) and the other header fields."""
     out = WEB_DATA / country.lower()
     generated = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     index = {
@@ -55,7 +56,6 @@ def export_country(country: str, country_name: str, regions: list[dict], meta: d
         "generated_at": generated,
         "country": country,
         "country_name": country_name,
-        "period": {"start": "2000-11", "end": "2025-12"},
         "units": UNITS,
         **meta,
         "regions": [r["entry"] for r in regions],
