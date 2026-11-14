@@ -54,7 +54,26 @@ Jury path in 1 minute: claude.ai connector with no auth. Keep a recorded fallbac
 - OpenAPI 3.2.1 for the static paths is optional.
 - WebMCP: W3C CG draft (12 Nov 2026), Chrome 149 origin trial. `mcp-handler` has an experimental bridge. Nice-to-have.
 
-## Proposed tools
+## Implemented tools (14 Nov 2026)
+
+`web/api/mcp.ts` registers 7 read-only tools; the logic is in `web/api/_lib/tools.ts` (pure, tested in `web/test/mcp-tools.test.ts`).
+
+| Tool | Inputs | Notes |
+|---|---|---|
+| `search_regions` | `country?`, `level?`, `query?`, `limit` | climatology, `annual_mean`, `loyo_mdape_pct`, `view_url` |
+| `get_region_series` | `region_id`, `from`, `to`, `aggregate` | max 120 monthly records, else an error that suggests `aggregate: "year"`; `view_url`, `data_url`, `csv_url` |
+| `get_season_calendar` | `region_id`, `year?` | climatology and season years |
+| `get_anomalies` | `region_id`, `year` | percentile, `baseline_median`, `baseline_p90`, `baseline_years`, `ratio_to_median`, `flagged` |
+| `compare_regions` | `region_ids` (2-10), `metric`, `year?` | count metrics ranked only when all regions are harmonized (`ranking_allowed`) |
+| `find_region_at` | `lat`, `lon` | point in polygon over `regions.geojson`, shared `regionAt` from `web/src/lib/geo.ts` |
+| `get_methodology` | `topic` | static text: overview, harmonization, validation, modes, anomalies, calendar, limits |
+
+- The country comes from the region id (`GR`, `EL..` vs `AR`, two digits), so no tool needs a country argument besides `search_regions`.
+- Every result has `caveats` with codes `relative_mode`, `backcast`, `backcast_terra`, `outage`, `detections_not_fires`. The text block lists them first, then the JSON; `structuredContent` carries the same object (no `outputSchema`).
+- `outage` is raised only for months whose value comes from MODIS, because `data/outages.csv` lists Aqua gaps only.
+- MCP resources and an MCP Apps widget are not built.
+
+## Proposed tools (13 Nov design)
 
 All read-only (`readOnlyHint: true`, `openWorldHint: false`), enums for `country` (`GR`, `AR`), `YYYY-MM` patterns, `structuredContent` plus a short text summary with caveats first.
 

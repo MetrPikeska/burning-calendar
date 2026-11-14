@@ -36,6 +36,8 @@ def build_region(rid: str, name: str, level: str, parent: str | None, m: pd.Data
     od = outage_days(rec.index, outages)
     rec["anom_pct"] = an["anom_pct"]
     rec["anom"] = an["anom"]
+    for k in ("baseline_median", "baseline_p90", "baseline_years"):
+        rec[k] = an[k]
     rec["outage_days"] = od.astype(int)
     rec["outage"] = od >= OUTAGE_MIN_DAYS
     months = [{k: (None if pd.isna(v) else v) for k, v in r.items()}

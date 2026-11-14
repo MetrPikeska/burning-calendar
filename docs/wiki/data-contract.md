@@ -43,7 +43,8 @@ Monthly record (`months`, 302 entries, Nov 2000 to Dec 2025):
 ```json
 {"ym":"2007-08","modis":41,"viirs":null,"harm":143.5,"harm_lo":118.0,"harm_hi":171.0,
  "src":"backcast","fit_level":"region_month_dn","anom_pct":90.0,"anom":false,
- "outage_days":0,"outage":false}
+ "outage_days":0,"outage":false,"baseline_median":98.2,"baseline_p90":160.4,
+ "baseline_years":"2002-2011 without 2007"}
 ```
 
 - `modis`: Terra + Aqua count after filters. `viirs`: S-NPP count, null before 2012.
@@ -53,8 +54,9 @@ Monthly record (`months`, 302 entries, Nov 2000 to Dec 2025):
 - `fit_level`: the coarsest fallback level among the day and night strata of that month: `region_month_dn`, `region_season_dn`, `region_dn` (later `national_dn`). Null for `observed`.
 - Day and night are fitted separately; only their sum is stored.
 - `anom_pct`: percentile rank (0-100) of the month among the same month of the preceding 10 years; years before 2012 use 2002-2011 minus the target year. `anom`: above the baseline 90th percentile. Computed on `harm` in `harmonized` mode, on `modis` in `relative` mode.
+- `baseline_median`, `baseline_p90`: median and 90th percentile of the same calendar month over the baseline years, on the same series as `anom_pct`. `baseline_years`: the window as text, `YYYY-YYYY` or `2002-2011 without YYYY`. All three null when fewer than 5 baseline values exist. The web's month-vs-median panel and the MCP `get_anomalies` tool read these instead of recomputing.
 - `outage_days`: days of the month covered by `data/outages.csv`. `outage`: `outage_days >= 3`.
-- In `relative` mode, `harm`, `harm_lo` and `harm_hi` are null; season metrics, `years.total` and anomalies are computed on `modis`.
+- In `relative` mode, `harm`, `harm_lo` and `harm_hi` are null; season metrics, `years.total`, anomalies and baseline fields are computed on `modis`.
 - No FRP fields yet. They come as optional fields with the FRP layer.
 
 Per-season-year record (`years`): `season_year` (the calendar year holding most of the season's months: the start year when `season_start_month` is 1-7, the next year when it is 8-12; Entre Ríos Dec 2019 to Nov 2020 is `2020`), `onset`, `end`, `season_length`, `peak_month`, `total`. Only complete season years are listed.

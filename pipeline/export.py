@@ -31,7 +31,7 @@ def write_json(path: Path, obj) -> None:
 
 
 CSV_FIELDS = ["ym", "modis", "viirs", "harm", "harm_lo", "harm_hi", "src", "fit_level",
-              "anom_pct", "anom", "outage_days", "outage"]
+              "anom_pct", "anom", "outage_days", "outage", "baseline_median", "baseline_p90", "baseline_years"]
 
 
 def write_csv(path: Path, region_id: str, mode: str, months: list[dict]) -> None:

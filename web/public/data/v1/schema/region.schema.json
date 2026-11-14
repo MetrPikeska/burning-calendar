@@ -3,118 +3,466 @@
   "title": "Burning calendar region detail (data/v1/{country}/regions/{id}.json)",
   "description": "Monthly series Nov 2000 to Dec 2025, per-season-year metrics, fitted factors, uncertainty band and validation for one region. Field meanings: docs/wiki/data-contract.md.",
   "type": "object",
-  "required": ["schema_version", "generated_at", "units", "id", "name", "level", "parent", "mode", "summary", "months", "years", "factors", "band", "validation"],
+  "required": [
+    "schema_version",
+    "generated_at",
+    "units",
+    "id",
+    "name",
+    "level",
+    "parent",
+    "mode",
+    "summary",
+    "months",
+    "years",
+    "factors",
+    "band",
+    "validation"
+  ],
   "properties": {
-    "schema_version": {"const": "1"},
-    "generated_at": {"type": "string", "format": "date-time"},
-    "units": {"type": "string"},
-    "id": {"type": "string"},
-    "name": {"type": "string"},
-    "level": {"enum": ["country", "nuts2", "nuts3", "province", "department"]},
-    "parent": {"type": ["string", "null"]},
-    "mode": {"enum": ["harmonized", "relative"]},
-    "summary": {"$ref": "index.schema.json#/$defs/climatology"},
-    "months": {"type": "array", "items": {"$ref": "#/$defs/month_record"}},
-    "years": {"type": "array", "items": {"$ref": "#/$defs/season_year"}},
-    "factors": {"type": "array", "items": {"$ref": "#/$defs/factor"}},
-    "band": {
-      "type": "array", "minItems": 12, "maxItems": 12,
+    "schema_version": {
+      "const": "1"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "units": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "level": {
+      "enum": [
+        "country",
+        "nuts2",
+        "nuts3",
+        "province",
+        "department"
+      ]
+    },
+    "parent": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "mode": {
+      "enum": [
+        "harmonized",
+        "relative"
+      ]
+    },
+    "summary": {
+      "$ref": "index.schema.json#/$defs/climatology"
+    },
+    "months": {
+      "type": "array",
       "items": {
-        "type": "object", "required": ["month", "q_lo", "q_hi"],
+        "$ref": "#/$defs/month_record"
+      }
+    },
+    "years": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/season_year"
+      }
+    },
+    "factors": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/factor"
+      }
+    },
+    "band": {
+      "type": "array",
+      "minItems": 12,
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "required": [
+          "month",
+          "q_lo",
+          "q_hi"
+        ],
         "properties": {
-          "month": {"type": "integer", "minimum": 1, "maximum": 12},
-          "q_lo": {"type": ["number", "null"], "minimum": 0},
-          "q_hi": {"type": ["number", "null"], "minimum": 0}
+          "month": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12
+          },
+          "q_lo": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "q_hi": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          }
         }
       }
     },
-    "validation": {"$ref": "#/$defs/validation"}
+    "validation": {
+      "$ref": "#/$defs/validation"
+    }
   },
   "$defs": {
-    "count_or_null": {"type": ["number", "null"], "minimum": 0},
-    "month_or_null": {"type": ["integer", "null"], "minimum": 1, "maximum": 12},
+    "count_or_null": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "month_or_null": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1,
+      "maximum": 12
+    },
     "month_record": {
       "type": "object",
-      "required": ["ym", "modis", "viirs", "harm", "harm_lo", "harm_hi", "src", "fit_level", "anom_pct", "anom", "outage_days", "outage"],
+      "required": [
+        "ym",
+        "modis",
+        "viirs",
+        "harm",
+        "harm_lo",
+        "harm_hi",
+        "src",
+        "fit_level",
+        "anom_pct",
+        "anom",
+        "outage_days",
+        "outage",
+        "baseline_median",
+        "baseline_p90",
+        "baseline_years"
+      ],
       "properties": {
-        "ym": {"type": "string", "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"},
-        "modis": {"type": "integer", "minimum": 0, "description": "Terra + Aqua detections after filters"},
-        "viirs": {"type": ["integer", "null"], "minimum": 0, "description": "S-NPP detections, null before 2012"},
-        "harm": {"$ref": "#/$defs/count_or_null", "description": "VIIRS-equivalent count; equals viirs when src is observed; null in relative mode"},
-        "harm_lo": {"$ref": "#/$defs/count_or_null", "description": "10th percentile band for back-cast months"},
-        "harm_hi": {"$ref": "#/$defs/count_or_null", "description": "90th percentile band for back-cast months"},
-        "src": {"enum": ["observed", "backcast", "backcast_terra"]},
-        "fit_level": {"enum": ["region_month_dn", "region_season_dn", "region_dn", "national_dn", null]},
-        "anom_pct": {"type": ["number", "null"], "minimum": 0, "maximum": 100, "description": "Percentile rank among the same month of the preceding 10 years"},
-        "anom": {"type": "boolean", "description": "Above the baseline 90th percentile"},
-        "outage_days": {"type": "integer", "minimum": 0, "maximum": 31},
-        "outage": {"type": "boolean", "description": "outage_days >= 3"}
+        "ym": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+        },
+        "modis": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Terra + Aqua detections after filters"
+        },
+        "viirs": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "S-NPP detections, null before 2012"
+        },
+        "harm": {
+          "$ref": "#/$defs/count_or_null",
+          "description": "VIIRS-equivalent count; equals viirs when src is observed; null in relative mode"
+        },
+        "harm_lo": {
+          "$ref": "#/$defs/count_or_null",
+          "description": "10th percentile band for back-cast months"
+        },
+        "harm_hi": {
+          "$ref": "#/$defs/count_or_null",
+          "description": "90th percentile band for back-cast months"
+        },
+        "src": {
+          "enum": [
+            "observed",
+            "backcast",
+            "backcast_terra"
+          ]
+        },
+        "fit_level": {
+          "enum": [
+            "region_month_dn",
+            "region_season_dn",
+            "region_dn",
+            "national_dn",
+            null
+          ]
+        },
+        "anom_pct": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentile rank among the same month of the preceding 10 years"
+        },
+        "anom": {
+          "type": "boolean",
+          "description": "Above the baseline 90th percentile"
+        },
+        "outage_days": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 31
+        },
+        "outage": {
+          "type": "boolean",
+          "description": "outage_days >= 3"
+        },
+        "baseline_median": {
+          "$ref": "#/$defs/count_or_null",
+          "description": "Median of the same calendar month over the baseline years, on the anomaly series (harm in harmonized mode, modis in relative mode)"
+        },
+        "baseline_p90": {
+          "$ref": "#/$defs/count_or_null",
+          "description": "90th percentile of the same baseline; anom is true above it"
+        },
+        "baseline_years": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9]{4}-[0-9]{4}( without [0-9]{4})?$",
+          "description": "Baseline window: the preceding 10 years, or 2002-2011 without the target year for years before 2012"
+        }
       }
     },
     "season_year": {
       "type": "object",
-      "required": ["season_year", "onset", "end", "season_length", "peak_month", "total"],
+      "required": [
+        "season_year",
+        "onset",
+        "end",
+        "season_length",
+        "peak_month",
+        "total"
+      ],
       "properties": {
-        "season_year": {"type": "integer", "description": "Calendar year holding most of the season's months"},
-        "onset": {"$ref": "#/$defs/month_or_null"},
-        "end": {"$ref": "#/$defs/month_or_null"},
-        "season_length": {"type": ["integer", "null"], "minimum": 1, "maximum": 12},
-        "peak_month": {"$ref": "#/$defs/month_or_null"},
-        "total": {"type": "number", "minimum": 0}
+        "season_year": {
+          "type": "integer",
+          "description": "Calendar year holding most of the season's months"
+        },
+        "onset": {
+          "$ref": "#/$defs/month_or_null"
+        },
+        "end": {
+          "$ref": "#/$defs/month_or_null"
+        },
+        "season_length": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 12
+        },
+        "peak_month": {
+          "$ref": "#/$defs/month_or_null"
+        },
+        "total": {
+          "type": "number",
+          "minimum": 0
+        }
       }
     },
     "factor": {
       "type": "object",
-      "required": ["month", "dn", "f", "level", "den_total", "kind", "window"],
+      "required": [
+        "month",
+        "dn",
+        "f",
+        "level",
+        "den_total",
+        "kind",
+        "window"
+      ],
       "properties": {
-        "month": {"type": "integer", "minimum": 1, "maximum": 12},
-        "dn": {"enum": ["D", "N"]},
-        "f": {"type": ["number", "null"]},
-        "level": {"enum": ["region_month_dn", "region_season_dn", "region_dn", "national_dn", null]},
-        "den_total": {"type": ["number", "null"]},
-        "kind": {"enum": ["viirs_over_modis", "modis_over_terra"]},
-        "window": {"type": "string"}
+        "month": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "dn": {
+          "enum": [
+            "D",
+            "N"
+          ]
+        },
+        "f": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "level": {
+          "enum": [
+            "region_month_dn",
+            "region_season_dn",
+            "region_dn",
+            "national_dn",
+            null
+          ]
+        },
+        "den_total": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "kind": {
+          "enum": [
+            "viirs_over_modis",
+            "modis_over_terra"
+          ]
+        },
+        "window": {
+          "type": "string"
+        }
       }
     },
     "validation": {
       "type": "object",
-      "required": ["loyo", "time_split", "fit_window_gap_pct", "ratio_trend", "mode", "mode_reasons"],
+      "required": [
+        "loyo",
+        "time_split",
+        "fit_window_gap_pct",
+        "ratio_trend",
+        "mode",
+        "mode_reasons"
+      ],
       "properties": {
         "loyo": {
           "type": "object",
-          "required": ["years", "annual_mdape_pct", "annual_err_pct", "monthly", "season"],
+          "required": [
+            "years",
+            "annual_mdape_pct",
+            "annual_err_pct",
+            "monthly",
+            "season"
+          ],
           "properties": {
-            "years": {"type": "array", "items": {"type": "integer"}},
-            "annual_mdape_pct": {"type": ["number", "null"]},
-            "annual_err_pct": {"type": "object", "additionalProperties": {"type": ["number", "null"]}},
-            "monthly": {"$ref": "#/$defs/monthly_scores"},
-            "season": {"type": "object"}
+            "years": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "annual_mdape_pct": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "annual_err_pct": {
+              "type": "object",
+              "additionalProperties": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            },
+            "monthly": {
+              "$ref": "#/$defs/monthly_scores"
+            },
+            "season": {
+              "type": "object"
+            }
           }
         },
         "time_split": {
           "type": "object",
-          "required": ["fit", "test", "annual_err_pct", "annual_mdape_pct", "monthly"],
+          "required": [
+            "fit",
+            "test",
+            "annual_err_pct",
+            "annual_mdape_pct",
+            "monthly"
+          ],
           "properties": {
-            "fit": {"type": "string"},
-            "test": {"type": "string"},
-            "annual_err_pct": {"type": "object", "additionalProperties": {"type": ["number", "null"]}},
-            "annual_mdape_pct": {"type": ["number", "null"]},
-            "monthly": {"$ref": "#/$defs/monthly_scores"}
+            "fit": {
+              "type": "string"
+            },
+            "test": {
+              "type": "string"
+            },
+            "annual_err_pct": {
+              "type": "object",
+              "additionalProperties": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            },
+            "annual_mdape_pct": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "monthly": {
+              "$ref": "#/$defs/monthly_scores"
+            }
           }
         },
-        "fit_window_gap_pct": {"type": ["number", "null"]},
-        "ratio_trend": {"type": "object"},
-        "mode": {"enum": ["harmonized", "relative"]},
-        "mode_reasons": {"type": "array", "items": {"type": "string"}}
+        "fit_window_gap_pct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "ratio_trend": {
+          "type": "object"
+        },
+        "mode": {
+          "enum": [
+            "harmonized",
+            "relative"
+          ]
+        },
+        "mode_reasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
     },
     "monthly_scores": {
       "type": "object",
       "properties": {
-        "bias_pct": {"type": ["number", "null"]},
-        "r": {"type": ["number", "null"]},
-        "rmse_log1p": {"type": ["number", "null"]},
-        "n_months": {"type": "integer"}
+        "bias_pct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "r": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "rmse_log1p": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "n_months": {
+          "type": "integer"
+        }
       }
     }
   }

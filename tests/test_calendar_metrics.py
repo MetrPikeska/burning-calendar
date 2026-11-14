@@ -52,6 +52,21 @@ def test_anomaly_flags_month_above_baseline():
     assert not an.loc["2013-07", "anom"]
 
 
+def test_baseline_median_and_years():
+    yms = pd.period_range("2002-01", "2013-12", freq="M").strftime("%Y-%m")
+    s = pd.Series(0.0, index=yms)
+    for y in range(2002, 2014):
+        s[f"{y}-08"] = float(y - 2000)  # Aug values 2..13
+    an = anomalies(s)
+    # 2013: preceding 10 years 2003-2012, Aug values 3..12, median 7.5
+    assert an.loc["2013-08", "baseline_median"] == 7.5
+    assert an.loc["2013-08", "baseline_years"] == "2003-2012"
+    # 2005: 2002-2011 without 2005, Aug values 2,3,4,6..11 (9 values), median 7
+    assert an.loc["2005-08", "baseline_median"] == 7.0
+    assert an.loc["2005-08", "baseline_years"] == "2002-2011 without 2005"
+    assert an.loc["2013-08", "baseline_p90"] > an.loc["2013-08", "baseline_median"]
+
+
 def test_static_filter_drops_cell_year_per_sensor():
     days = pd.date_range("2015-01-01", periods=20, freq="D")
     static = pd.DataFrame({"sensor": "viirs", "year": 2015, "cell": 1, "acq_date": days})

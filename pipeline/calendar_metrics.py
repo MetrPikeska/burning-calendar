@@ -79,27 +79,35 @@ def season_metrics(s: pd.Series, start_month: int | None = None) -> tuple[dict, 
 def anomalies(s: pd.Series, baseline_floor: int = 2002, baseline_n: int = 10) -> pd.DataFrame:
     """Percentile rank of each month among the same month of the preceding 10 years.
     Years whose 10-year window would start before `baseline_floor` use
-    baseline_floor..baseline_floor+9 minus the target year. anom = above baseline p90."""
+    baseline_floor..baseline_floor+9 minus the target year. anom = above baseline p90.
+    Also returns baseline_median, baseline_p90 and baseline_years (the window as text)."""
     df = pd.DataFrame({"v": s.astype(float)})
     df["year"] = df.index.str[:4].astype(int)
     df["month"] = df.index.str[5:7].astype(int)
     piv = df.pivot(index="year", columns="month", values="v")
-    pct, flag = [], []
+    rows = []
     for ym, r in df.iterrows():
         y, mo, x = int(r["year"]), int(r["month"]), r["v"]
         if y - baseline_n >= baseline_floor:
-            base_years = range(y - baseline_n, y)
+            base_years = list(range(y - baseline_n, y))
+            label = f"{y - baseline_n}-{y - 1}"
         else:
-            base_years = [b for b in range(baseline_floor, baseline_floor + baseline_n) if b != y]
+            lo, hi = baseline_floor, baseline_floor + baseline_n - 1
+            base_years = [b for b in range(lo, hi + 1) if b != y]
+            label = f"{lo}-{hi}" + (f" without {y}" if lo <= y <= hi else "")
         base = piv.loc[piv.index.isin(base_years), mo].dropna().to_numpy()
-        if len(base) < 5 or np.isnan(x):
-            pct.append(None)
-            flag.append(False)
+        if len(base) < 5:
+            rows.append((None, False, None, None, None))
+            continue
+        med = round(float(np.median(base)), 1)
+        p90 = round(float(np.percentile(base, 90)), 1)
+        if np.isnan(x):
+            rows.append((None, False, med, p90, label))
             continue
         p = 100 * ((base < x).sum() + 0.5 * (base == x).sum()) / len(base)
-        pct.append(round(float(p), 1))
-        flag.append(bool(x > 0 and x > np.percentile(base, 90)))
-    return pd.DataFrame({"anom_pct": pct, "anom": flag}, index=df.index)
+        rows.append((round(float(p), 1), bool(x > 0 and x > np.percentile(base, 90)), med, p90, label))
+    return pd.DataFrame(rows, index=df.index,
+                        columns=["anom_pct", "anom", "baseline_median", "baseline_p90", "baseline_years"])
 
 
 def outage_days(yms: pd.Index, outages: pd.DataFrame) -> pd.Series:
