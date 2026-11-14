@@ -1,14 +1,14 @@
 ---
 title: Region boundaries
 updated: 2026-11-14
-verified_by: download pages linked below; licence texts for GISCO and IGN not read
+verified_by: download pages linked below; licence pages read 14 Nov 2026: https://ec.europa.eu/eurostat/web/gisco/geodata/administrative-units, https://ec.europa.eu/eurostat/help/copyright-notice, https://www.ign.gob.ar/descargas/tyc1.html, https://datos.gob.ar/dataset/unidades-territoriales
 sources: [sources/2026-11-13-research-conae-argentina.md]
 ---
 
 | Dataset | Use | Download | Licence |
 |---|---|---|---|
-| GISCO NUTS 2024 | Greece NUTS2 / NUTS3 | [GISCO NUTS download](https://gisco-services.ec.europa.eu/distribution/v2/nuts/download), e.g. `ref-nuts-2024-01m.geojson.zip`; scales 1M to 60M; SHP, GeoJSON, TopoJSON, GDB, Parquet | Eurostat copyright notice plus GISCO provisions; exact text UNVERIFIED |
-| IGN Argentina, Provincia and Departamento | Argentina provinces and departments; joins to CONAE `in1` ids | [IGN Capas SIG](https://www.ign.gob.ar/NuestrasActividades/InformacionGeoespacial/CapasSIG), Geodesia y demarcación > Límites; SHP, KML, GeoJSON, CSV; EPSG:4326 | IGN terms UNVERIFIED; the datos.gob.ar departments layer, derived from IGN, is CC BY 4.0 |
+| GISCO NUTS 2024 | Greece NUTS2 / NUTS3 | [GISCO NUTS download](https://gisco-services.ec.europa.eu/distribution/v2/nuts/download), e.g. `ref-nuts-2024-01m.geojson.zip`; scales 1M to 60M; SHP, GeoJSON, TopoJSON, GDB, Parquet | NUTS page states no licence. GISCO administrative units: right to use and process, not for commercial purposes; attribution "© EuroGeographics for the administrative boundaries". Eurostat general notice: reuse with source acknowledged, editorial content CC BY 4.0; whether it covers NUTS geodata is not confirmed |
+| IGN Argentina, Provincia and Departamento | Argentina provinces and departments; joins to CONAE `in1` ids | [IGN Capas SIG](https://www.ign.gob.ar/NuestrasActividades/InformacionGeoespacial/CapasSIG), Geodesia y demarcación > Límites; SHP, KML, GeoJSON, CSV; EPSG:4326 | IGN Términos y Condiciones: share downloaded data freely and free of charge, commercial use only in derivative works, attribution "FUENTE: Instituto Geográfico Nacional de la República Argentina" plus the date of the original data. datos.gob.ar `unidades-territoriales` (IGN, updated 4 Aug 2026) states no licence; earlier note that the departments layer is CC BY 4.0 is UNVERIFIED |
 | geoBoundaries gbOpen | Global fallback | `https://www.geoboundaries.org/api/current/gbOpen/ARG/ADM2/` | CC BY 4.0; cite Runfola et al. 2020, [doi:10.1371/journal.pone.0231866](https://doi.org/10.1371/journal.pone.0231866) |
 | GADM | Avoid | gadm.org | Non-commercial only; no redistribution without permission |
 

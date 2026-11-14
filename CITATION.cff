@@ -1,0 +1,66 @@
+cff-version: 1.2.0
+message: "If you use this software or its harmonized data, please cite it as below, and cite NASA FIRMS for the source detections (see DATA_LICENSE.md)."
+title: "Burning calendar: harmonized MODIS + VIIRS fire hotspots for Greece and Argentina"
+type: software
+authors:
+  - given-names: Petr
+    family-names: Mikeska
+  - given-names: Vit
+    family-names: Kadlec
+version: v1
+date-released: 2026-11-15
+license: MIT
+repository-code: "https://github.com/MetrPikeska/burning-calendar"
+url: "https://burning-calendar.vercel.app"
+abstract: >-
+  Monthly active fire detection counts from MODIS (Terra and Aqua, from Nov 2000)
+  and VIIRS S-NPP 375 m (from 2012) joined into one VIIRS-equivalent series per
+  region for Greek NUTS2 regions and Argentine provinces, Nov 2000 to Dec 2025.
+  Method version v1-region-month-dn-loyo: factors per region, month and day/night
+  fitted on 2012-2019, leave-one-year-out validation, back-cast intervals for
+  months before 2012. Built for the NASA Space Apps Challenge 2026 (CONAE challenge
+  "Harmonization of MODIS and VIIRS Hot Spots").
+keywords:
+  - active fire
+  - MODIS
+  - VIIRS
+  - FIRMS
+  - harmonization
+  - Greece
+  - Argentina
+references:
+  - type: article
+    title: "The collection 6 MODIS active fire detection algorithm and fire products"
+    authors:
+      - family-names: Giglio
+        given-names: Louis
+      - family-names: Schroeder
+        given-names: Wilfrid
+      - family-names: Justice
+        given-names: Christopher O.
+    journal: "Remote Sensing of Environment"
+    volume: 178
+    year: 2016
+    doi: 10.1016/j.rse.2016.02.054
+  - type: article
+    title: "The New VIIRS 375 m active fire detection data product: Algorithm description and initial assessment"
+    authors:
+      - family-names: Schroeder
+        given-names: Wilfrid
+      - family-names: Oliva
+        given-names: Patricia
+      - family-names: Giglio
+        given-names: Louis
+      - family-names: Csiszar
+        given-names: Ivan A.
+    journal: "Remote Sensing of Environment"
+    volume: 143
+    year: 2014
+    doi: 10.1016/j.rse.2013.12.008
+identifiers:
+  - type: other
+    value: "method_version: v1-region-month-dn-loyo"
+    description: "Harmonization method version, also in the method_version field of every index.json"
+  - type: other
+    value: "schema_version: 1"
+    description: "Data contract version of web/public/data/v1/"

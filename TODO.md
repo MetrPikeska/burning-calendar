@@ -36,7 +36,7 @@ Feature freeze Sun 15 Nov 12:00. Local submission Sun 15:00, pitch 16:00 (7 min 
 - [ ] P Test the deployed MCP with MCP Inspector and a claude.ai custom connector; record a fallback video
 - [x] P Vercel Git auto-deploy connected (root `web/`, branch main)
 - [x] P Push deploy of fc59713 went to production automatically, /api/mcp checked
-- [ ] P+V README (problem, method, LOYO number, limits, how to run), MIT licence
+- [ ] P+V README (problem, method, LOYO number, limits, how to run); MIT licence, DATA_LICENSE.md, CITATION.cff and "Next steps" done
 - [ ] V Slides (PDF, English, max 7 for global demo), 30 s video, backup screen recording
 - [ ] P+V Project page on the NASA portal, first save by Sun 14:00
 
