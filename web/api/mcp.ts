@@ -356,7 +356,7 @@ const handler = createMcpHandler(
         title: "Methodology",
         description: "How the data were made: overview, harmonization, validation, modes, anomalies, calendar, caveats (meaning of each caveat code), limits.",
         inputSchema: z.object({
-          topic: z.enum(["overview", "harmonization", "validation", "modes", "anomalies", "calendar", "caveats", "limits"]).default("overview"),
+          topic: z.enum(["overview", "harmonization", "validation", "modes", "anomalies", "units", "calendar", "caveats", "limits"]).default("overview"),
         }),
         annotations: RO,
       },

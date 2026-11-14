@@ -114,6 +114,14 @@ describe("MCP endpoint, 2025 stateless clients", () => {
     expect(r.body.result.tools).toHaveLength(16);
   });
 
+  it("serves the units methodology topic and names units in the caveats topic", async () => {
+    const u = await rpc("tools/call", { name: "get_methodology", arguments: { topic: "units" } });
+    expect(u.body.result.isError).toBeFalsy();
+    expect(u.body.result.content[0].text).toMatch(/percentile rank 0-100, not a percent change/);
+    const c = await rpc("tools/call", { name: "get_methodology", arguments: { topic: "caveats" } });
+    expect(c.body.result.content[0].text).toMatch(/Units: every answer with numbers carries units/);
+  });
+
   it("lists and reads the ui:// resource", async () => {
     const list = await rpc("resources/list");
     expect(list.body.result.resources).toEqual([expect.objectContaining({ uri: CALENDAR_URI, mimeType: RESOURCE_MIME_TYPE })]);

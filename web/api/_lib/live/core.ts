@@ -129,7 +129,8 @@ export const upstreamError = (source: string, e: unknown): LiveCaveat => ({
 });
 
 /** Caveats first as header lines, then the JSON with caveat codes; structuredContent keeps the full caveats (as in api/mcp.ts). */
-export function liveResult(body: Record<string, unknown>, caveats: LiveCaveat[], sources: SourceInfo[], mode: "full" | "codes" = "full") {
+/** caveats: live caveats, plus calendar caveats where a tool mixes both (investigate_month); only code and message are read. */
+export function liveResult(body: Record<string, unknown>, caveats: { code: string; message: string }[], sources: SourceInfo[], mode: "full" | "codes" = "full") {
   const seen = new Set<string>();
   const unique = [LIVE, ...caveats].filter((c) => !seen.has(c.code) && seen.add(c.code));
   const full = { ...body, fetched_at: new Date().toISOString(), source: sources, caveats: unique };

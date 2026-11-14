@@ -9,7 +9,7 @@ import { FIRMS, recentDetections } from "./firms.ts";
 import { findRegion, type LiveRegion, resolveRegion, seasonContext } from "./regions.ts";
 import { METEOSTAT, weatherStations } from "./stations.ts";
 import { fireWeather, MAX_FORECAST_DAYS, MAX_RANGE_DAYS, OPEN_METEO } from "./weather.ts";
-import { investigateMonth } from "../investigate.ts";
+import { investigateMonth } from "./investigate.ts";
 
 type Server = Parameters<Parameters<typeof createMcpHandler>[0]>[0];
 
@@ -199,8 +199,7 @@ export function registerLiveTools(server: Server) {
     },
     async ({ region_id, ym, caveats: mode }) =>
       guarded([OPEN_METEO, FIRMS, GDACS, CEMS], mode, async () => {
-        await region(region_id); // unknown id -> input error
-        const { body, caveats, sources } = await investigateMonth(region_id, ym);
+        const { body, caveats, sources } = await investigateMonth(await region(region_id), ym);
         return liveResult(body, caveats, sources, mode);
       }),
   );

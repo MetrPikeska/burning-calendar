@@ -2,7 +2,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { POST } from "../api/mcp.ts";
 import { clearLiveCache } from "../api/_lib/live/core.ts";
-import { investigateMonth, isRecent, weatherWindow } from "../api/_lib/investigate.ts";
+import { investigateMonth, isRecent, weatherWindow } from "../api/_lib/live/investigate.ts";
+import { resolveRegion } from "../api/_lib/live/regions.ts";
 
 const om = {
   latitude: 38.77, longitude: 23.33, elevation: 136, timezone: "Europe/Athens",
@@ -55,7 +56,7 @@ describe("investigate_month helpers", () => {
 describe("investigateMonth", () => {
   it("puts Evia Aug 2021 next to its weather (EL64: 4235, median 63.1)", async () => {
     fetchMock.mockResolvedValue(new Response(JSON.stringify(om), { status: 200 }));
-    const { body, caveats, sources } = await investigateMonth("EL64", "2021-08", {});
+    const { body, caveats, sources } = await investigateMonth(await resolveRegion("EL64"), "2021-08", {});
     const h = body.history;
     if (!h.found) throw new Error("month not found");
     expect(h.month).toMatchObject({ value: 4235, src: "observed", anom: true, baseline_median: 63.1, rank_among_years: 1, baseline_kind: "retrospective" });
@@ -74,7 +75,7 @@ describe("investigateMonth", () => {
 
   it("still returns the history when the weather service fails", async () => {
     fetchMock.mockRejectedValue(new Error("offline"));
-    const { body, caveats } = await investigateMonth("30", "2020-08", {});
+    const { body, caveats } = await investigateMonth(await resolveRegion("30"), "2020-08", {});
     if (!body.history.found) throw new Error("month not found");
     expect(body.history.month.value).toBe(16492);
     expect(codes(caveats)).toContain("upstream_error");
@@ -82,14 +83,14 @@ describe("investigateMonth", () => {
 
   it("says when the month is outside the calendar", async () => {
     fetchMock.mockResolvedValue(new Response(JSON.stringify(om), { status: 200 }));
-    const { body, caveats } = await investigateMonth("EL52", "1999-07", {});
+    const { body, caveats } = await investigateMonth(await resolveRegion("EL52"), "1999-07", {});
     expect(body.history.found).toBe(false);
     expect(codes(caveats)).toContain("out_of_coverage");
   });
 
   it("adds the live picture for the current month, also without a FIRMS key", async () => {
     fetchMock.mockRejectedValue(new Error("offline"));
-    const { body, caveats } = await investigateMonth("EL52", "2026-11", {});
+    const { body, caveats } = await investigateMonth(await resolveRegion("EL52"), "2026-11", {});
     expect(body.history.found).toBe(false); // the calendar ends Oct 2026
     expect(body.now).toMatchObject({ recent_detections: { configured: false } });
     expect(codes(caveats)).toEqual(expect.arrayContaining(["out_of_coverage", "not_configured", "upstream_error"]));
