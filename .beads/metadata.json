@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "burncal",
+  "project_id": "4547c66c-684e-42ff-84ca-55d3c7c60b07"
+}

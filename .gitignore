@@ -7,3 +7,10 @@ __pycache__/
 .env
 node_modules/
 .vercel/
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
+.beads/proxieddb/
+*.gate.lock*
