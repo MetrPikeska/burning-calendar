@@ -242,3 +242,11 @@ describe("GeoJSON topology (audit BC3-008)", () => {
     expect(ringSelfIntersects([[0, 0], [4, 0], [4, 4], [0, 0]])).toBe(false);
   });
 });
+
+describe("GeoJSON rings from GIS exports", () => {
+  it("accepts a ring with repeated consecutive positions", () => {
+    const sq = [[22, 38], [24, 38], [24, 38], [24, 40], [22, 40], [22, 40], [22, 38]];
+    const a = parseGeoJson(JSON.stringify({ type: "Polygon", coordinates: [sq] }));
+    expect(a.polygons[0][0]).toHaveLength(5);
+  });
+});

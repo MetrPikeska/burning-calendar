@@ -63,7 +63,10 @@ export function ringSelfIntersects(r: Ring): boolean {
 
 function ring(c: unknown): Ring {
   if (!Array.isArray(c) || c.length < 4 || !c.every(isPos)) throw new AoiError("A polygon ring needs at least 4 lon/lat positions in degrees.");
-  const r = c.map((p) => [p[0], p[1]]);
+  // Repeated consecutive positions (common in GIS exports) are zero-length edges, not crossings: drop them.
+  const r = c.map((p) => [p[0], p[1]])
+    .filter((p, i, all) => i === 0 || Math.abs(p[0] - all[i - 1][0]) > 1e-12 || Math.abs(p[1] - all[i - 1][1]) > 1e-12);
+  if (r.length < 4) throw new AoiError("A polygon ring needs at least 4 distinct lon/lat positions in degrees.");
   const [f, l] = [r[0], r[r.length - 1]];
   if (Math.abs(f[0] - l[0]) > 1e-9 || Math.abs(f[1] - l[1]) > 1e-9) {
     throw new AoiError("A polygon ring is not closed: its first and last positions differ.");
