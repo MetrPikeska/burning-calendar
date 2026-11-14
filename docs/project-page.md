@@ -42,7 +42,7 @@ Code: https://github.com/MetrPikeska/burning-calendar
 
 ## Use of Super Intelligence (SI)
 
-The team chose the challenge, the users and the method: the VIIRS reference scale, region × month × day/night factors, the 2012-2019 fit window, leave-one-year-out validation, the static-source filter and the relative-mode rule (docs/wiki/decisions.md in the repository). Claude (Anthropic) did literature research before the event. During the event Claude Code (Claude Opus 5.5) wrote most of the pipeline, web and MCP code to the team's specification, ran the pipeline, wrote tests and drafted documentation; the team reviewed the results and the numbers. Every SI task is logged with time, tool and files in docs/si-use.md. No SI-generated images or video are used.
+The team chose the challenge, the users and the method: the VIIRS reference scale, region × month × day/night factors, the 2012-2019 fit window, leave-one-year-out validation, the static-source filter and the relative-mode rule (docs/wiki/decisions.md in the repository). Claude (Anthropic) did literature research before the event. During the event Claude Code (Claude Opus 5.5) wrote most of the pipeline, web and MCP code to the team's specification, ran the pipeline, wrote tests and drafted documentation; the team reviewed the results and the numbers. Every SI task is logged with time, tool and files in docs/si-use.md. Claude Code built the 30 s demo video in HyperFrames (HTML rendered to video) from our data, our charts and a screen recording of the real app; it contains no generated images or footage.
 
 ## NASA Data
 

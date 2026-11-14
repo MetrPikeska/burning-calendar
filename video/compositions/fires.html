@@ -1,0 +1,150 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "IBM Plex Sans";
+      src: url("assets/fonts/IBMPlexSans-Variable.woff2") format("woff2");
+      font-weight: 100 700;
+      font-style: normal;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      font-family: "IBM Plex Sans", sans-serif;
+      background: #12100e;
+      color: #faf8f5;
+      font-variant-numeric: tabular-nums;
+    }
+    #fires-svg {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+    }
+    #fires-title {
+      position: absolute;
+      left: 120px;
+      top: 96px;
+      font-size: 44px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+    #fires-title small {
+      display: block;
+      font-size: 30px;
+      font-weight: 450;
+      color: #c5bbb0;
+      margin-top: 8px;
+    }
+    #fires-date {
+      position: absolute;
+      right: 140px;
+      top: 96px;
+      font-size: 72px;
+      font-weight: 650;
+      letter-spacing: -0.02em;
+      text-align: right;
+    }
+    #fires-count {
+      position: absolute;
+      right: 140px;
+      top: 186px;
+      font-size: 32px;
+      color: #f98e09;
+      text-align: right;
+    }
+    #fires-evia {
+      position: absolute;
+      font-size: 32px;
+      font-weight: 600;
+      color: #fcffa4;
+    }
+    #fires-src {
+      position: absolute;
+      left: 120px;
+      bottom: 72px;
+      font-size: 28px;
+      color: #a59c92;
+    }
+  </style>
+  <div id="root" data-composition-id="fires" data-width="1920" data-height="1080">
+    <svg id="fires-svg" viewBox="0 0 1920 1080" width="1920" height="1080" data-layout-allow-overflow>
+      <rect x="0" y="0" width="1920" height="1080" fill="#12100e" />
+      <path id="fires-land" fill="#2a2622" stroke="#4a443e" stroke-width="1.5" />
+      <g id="fires-days"></g>
+    </svg>
+    <div id="fires-text-clip" class="clip" data-start="0" data-duration="2" data-track-index="2">
+      <div id="fires-title">Every dot is one satellite detection<small>Greece, VIIRS 375 m, summer 2021</small></div>
+      <div id="fires-date">15 Jul 2021</div>
+      <div id="fires-count">0 detections</div>
+      <div id="fires-src">NASA FIRMS VIIRS S-NPP, vegetation fires, static sources removed</div>
+    </div>
+    <div id="fires-evia-clip" class="clip" data-start="0.85" data-duration="1.15" data-track-index="3">
+      <div id="fires-evia">Evia</div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const F = window.BC_FIRES;
+      const start = new Date(F.start + "T00:00:00Z");
+      const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      // label at Evia (23.6 E, 38.8 N) with the projection of build_fires.py
+      const K = 128, COSL = Math.cos((38.3 * Math.PI) / 180);
+      const ex = 1010 + (23.75 - 24.3) * COSL * K, ey = 560 - (38.85 - 38.3) * K;
+      const ev = document.getElementById("fires-evia");
+      ev.style.left = ex + 40 + "px";
+      ev.style.top = ey - 60 + "px";
+
+      const S = { day: 0 };
+      // cumulative counts per day for the counter
+      const perDay = new Array(F.days).fill(0);
+      F.points.forEach((p) => perDay[p[2]]++);
+      const cum = [];
+      perDay.reduce((a, b, i) => (cum[i] = a + b), 0);
+
+      // land: one path with every NUTS2 ring
+      document.getElementById("fires-land").setAttribute(
+        "d",
+        F.rings.map((r) => "M" + r.map((p) => p[0] + "," + p[1]).join("L") + "Z").join("")
+      );
+      // detections: one path of small squares per day
+      const NS = "http://www.w3.org/2000/svg";
+      const dayPaths = [];
+      const byDay = Array.from({ length: F.days }, () => []);
+      F.points.forEach((p) => byDay[p[2]].push(p));
+      const g = document.getElementById("fires-days");
+      byDay.forEach((pts) => {
+        const el = document.createElementNS(NS, "path");
+        el.setAttribute("d", pts.map((p) => "M" + (p[0] - 1.6).toFixed(1) + "," + (p[1] - 1.6).toFixed(1) + "h3.2v3.2h-3.2z").join(""));
+        el.setAttribute("opacity", 0);
+        g.appendChild(el);
+        dayPaths.push(el);
+      });
+
+      function draw() {
+        const cur = S.day;
+        dayPaths.forEach((el, d) => {
+          const age = cur - d;
+          if (age < 0) { el.setAttribute("opacity", 0); return; }
+          let col, a;
+          if (age < 1.5) { col = "#fcffa4"; a = 0.95; }
+          else if (age < 5) { col = "#f98e09"; a = 0.8; }
+          else { col = "#bc3754"; a = 0.6; }
+          el.setAttribute("fill", col);
+          el.setAttribute("opacity", a);
+        });
+        const di = Math.min(F.days - 1, Math.max(0, Math.floor(cur)));
+        const d = new Date(start.getTime() + di * 86400000);
+        document.getElementById("fires-date").textContent = d.getUTCDate() + " " + MON[d.getUTCMonth()] + " " + d.getUTCFullYear();
+        document.getElementById("fires-count").textContent = cum[di].toLocaleString("en-US") + " detections";
+      }
+
+      const tl = gsap.timeline({ paused: true, onUpdate: draw, defaults: { immediateRender: false } });
+      tl.fromTo(S, { day: 0 }, { day: F.days - 0.01, duration: 1.75, ease: "none", immediateRender: true }, 0.05);
+      tl.fromTo("#fires-evia", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.15, ease: "power4.out", immediateRender: true }, 0.85);
+      draw();
+      window.__timelines["fires"] = tl;
+    })();
+  </script>
+</template>

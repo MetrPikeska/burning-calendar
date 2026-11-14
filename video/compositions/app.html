@@ -1,0 +1,98 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "IBM Plex Sans";
+      src: url("assets/fonts/IBMPlexSans-Variable.woff2") format("woff2");
+      font-weight: 100 700;
+      font-style: normal;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      font-family: "IBM Plex Sans", sans-serif;
+      background: #faf8f5;
+      overflow: hidden;
+    }
+    #app-cam {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+      transform-origin: 0 0;
+    }
+    #app-video {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+      object-fit: contain;
+    }
+    .app-card {
+      position: absolute;
+      left: 72px;
+      bottom: 72px;
+      background: #1d1b19;
+      color: #faf8f5;
+      padding: 22px 30px;
+      font-size: 38px;
+      font-weight: 600;
+      letter-spacing: -0.005em;
+      max-width: 1100px;
+      line-height: 1.2;
+    }
+    #app-card1,
+    #app-card2 {
+      opacity: 0;
+    }
+    .app-card small {
+      display: block;
+      font-size: 28px;
+      font-weight: 450;
+      color: #c5bbb0;
+      margin-top: 6px;
+    }
+  </style>
+  <div id="root" data-composition-id="app" data-width="1920" data-height="1080" data-layout-allow-overflow>
+    <div id="app-cam">
+      <video
+        id="app-video"
+        class="clip"
+        src="assets/footage/app-evia.mp4"
+        data-start="0"
+        data-duration="7"
+        data-media-start="2.5"
+        data-track-index="1"
+        muted
+        playsinline
+      ></video>
+    </div>
+    <div id="app-card1-clip" class="clip" data-start="0.2" data-duration="3.3" data-track-index="2">
+      <div id="app-card1" class="app-card">
+        Pick a region, then a month
+        <small>burning-calendar.vercel.app · Greece, 13 regions · Argentina, 24 provinces</small>
+      </div>
+    </div>
+    <div id="app-card2-clip" class="clip" data-start="4.7" data-duration="2.3" data-track-index="2">
+      <div id="app-card2" class="app-card">
+        Evia (Sterea Elláda), August 2021: <span id="app-times">67</span>× the August median
+        <small id="app-base">median of 2010-2019 · flagged as an anomaly</small>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const E = window.BC_DATA.mcp_evia_aug_2021;
+      document.getElementById("app-times").textContent = Math.round(E.ratio_to_median);
+      document.getElementById("app-base").textContent = "median of " + E.baseline_years + " · flagged as an anomaly";
+      const tl = gsap.timeline({ paused: true, defaults: { immediateRender: false } });
+      tl.fromTo("#app-card1", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 0.2);
+      tl.fromTo("#app-card1", { opacity: 1 }, { opacity: 0, duration: 0.15, ease: "power3.in" }, 3.35);
+      // punch-in on the median panel after the Aug 2020 click (cell click at ~3.7 s)
+      tl.fromTo("#app-cam", { scale: 1, x: 0, y: 0 }, { scale: 2, x: -1920, y: 0, duration: 0.8, ease: "power2.inOut" }, 4.0);
+      tl.fromTo("#app-card2", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 4.7);
+      window.__timelines["app"] = tl;
+    })();
+  </script>
+</template>

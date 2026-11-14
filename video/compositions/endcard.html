@@ -1,0 +1,86 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "IBM Plex Sans";
+      src: url("assets/fonts/IBMPlexSans-Variable.woff2") format("woff2");
+      font-weight: 100 700;
+      font-style: normal;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      font-family: "IBM Plex Sans", sans-serif;
+      background: #1d1b19;
+      color: #faf8f5;
+    }
+    #end-ramp {
+      position: absolute;
+      left: 160px;
+      top: 250px;
+      width: 560px;
+      height: 16px;
+      background: linear-gradient(90deg, #fcffa4, #f98e09, #bc3754, #57106e, #000004);
+      transform-origin: 0 50%;
+    }
+    #end-title {
+      position: absolute;
+      left: 160px;
+      top: 300px;
+      font-size: 132px;
+      font-weight: 650;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+    #end-tag {
+      position: absolute;
+      left: 160px;
+      top: 460px;
+      font-size: 44px;
+      font-weight: 450;
+      color: #e2dbd2;
+    }
+    #end-meta {
+      position: absolute;
+      left: 160px;
+      top: 590px;
+      font-size: 34px;
+      line-height: 1.55;
+      color: #c5bbb0;
+    }
+    #end-meta b {
+      color: #faf8f5;
+      font-weight: 600;
+    }
+    #end-url {
+      position: absolute;
+      left: 160px;
+      bottom: 120px;
+      font-size: 44px;
+      font-weight: 600;
+      color: #f98e09;
+    }
+  </style>
+  <div id="root" data-composition-id="endcard" data-width="1920" data-height="1080">
+    <div id="end-clip" class="clip" data-start="0" data-duration="3" data-track-index="1">
+      <div id="end-ramp"></div>
+      <div id="end-title">Burning Calendar</div>
+      <div id="end-tag">One fire record from MODIS and VIIRS, Greece and Argentina</div>
+      <div id="end-meta">
+        <b>Team Spearow</b> · Petr Mikeska, Vít Kadlec<br />
+        Challenge: <b>Harmonization of MODIS and VIIRS Hot Spots</b><br />
+        NASA Space Apps Challenge 2026, Thessaloniki · data: NASA FIRMS<br />
+        MCP server for AI agents: <b>burning-calendar.vercel.app/api/mcp</b>
+      </div>
+      <div id="end-url">burning-calendar.vercel.app</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true, defaults: { immediateRender: false } });
+    tl.fromTo("#end-ramp", { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "expo.out", immediateRender: true }, 0);
+    tl.fromTo("#end-title", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out", immediateRender: true }, 0.1);
+    tl.fromTo("#end-tag", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out", immediateRender: true }, 0.35);
+    tl.fromTo("#end-meta", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out", immediateRender: true }, 0.55);
+    tl.fromTo("#end-url", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out", immediateRender: true }, 0.75);
+    window.__timelines["endcard"] = tl;
+  </script>
+</template>

@@ -1,0 +1,116 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "IBM Plex Sans";
+      src: url("assets/fonts/IBMPlexSans-Variable.woff2") format("woff2");
+      font-weight: 100 700;
+      font-style: normal;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      font-family: "IBM Plex Sans", sans-serif;
+      background: #faf8f5;
+      color: #1d1b19;
+      font-variant-numeric: tabular-nums;
+    }
+    .num-block {
+      position: absolute;
+      top: 250px;
+      width: 760px;
+    }
+    #num-a {
+      left: 160px;
+    }
+    #num-b {
+      left: 1000px;
+    }
+    .num-big {
+      font-size: 190px;
+      font-weight: 650;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+    .num-big .num-vs {
+      font-size: 80px;
+      color: #a59c92;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+    .num-label {
+      margin-top: 28px;
+      font-size: 38px;
+      font-weight: 500;
+      line-height: 1.25;
+    }
+    .num-label small {
+      display: block;
+      margin-top: 10px;
+      font-size: 30px;
+      color: #615a53;
+      font-weight: 450;
+    }
+    #num-a .num-big {
+      color: #6a176e;
+    }
+    #num-b .num-big {
+      color: #6a176e;
+    }
+    #num-src {
+      position: absolute;
+      left: 160px;
+      bottom: 110px;
+      font-size: 28px;
+      color: #615a53;
+    }
+  </style>
+  <div id="root" data-composition-id="numbers" data-width="1920" data-height="1080">
+    <div id="num-a-clip" class="clip" data-start="0" data-duration="2.5" data-track-index="1">
+      <div id="num-a" class="num-block">
+        <div class="num-big"><span id="num-a-val">5.4</span> %</div>
+        <div class="num-label">
+          median error of yearly totals in held-out years
+          <small>Greece · Argentina <span id="num-a-ar">1.5</span> %</small>
+        </div>
+      </div>
+    </div>
+    <div id="num-b-clip" class="clip" data-start="0.25" data-duration="2.25" data-track-index="1">
+      <div id="num-b" class="num-block">
+        <div class="num-big"><span id="num-b-val">86</span> %<span class="num-vs"> vs <span id="num-b-raw">57</span> %</span></div>
+        <div class="num-label">
+          peak fire month found, harmonized vs raw MODIS
+          <small>Greece · Argentina <span id="num-b-ar">100</span> % vs <span id="num-b-arraw">86</span> %</small>
+        </div>
+      </div>
+    </div>
+    <div id="num-src-clip" class="clip" data-start="0.4" data-duration="2.1" data-track-index="2">
+      <div id="num-src">Leave-one-year-out validation 2012-2019 · NASA FIRMS MODIS C6.1 (Terra, Aqua) + VIIRS S-NPP 375 m</div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const B = window.BC_DATA;
+      const pct = (x) => Math.round(x * 100);
+      const G = B.greece, A = B.argentina;
+      const set = (id, v) => (document.getElementById(id).textContent = v);
+      set("num-a-ar", A.loyo_annual_mdape_pct.toFixed(1));
+      set("num-b-raw", pct(G.peak_hit_modis_raw));
+      set("num-b-ar", pct(A.peak_hit_harm));
+      set("num-b-arraw", pct(A.peak_hit_modis_raw));
+      const C = { a: 0, b: 0 };
+      const draw = () => {
+        set("num-a-val", C.a.toFixed(1));
+        set("num-b-val", Math.round(C.b));
+      };
+      const tl = gsap.timeline({ paused: true, onUpdate: draw, defaults: { immediateRender: false } });
+      tl.fromTo("#num-a", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 0);
+      tl.fromTo(C, { a: 0 }, { a: G.loyo_annual_mdape_pct, duration: 0.8, ease: "power3.out" }, 0);
+      tl.fromTo("#num-b", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 0.25);
+      tl.fromTo(C, { b: 0 }, { b: pct(G.peak_hit_harm), duration: 0.8, ease: "power3.out" }, 0.25);
+      tl.fromTo("#num-src", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 0.4);
+      tl.fromTo("#num-a, #num-b, #num-src", { opacity: 1 }, { opacity: 0, duration: 0.15, ease: "power3.in" }, 2.33);
+      draw();
+      window.__timelines["numbers"] = tl;
+    })();
+  </script>
+</template>

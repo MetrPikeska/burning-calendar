@@ -1,0 +1,159 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "IBM Plex Sans";
+      src: url("assets/fonts/IBMPlexSans-Variable.woff2") format("woff2");
+      font-weight: 100 700;
+      font-style: normal;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      font-family: "IBM Plex Sans", sans-serif;
+      background: #faf8f5;
+      color: #1d1b19;
+      font-variant-numeric: tabular-nums;
+    }
+    #mcp-head {
+      position: absolute;
+      left: 160px;
+      top: 96px;
+      width: 1600px;
+    }
+    #mcp-title {
+      font-size: 76px;
+      font-weight: 650;
+      letter-spacing: -0.015em;
+      line-height: 1.05;
+    }
+    #mcp-sub {
+      margin-top: 16px;
+      font-size: 32px;
+      color: #615a53;
+      font-weight: 450;
+    }
+    #mcp-sub code {
+      font-family: "IBM Plex Mono", monospace;
+      color: #1d1b19;
+      font-weight: 500;
+    }
+    #mcp-q {
+      position: absolute;
+      right: 160px;
+      top: 330px;
+      max-width: 1100px;
+      background: #1d1b19;
+      color: #faf8f5;
+      font-size: 38px;
+      font-weight: 500;
+      padding: 22px 30px;
+      border-radius: 20px 20px 4px 20px;
+      line-height: 1.25;
+    }
+    #mcp-call {
+      position: absolute;
+      left: 160px;
+      top: 490px;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 30px;
+      color: #615a53;
+      border-left: 4px solid #c5bbb0;
+      padding: 6px 0 6px 20px;
+    }
+    #mcp-call b {
+      color: #6a176e;
+      font-weight: 600;
+    }
+    #mcp-res {
+      position: absolute;
+      left: 160px;
+      top: 580px;
+      width: 1600px;
+      background: #ffffff;
+      border: 2px solid #e2dbd2;
+      padding: 30px 40px;
+    }
+    #mcp-num {
+      font-size: 64px;
+      font-weight: 650;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+    #mcp-num .mcp-x {
+      color: #1565b5;
+    }
+    #mcp-detail {
+      margin-top: 10px;
+      font-size: 32px;
+      color: #615a53;
+    }
+    #mcp-tags {
+      margin-top: 22px;
+      display: flex;
+      gap: 18px;
+      font-size: 28px;
+      font-weight: 500;
+    }
+    .mcp-tag {
+      padding: 6px 16px;
+      border: 2px solid #c5bbb0;
+      color: #1d1b19;
+    }
+    .mcp-tag.mcp-link {
+      border-color: #1565b5;
+      color: #1565b5;
+    }
+    #mcp-src {
+      position: absolute;
+      left: 160px;
+      bottom: 64px;
+      font-size: 28px;
+      color: #615a53;
+    }
+  </style>
+  <div id="root" data-composition-id="mcp" data-width="1920" data-height="1080">
+    <div id="mcp-head-clip" class="clip" data-start="0" data-duration="4.5" data-track-index="1">
+      <div id="mcp-head">
+        <div id="mcp-title">Same question, from any AI assistant</div>
+        <div id="mcp-sub">MCP server · <span id="mcp-ntools">15</span> read-only tools · no key · <code>burning-calendar.vercel.app/api/mcp</code></div>
+      </div>
+    </div>
+    <div id="mcp-q-clip" class="clip" data-start="0.35" data-duration="4.15" data-track-index="2">
+      <div id="mcp-q">Was August 2021 abnormal on Evia (Sterea Elláda, EL64)?</div>
+    </div>
+    <div id="mcp-call-clip" class="clip" data-start="0.9" data-duration="3.6" data-track-index="2">
+      <div id="mcp-call">→ <b>get_anomalies</b> { region_id: "EL64", year: 2021 }</div>
+    </div>
+    <div id="mcp-res-clip" class="clip" data-start="1.35" data-duration="3.15" data-track-index="2">
+      <div id="mcp-res">
+        <div id="mcp-num"><span id="mcp-value">4,235</span> detections · <span class="mcp-x"><span id="mcp-ratio">67</span>× the August median</span></div>
+        <div id="mcp-detail">median <span id="mcp-median">63.1</span> in <span id="mcp-years">2011-2020</span> · flagged: above the 90th percentile</div>
+        <div id="mcp-tags">
+          <span class="mcp-tag">caveat: detections, not fires</span>
+          <span class="mcp-tag mcp-link">view_url → same view on the map</span>
+        </div>
+      </div>
+    </div>
+    <div id="mcp-src-clip" class="clip" data-start="1.6" data-duration="2.9" data-track-index="3">
+      <div id="mcp-src">Tool response from the production server, 14 Nov 2026</div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const M = window.BC_DATA.mcp_evia_aug_2021;
+      const set = (id, v) => (document.getElementById(id).textContent = v);
+      set("mcp-value", M.value.toLocaleString("en-US"));
+      set("mcp-ratio", Math.round(M.ratio_to_median));
+      set("mcp-median", M.baseline_median.toFixed(1));
+      set("mcp-years", M.baseline_years);
+      set("mcp-ntools", M.tools);
+      const tl = gsap.timeline({ paused: true, defaults: { immediateRender: false } });
+      tl.fromTo("#mcp-head", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out", immediateRender: true }, 0);
+      tl.fromTo("#mcp-q", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.35, ease: "expo.out", immediateRender: true }, 0.35);
+      tl.fromTo("#mcp-call", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.15, ease: "power4.out", immediateRender: true }, 0.9);
+      tl.fromTo("#mcp-res", { opacity: 0, scale: 0.97 }, { opacity: 1, scale: 1, duration: 0.4, ease: "expo.out", immediateRender: true }, 1.35);
+      tl.fromTo("#mcp-src", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out", immediateRender: true }, 1.6);
+      window.__timelines["mcp"] = tl;
+    })();
+  </script>
+</template>
