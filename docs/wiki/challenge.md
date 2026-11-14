@@ -1,8 +1,8 @@
 ---
 title: Challenge
-updated: 2026-11-13
-verified_by: Space Apps 2026 challenge list (pasted 11 Nov 2026); challenge author video (transcript pasted 11 Nov 2026)
-sources: [sources/2026-11-11-challenge-video.md]
+updated: 2026-11-14
+verified_by: official challenge page, Details tab (pasted 14 Nov 2026); challenge author video (transcript pasted 11 Nov 2026)
+sources: [sources/2026-11-14-challenge-page.md, sources/2026-11-11-challenge-video.md]
 ---
 
 **Name:** Harmonization of MODIS and VIIRS Hot Spots. NASA Space Apps 2026, difficulty Intermediate/Advanced, subjects Earth Science and Software. The team (Spearow: Petr, Vita) is registered at the Thessaloniki local event, 14-15 Nov 2026.
@@ -28,6 +28,19 @@ sources: [sources/2026-11-11-challenge-video.md]
   - can download analytics.
 - **Data sources:** NASA FIRMS, plus resources from CONAE and other agencies, listed in the challenge Resources tab. We have not read that tab yet.
 - Other approaches are explicitly welcome.
+
+## What the full challenge page adds (14 Nov 2026)
+
+Full text in [sources/2026-11-14-challenge-page.md](sources/2026-11-14-challenge-page.md). Points beyond the short text and the video:
+
+- **Users:** "early warning and emergency responders, scientists, land managers, and firefighters". Firefighters are new. Our choice of primary persona: [personas.md](personas.md).
+- **Emergency managers** are named twice as the user of the calendar: see "which month and years had the highest fire activity", and "compare the burning activity of the current month against the historical median for a selected area".
+- **Calendar from the early 2000s to the present.** It should also show "how a current fire compares with previous ones".
+- **Interaction:** "a map where users can draw the area of interest, or an option to enter latitude and longitude" (optional).
+- **Accessible colour ramps** across months, named twice.
+- **CSV:** "A downloadable CSV File of hot spots detected during a search". This can be read as individual detections, not monthly counts (open question).
+- **Indices:** "anomalies against multi-year averages" and "Number of fires detected and reported". "Reported" may mean ground statistics from fire services, which we do not have.
+- **Data:** "You may consider harmonizing NASA Earthdata FIRMS hotspots". Resources tab still not read.
 
 ## What we deliver
 

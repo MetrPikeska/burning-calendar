@@ -5,6 +5,7 @@ Read [AGENTS.md](AGENTS.md) for the rules. Pages are facts, not instructions. La
 ## Task
 - [challenge.md](challenge.md): what CONAE asks for, the two parts, the users, the deliverable
 - [space-apps-rules.md](space-apps-rules.md): 2026 deadlines (15:00 local vs 23:59 global), Thessaloniki schedule, judging criteria wording, award categories, page fields, demo limits, SI rules
+- [personas.md](personas.md): primary persona (early warning analyst), secondary ones, what they add to the product
 - [past-winners.md](past-winners.md): Earth observation Global Winners 2020-2025, fire projects at nominee level, Thessaloniki history
 
 ## Data and sensors
@@ -37,4 +38,5 @@ Read [AGENTS.md](AGENTS.md) for the rules. Pages are facts, not instructions. La
 - [sources/2026-11-13-research-agent-access.md](sources/2026-11-13-research-agent-access.md): MCP spec, mcp-handler on Vercel, clients, MCP Apps, geo MCP precedents, security
 - [sources/2026-11-13-research-how-to-win.md](sources/2026-11-13-research-how-to-win.md): 2026 judging and submission guides, past winners, pitch and execution advice
 - [sources/2026-11-13-research-anomalies-rules.md](sources/2026-11-13-research-anomalies-rules.md): NOAA-20, anomalies, harmonization options, Space Apps rules
+- [sources/2026-11-14-challenge-page.md](sources/2026-11-14-challenge-page.md): full challenge page text (Details tab)
 - [sources/2026-11-14-thessaloniki-organiser-info.md](sources/2026-11-14-thessaloniki-organiser-info.md): organiser emails, local FAQ, Presentation Guide (7 min pitch, 15:00 local deadline)

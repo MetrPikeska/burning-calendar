@@ -8,6 +8,8 @@ sources: [sources/2026-11-13-research-harmonization-validation.md, sources/2026-
 - **Challenge author's real name.** The transcript says "Marina Companuchi". Searches found nothing. Check the challenge page in a browser.
 - **Challenge Resources tab.** It lists CONAE and other agency resources. Not read yet: the page fails TLS from our machine and its content is rendered by JavaScript.
 - **Space Apps 2026 rules.** Guides read 13 Nov 2026 (see space-apps-rules.md). Pitch length (7 min + Q&A) and deadlines (15:00 to local judges, 23:59 project page) answered by the Thessaloniki FAQ, 14 Nov. Still open: the email or upload address for the 15:00 local submission (placeholder in the FAQ), number of Global Nominees per event, local prizes. Ask on Discord or the Local Lead at the kick-off.
+- **CSV of individual detections.** The challenge page asks for "a downloadable CSV File of hot spots detected during a search". We export monthly counts per region. Detection-level CSV would need detections in the web data (Greece is small, Argentina has 4.5 M). Not needed by the primary persona ([personas.md](personas.md)).
+- **"Number of fires detected and reported".** Does "reported" mean fire-service statistics (Hellenic Fire Service, SNMF)? We have none in the app.
 - **The July 2026 fire in Argentina** from the author video. Not identified. Check the SNMF daily reports for July 2026.
 - **S-NPP vs NOAA-20 count factor.** No published multi-year value exists, confirmed again 13 Nov. The only number is 0.988 from 12 days in Mar 2023. Compute it from the 2018-2026 overlap (needs a MAP_KEY).
 - **Licence texts.** Neither the GISCO NUTS nor the IGN Argentina licence text has been read.
