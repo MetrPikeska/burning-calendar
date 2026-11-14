@@ -1,5 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { detectionDaysText, type IndexFile, type MonthRecord, type RegionFile } from "../src/lib/contract.ts";
+import { buildReport, CITATION } from "../src/lib/report.ts";
 import { csvFileName, filterCsvByRange } from "../src/lib/csv.ts";
 import { parseLatLon, regionAt, type RegionCollection } from "../src/lib/geo.ts";
 
@@ -58,5 +60,48 @@ describe("defaultMonth", async () => {
   });
   it("without a range picks the strongest of the last 12 months, not the latest month", () => {
     expect(defaultMonth(entreRios, null, null)).toBe("2026-09");
+  });
+});
+
+describe("detectionDaysText", () => {
+  const rec = (o: Partial<MonthRecord>) => ({ ym: "2024-08", days_viirs: 18, days_modis: 8, ...o }) as MonthRecord;
+  it("uses VIIRS days for observed months and the month length", () => {
+    expect(detectionDaysText(rec({}), true)).toBe("VIIRS saw fire on 18 of 31 days");
+    expect(detectionDaysText(rec({ ym: "2024-02", days_viirs: 3 }), true)).toBe("VIIRS saw fire on 3 of 29 days");
+  });
+  it("uses MODIS days for back-cast or relative months and gives null without data", () => {
+    expect(detectionDaysText(rec({ ym: "2007-08", days_viirs: null, days_modis: 25 }), false)).toBe("MODIS saw fire on 25 of 31 days");
+    expect(detectionDaysText(rec({ days_viirs: null }), true)).toBeNull();
+  });
+});
+
+describe("buildReport", () => {
+  const load = <T>(p: string) => JSON.parse(readFileSync(`public/data/v1/${p}`, "utf8")) as T;
+  const grIndex = load<IndexFile>("gr/index.json");
+  const base = { from: null, to: null, viewUrl: "https://example.test/?country=gr&region=EL52", csvUrl: "https://example.test/data/v1/gr/regions/EL52.csv", today: "2026-11-15" };
+
+  it("quotes the month, its median, days and validation from the data", () => {
+    const md = buildReport({ ...base, index: grIndex, region: load<RegionFile>("gr/regions/EL52.json"), ym: "2024-08" });
+    expect(md).toMatch(/^# Burning calendar: Kentriki Makedonia \(EL52\)/);
+    expect(md).toContain("| VIIRS-equivalent detections | 208 |");
+    expect(md).toContain("| baseline median / 90th percentile | 19 / 33.9 |");
+    expect(md).toContain("VIIRS saw fire on 18 of 31 days");
+    expect(md).toMatch(/Leave-one-year-out 2012-2019: median absolute error of annual totals 4 %/);
+    expect(md).toContain(CITATION);
+    expect(md).not.toMatch(/undefined|NaN/);
+  });
+
+  it("gives the range for a back-cast month and flags small counts", () => {
+    const el52 = load<RegionFile>("gr/regions/EL52.json");
+    expect(buildReport({ ...base, index: grIndex, region: el52, ym: "2012-01" })).toMatch(/likely range \(10th-90th percentile of the back-cast check\) \| [\d.,]+ to [\d.,]+ \|/);
+    expect(buildReport({ ...base, index: grIndex, region: el52, ym: "2024-05" })).toContain("fewer than 20 detections");
+  });
+
+  it("says relative mode and uses MODIS columns", () => {
+    const md = buildReport({ ...base, index: grIndex, region: load<RegionFile>("gr/regions/EL62.json"), ym: "2021-08", from: "2021-01", to: "2021-12" });
+    expect(md).toContain("mode: **relative**");
+    expect(md).toContain("| month | MODIS | VIIRS | anomaly |");
+    expect(md).toContain("## Monthly values, 2021-01 to 2021-12");
+    expect(md.match(/^\| 2021-\d\d \|/gm)).toHaveLength(12);
   });
 });

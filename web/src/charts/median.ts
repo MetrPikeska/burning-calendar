@@ -1,6 +1,6 @@
 // Panel "chosen month vs median of the preceding 10 years", from the pipeline's baseline_* fields.
 import * as Plot from "@observablehq/plot";
-import { baselineValue, outageNote, type MonthRecord, type RegionFile } from "../lib/contract.ts";
+import { baselineValue, detectionDaysText, outageNote, type MonthRecord, type RegionFile } from "../lib/contract.ts";
 import { countTick } from "./ramp.ts";
 
 const monthYear = (ym: string) =>
@@ -50,7 +50,9 @@ export function renderMedianPanel(region: RegionFile, ym: string, width = 520): 
     return el;
   }
 
-  const gap = outageNote(rec, region.mode === "harmonized" && rec.src === "observed");
+  const usesViirs = region.mode === "harmonized" && rec.src === "observed";
+  const gap = outageNote(rec, usesViirs);
+  const daysText = detectionDaysText(rec, usesViirs);
   const backcast = region.mode === "harmonized" && rec.src !== "observed" && rec.harm_lo != null && rec.harm_hi != null;
   const verdict = rec.anom
     ? `<span class="flag">Anomaly</span> above the 90th percentile (${num(rec.baseline_p90)})`
@@ -60,6 +62,7 @@ export function renderMedianPanel(region: RegionFile, ym: string, width = 520): 
     <p><strong>${num(value)}</strong> ${seriesName} detections, ${ratioText(value, rec.baseline_median)}
       of ${monthOnly(ym)} ${rec.baseline_years} (${num(rec.baseline_median)}).
       Percentile ${rec.anom_pct == null ? "n/a" : Math.round(rec.anom_pct)}, ${verdict}.
+      ${daysText ? `<br><span class="days">${daysText}.</span>` : ""}
       ${gap ? `<br>${gap[0].toUpperCase()}${gap.slice(1)}, the count may be too low.` : ""}
       ${rec.provisional ? "<br>Provisional: built from FIRMS near real-time data, may change when standard processing replaces it." : ""}
       ${backcast ? `<br>Back-cast month: modelled from MODIS, likely range <strong>${num(rec.harm_lo!)}-${num(rec.harm_hi!)}</strong> (10th-90th percentile of the back-cast check).` : ""}</p>`;

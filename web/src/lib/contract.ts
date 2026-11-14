@@ -68,6 +68,9 @@ export interface MonthRecord {
   outage_viirs?: boolean;
   /** Built partly from FIRMS near real-time data; may change when standard processing replaces it. */
   provisional?: boolean;
+  /** Days of the month with at least one detection after filters (distinct UTC acq_date), per sensor; days_viirs null before 2012. */
+  days_modis?: number | null;
+  days_viirs?: number | null;
   /** Median of the same calendar month over the baseline years, same series as anom_pct. Null with < 5 values. */
   baseline_median: number | null;
   baseline_p90: number | null;
@@ -174,4 +177,16 @@ export function baselineValue(rec: MonthRecord, mode: Mode): number | null {
 export function outageNote(rec: MonthRecord, usesViirs: boolean): string | null {
   if (usesViirs) return rec.outage_viirs ? `known VIIRS S-NPP outage: ${rec.outage_days_viirs} days` : null;
   return rec.outage ? `known MODIS outage: ${rec.outage_days} days` : null;
+}
+
+/**
+ * "VIIRS saw fire on 18 of 31 days": days with a detection from the sensor behind the shown value
+ * (VIIRS for observed harmonized months, MODIS for back-cast and relative-mode months). Null without data.
+ */
+export function detectionDaysText(rec: MonthRecord, usesViirs: boolean): string | null {
+  const days = usesViirs ? rec.days_viirs : rec.days_modis;
+  if (days == null) return null;
+  const [y, m] = rec.ym.split("-").map(Number);
+  const inMonth = new Date(Date.UTC(y, m, 0)).getUTCDate();
+  return `${usesViirs ? "VIIRS" : "MODIS"} saw fire on ${days} of ${inMonth} days`;
 }

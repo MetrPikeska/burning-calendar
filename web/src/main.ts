@@ -3,6 +3,7 @@ import "./style.css";
 import { formatMonth } from "@observablehq/plot";
 import { availableSeries, shownSeries, type CountryCode, type IndexFile, type RegionFile, type Series } from "./lib/contract.ts";
 import { csvFileName, filterCsvByRange } from "./lib/csv.ts";
+import { buildReport, reportFileName } from "./lib/report.ts";
 import { dataUrl, loadIndex, loadRegion } from "./lib/data.ts";
 import { parseLatLon, regionAt, type RegionCollection } from "./lib/geo.ts";
 import { parseState, serializeState, type AppState } from "./lib/url-state.ts";
@@ -213,7 +214,11 @@ function renderPanel(): void {
         <div class="toggle" role="group" aria-label="Series">
           ${options.map((o) => `<button type="button" data-series="${o}" aria-pressed="${o === series}">${SERIES_BUTTON[o]}</button>`).join("")}
         </div>
-        <button type="button" id="csv" class="btn">${DOWNLOAD_ICON}Download CSV${hasRange ? " (range)" : ""}</button>
+        <div class="downloads" role="group" aria-label="Downloads">
+          <button type="button" id="csv" class="btn">${DOWNLOAD_ICON}Download CSV${hasRange ? " (range)" : ""}</button>
+          ${state.country === "gr" ? `<a id="hotspots" class="btn btn-quiet" href="${dataUrl(state.country, `detections/${encodeURIComponent(region.id)}.csv`)}" download="burning-calendar_gr_${escapeHtml(region.id)}_hotspots.csv" title="Every detection after filters: date, time, sensor, lat/lon, FRP (2000-11 to ${index.period.end})">${DOWNLOAD_ICON}Hotspots CSV</a>` : ""}
+          <button type="button" id="report" class="btn btn-quiet" title="Markdown report: this month vs the median, monthly values, validation, sources, limits, citation">${DOWNLOAD_ICON}Report</button>
+        </div>
       </div>
       ${narrow ? `<details class="range-details" ${rangeOpen || hasRange ? "open" : ""}><summary>Date range${hasRange ? `: ${state.from ?? "start"} to ${state.to ?? "end"}` : ""}</summary>${rangeHtml}</details>` : rangeHtml}
     </div>
@@ -273,6 +278,7 @@ function renderPanel(): void {
     renderPanel();
   });
   $("#csv").addEventListener("click", () => void downloadCsv());
+  $("#report").addEventListener("click", () => downloadReport(ym));
   if (refocus) panel.querySelector<HTMLElement>(refocus)?.focus({ preventScroll: true });
 }
 
@@ -291,6 +297,22 @@ async function downloadCsv(): Promise<void> {
   a.click();
   a.remove();
   if (href !== url) setTimeout(() => URL.revokeObjectURL(href), 1000);
+}
+
+function downloadReport(ym: string): void {
+  if (!region) return;
+  const md = buildReport({
+    index, region, ym, from: state.from, to: state.to,
+    viewUrl: new URL(serializeState(state), location.origin + location.pathname).href,
+    csvUrl: new URL(dataUrl(state.country, `regions/${encodeURIComponent(region.id)}.csv`), location.origin).href,
+    today: new Date().toISOString().slice(0, 10),
+  });
+  const href = URL.createObjectURL(new Blob([md], { type: "text/markdown" }));
+  const a = Object.assign(document.createElement("a"), { href, download: reportFileName(state.country, region.id, ym) });
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(href), 1000);
 }
 
 // ---------- wiring ----------
