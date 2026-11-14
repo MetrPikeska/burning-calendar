@@ -1,6 +1,6 @@
 // Panel "chosen month vs median of the preceding 10 years", from the pipeline's baseline_* fields.
 import * as Plot from "@observablehq/plot";
-import { baselineValue, detectionDaysText, outageNote, type MonthRecord, type RegionFile, type Series } from "../lib/contract.ts";
+import { baselineValue, detectionDaysText, outageNote, shownSeries, SMALL_MEDIAN, type MonthRecord, type RegionFile, type Series } from "../lib/contract.ts";
 import { countTick } from "./ramp.ts";
 
 const monthYear = (ym: string) =>
@@ -27,8 +27,6 @@ export function defaultMonth(region: RegionFile, from: string | null, to: string
   return (best ?? region.months[region.months.length - 1]).ym;
 }
 
-/** Below this median a ratio swings with one fire ("61x a median of 1"), so the text gives the difference instead. */
-export const SMALL_MEDIAN = 5;
 
 /** How the month compares with the median, in words (burncal-0kc). */
 export function ratioText(value: number, median: number): string {
@@ -46,14 +44,14 @@ export function ratioText(value: number, median: number): string {
 }
 
 /** Anomaly verdict in one statement: "higher than every August" instead of "Percentile 100, Anomaly above ...". */
-export function verdictText(rec: MonthRecord & { baseline_p90: number }, ym: string): string {
-  const years = rec.baseline_years ?? "the baseline years";
-  if (rec.anom && rec.anom_pct != null && rec.anom_pct >= 100) {
-    return `<span class="flag">Anomaly</span>: higher than every ${monthOnly(ym)} in ${years}.`;
+export function verdictText(anom: boolean, pct: number | null | undefined, baselineYears: string | null | undefined,
+                            p90: number, ym: string): string {
+  if (anom && pct != null && pct >= 100) {
+    return `<span class="flag">Anomaly</span>: higher than every ${monthOnly(ym)} in ${baselineYears ?? "the baseline years"}.`;
   }
-  return rec.anom
-    ? `<span class="flag">Anomaly</span>: above the 90th percentile of those years (${num(rec.baseline_p90)}).`
-    : `Not an anomaly: below the 90th percentile of those years (${num(rec.baseline_p90)}).`;
+  return anom
+    ? `<span class="flag">Anomaly</span>: above the 90th percentile of those years (${num(p90)}).`
+    : `Not an anomaly: below the 90th percentile of those years (${num(p90)}).`;
 }
 
 export function renderMedianPanel(region: RegionFile, ym: string, width = 520, shown?: Series): HTMLElement {
@@ -76,7 +74,7 @@ export function renderMedianPanel(region: RegionFile, ym: string, width = 520, s
   const daysText = detectionDaysText(rec, usesViirs);
   const backcast = region.mode === "harmonized" && rec.src !== "observed" && rec.harm_lo != null && rec.harm_hi != null;
   // The comparison and the anomaly flags always use the region's own series (burncal-5od).
-  const own: Series = region.mode === "harmonized" ? "harm" : "modis";
+  const own = shownSeries(region.mode, "harm");
   const otherSeries = shown && shown !== own
     ? `<br><span class="series-note">The calendar shows ${shown === "viirs" ? "raw VIIRS" : "raw MODIS"}; this comparison and the anomaly flags use the ${seriesName} series.</span>`
     : "";
@@ -84,7 +82,7 @@ export function renderMedianPanel(region: RegionFile, ym: string, width = 520, s
     <h3>${monthYear(ym)} vs the median</h3>
     <p><strong>${num(value)}</strong> ${seriesName} detections, ${ratioText(value, rec.baseline_median)}
       of ${monthOnly(ym)} ${rec.baseline_years} (${num(rec.baseline_median)}).
-      ${verdictText({ ...rec, baseline_p90: rec.baseline_p90 }, ym)}${otherSeries}
+      ${verdictText(rec.anom, rec.anom_pct, rec.baseline_years, rec.baseline_p90, ym)}${otherSeries}
       ${daysText ? `<br><span class="days">${daysText}.</span>` : ""}
       ${gap ? `<br>${gap[0].toUpperCase()}${gap.slice(1)}, the count may be too low.` : ""}
       ${rec.provisional ? "<br>Provisional: built from FIRMS near real-time data, may change when standard processing replaces it." : ""}

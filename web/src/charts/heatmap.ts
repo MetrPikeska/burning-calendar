@@ -104,6 +104,7 @@ export function renderHeatmap(
   const rowH = narrow ? 16 : Math.max(12, Math.min(14, cellW * 0.36));
   const selectedYear = selectedYm ? Number(selectedYm.slice(0, 4)) : null;
   const dim = (c: Cell) => (inRange(c.rec.ym, range) ? 1 : 0.16);
+  const anomalies = cells.filter((c) => c.rec.anom && inRange(c.rec.ym, range));
   const colorLabel = `${SERIES_LABEL[series]}, detections / month`;
 
   const plot = Plot.plot({
@@ -135,10 +136,10 @@ export function renderHeatmap(
       Plot.cell(cells, { x: "month", y: "year", fill: "value", fillOpacity: dim, title: (c: Cell) => title(c, series), tip: true }),
       // Anomalies: thin outline, inset so neighbouring outlines do not merge, plus a white corner wedge with a
       // dark edge that stays visible in grayscale and red-green colour vision deficiency.
-      Plot.cell(cells.filter((c) => c.rec.anom && inRange(c.rec.ym, range)), {
+      Plot.cell(anomalies, {
         x: "month", y: "year", fill: null, stroke: ANOMALY_STROKE, strokeWidth: 1.5, inset: 1.5,
       }),
-      Plot.dot(cells.filter((c) => c.rec.anom && inRange(c.rec.ym, range)), {
+      Plot.dot(anomalies, {
         x: "month", y: "year", symbol: wedge, r: WEDGE_PX / Math.sqrt(Math.PI),
         dx: (cellW * 0.92) / 2 - WEDGE_PX / 2 - 1, dy: -(rowH * 0.92) / 2 + WEDGE_PX / 2 + 1,
         fill: WEDGE_FILL, stroke: WEDGE_EDGE, strokeWidth: 0.75,

@@ -190,3 +190,6 @@ export function detectionDaysText(rec: MonthRecord, usesViirs: boolean): string 
   const inMonth = new Date(Date.UTC(y, m, 0)).getUTCDate();
   return `${usesViirs ? "VIIRS" : "MODIS"} saw fire on ${days} of ${inMonth} days`;
 }
+
+/** Below this baseline median a ratio swings with one fire ("61x a median of 1"); the web gives the difference instead. */
+export const SMALL_MEDIAN = 5;

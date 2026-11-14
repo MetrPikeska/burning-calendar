@@ -1,7 +1,7 @@
 // Region report as Markdown, built in the browser from the loaded index.json and regions/{id}.json.
 // DOM-free so it can be tested. Every number comes from the data files; nothing is recomputed
 // except ratios and month lengths.
-import { baselineValue, detectionDaysText, outageNote, type IndexFile, type MonthRecord, type RegionFile } from "./contract.ts";
+import { baselineValue, detectionDaysText, outageNote, SMALL_MEDIAN, type IndexFile, type MonthRecord, type RegionFile } from "./contract.ts";
 
 /** Same text as CITATION.cff (keep the two in step). */
 export const CITATION =
@@ -83,8 +83,8 @@ export function buildReport(p: ReportInput): string {
     if (harmonized && rec.src !== "observed") push(`| likely range (10th-90th percentile of the back-cast check) | ${n1(rec.harm_lo)} to ${n1(rec.harm_hi)} |`);
     push(`| baseline years | ${rec.baseline_years ?? "n/a"} |`);
     push(`| baseline median / 90th percentile | ${n1(rec.baseline_median)} / ${n1(rec.baseline_p90)} |`);
-    // A ratio on a median under 5 swings with one fire (burncal-0kc); give it only above that.
-    if (value != null && rec.baseline_median != null && rec.baseline_median >= 5) push(`| ratio to the median | ${n1(value / rec.baseline_median)}x |`);
+    // A ratio on a small median swings with one fire (burncal-0kc); give it only from SMALL_MEDIAN up.
+    if (value != null && rec.baseline_median != null && rec.baseline_median >= SMALL_MEDIAN) push(`| ratio to the median | ${n1(value / rec.baseline_median)}x |`);
     push(`| percentile rank in the baseline (0-100, not a percent change) | ${rec.anom_pct ?? "n/a"} |`);
     push(`| anomaly (above the 90th percentile) | ${rec.anom ? "yes" : "no"}${rec.anom && (value ?? 0) < 20 ? " (fewer than 20 detections: one fire can cross the threshold)" : ""} |`);
     const days = detectionDaysText(rec, usesViirs);

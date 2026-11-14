@@ -3,6 +3,7 @@ import "./style.css";
 import { formatMonth } from "@observablehq/plot";
 import { availableSeries, shownSeries, type CountryCode, type IndexFile, type RegionFile, type Series } from "./lib/contract.ts";
 import { csvFileName, filterCsvByRange } from "./lib/csv.ts";
+import { nowText, type RecentBody } from "./lib/now.ts";
 import { buildReport, reportFileName } from "./lib/report.ts";
 import { dataUrl, loadIndex, loadRegion } from "./lib/data.ts";
 import { parseLatLon, regionAt, type RegionCollection } from "./lib/geo.ts";
@@ -319,24 +320,8 @@ function downloadReport(ym: string): void {
 
 // ---------- "Now": FIRMS near real-time, last 3 days (api/recent.ts) ----------
 
-interface RecentBody {
-  configured: boolean;
-  total: number;
-  window: { from: string; to: string; days: number };
-  sources_failed?: string[];
-  calendar_context: { month: number; years: string; median_per_day: number | null; nrt_viirs_noaa20_per_day: number | null } | null;
-}
 const NOW_TTL_MS = 10 * 60_000;
 const nowCache = new Map<string, { at: number; body: RecentBody | null }>();
-
-function nowText(b: RecentBody): string {
-  const c = b.calendar_context;
-  const rate = c && c.median_per_day != null && c.nrt_viirs_noaa20_per_day != null
-    ? `; NOAA-20 ${c.nrt_viirs_noaa20_per_day}/day vs a median of ${c.median_per_day}/day for ${monthName(c.month - 1)} ${c.years} (S-NPP)`
-    : "";
-  return `<strong>Now</strong>, last ${b.window.days} days: ${b.total.toLocaleString("en")} detections${rate}. `
-    + `<span class="now-note">NASA FIRMS near real-time (NOAA-20/21, MODIS), not filtered or harmonized like the calendar; order of magnitude only.</span>`;
-}
 
 function paintNow(id: string, body: RecentBody | null): void {
   const el = document.querySelector<HTMLElement>("#now");

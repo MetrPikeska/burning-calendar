@@ -120,9 +120,24 @@ describe("median panel wording (burncal-0kc)", async () => {
     expect(ratioText(0, 0)).toBe("equal to the median");
   });
   it("states the anomaly in one sentence", () => {
-    const base = { ym: "2025-08", modis: 0, viirs: null, harm: 1, harm_lo: null, harm_hi: null, src: "observed", fit_level: null, anom_pct: 100, anom: true, outage: false, baseline_years: "2015-2024", baseline_p90: 1488 } as never;
-    expect(verdictText(base, "2025-08")).toMatch(/Anomaly<\/span>: higher than every August in 2015-2024\./);
-    expect(verdictText({ ...(base as object), anom_pct: 95 } as never, "2025-08")).toMatch(/above the 90th percentile of those years \(1,488\)/);
-    expect(verdictText({ ...(base as object), anom: false, anom_pct: 40 } as never, "2025-08")).toMatch(/^Not an anomaly/);
+    expect(verdictText(true, 100, "2015-2024", 1488, "2025-08")).toMatch(/Anomaly<\/span>: higher than every August in 2015-2024\./);
+    expect(verdictText(true, 95, "2015-2024", 1488, "2025-08")).toMatch(/above the 90th percentile of those years \(1,488\)/);
+    expect(verdictText(false, 40, "2015-2024", 1488, "2025-08")).toMatch(/^Not an anomaly/);
+  });
+});
+
+describe("Now line", async () => {
+  const { nowText } = await import("../src/lib/now.ts");
+  const base = { configured: true, total: 9, window: { from: "2026-11-12", to: "2026-11-14", days: 3 } };
+  it("shows the NOAA-20 rate against the median only when the API gives a ratio", () => {
+    const t = nowText({ ...base, calendar_context: { month: 11, years: "2016-2025", median_per_day: 1.22, nrt_viirs_noaa20_per_day: 1, ratio_to_median_per_day: 0.82 } });
+    expect(t).toContain("9 detections; NOAA-20 1/day, 0.82× the median of 1.22/day for Nov 2016-2025 (S-NPP)");
+  });
+  it("gives only the count on a low baseline or a failed NOAA-20 source", () => {
+    const low = nowText({ ...base, calendar_context: { month: 11, years: "2016-2025", median_per_day: 0.22, nrt_viirs_noaa20_per_day: 3, ratio_to_median_per_day: null } });
+    expect(low).toContain("last 3 days: 9 detections. ");
+    expect(low).not.toContain("NOAA-20 3/day");
+    const failed = nowText({ ...base, calendar_context: { month: 11, years: "2016-2025", median_per_day: 1.22, nrt_viirs_noaa20_per_day: null, ratio_to_median_per_day: null } });
+    expect(failed).not.toContain("/day,");
   });
 });
