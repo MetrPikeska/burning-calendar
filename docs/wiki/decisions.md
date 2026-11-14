@@ -51,7 +51,7 @@ sources: [sources/2026-11-13-research-harmonization-validation.md, findings-gree
 | 14 Nov | Charts with Observable Plot; basemap OpenFreeMap positron (no key) with a local Natural Earth fallback when offline or with `?basemap=local` | Plot gives cell, area and line marks with tooltips in a few lines; the demo must survive without Wi-Fi |
 | 14 Nov | Vercel project root `web/`; future function at `web/api/mcp.ts`; DOM-free TS shared by web and function in `web/src/lib/` | One deploy; `includeFiles: public/data/**` resolves relative to the root |
 | 14 Nov | Hosting and build: everything (pipeline, web, MCP function) is built on Petr's laptop and deployed from Petr's own GitHub repo `MetrPikeska/burning-calendar` and Petr's Vercel account; no separate Vercel project for Vita |
-| 14 Nov | Vercel project `burning-calendar` on Petr's account, deployed from the laptop with `vercel deploy` from `web/`; Git auto-deploy not connected yet | Production URL https://burning-calendar.vercel.app; the first CLI deploy of a new project went to production | One repo, one deploy, one URL for the jury; replaces the plan's assumption that Vita sets up `web/` on Vercel |
+| 14 Nov | Vercel project `burning-calendar` on Petr's account, root directory `web/`, Git auto-deploy from `MetrPikeska/burning-calendar` branch `main` (connected 14 Nov); CLI deploys only as a fallback, run from the repo root | Production URL https://burning-calendar.vercel.app; every push deploys, so production never carries uncommitted work | One repo, one deploy, one URL for the jury; replaces the plan's assumption that Vita sets up `web/` on Vercel |
 
 ## Open
 

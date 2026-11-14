@@ -32,7 +32,8 @@ Feature freeze Sun 15 Nov 12:00. Local submission Sun 15:00, pitch 16:00 (7 min 
 - [x] P Deep-link format into llms.txt: `?country=gr&region=EL52&from=YYYY-MM&to=YYYY-MM&series=harm|modis|viirs` (web/src/lib/url-state.ts)
 - [x] P api/mcp.ts smoke test on Vercel (mcp-handler 2.4.0, one tool `search_regions`), https://burning-calendar.vercel.app/api/mcp
 - [ ] P MCP tools with `caveats` and `view_url` (agent-access.md), test with MCP Inspector and a claude.ai connector
-- [ ] P Decide: connect Vercel Git auto-deploy (root `web/`) or keep CLI deploys from the laptop
+- [x] P Vercel Git auto-deploy connected (root `web/`, branch main)
+- [ ] P After the next push: `vercel promote` the new deployment (production was rolled back, so auto-assign is paused) and check /api/mcp
 - [ ] P+V README (problem, method, LOYO number, limits, how to run), MIT licence
 - [ ] V Slides (PDF, English, max 7 for global demo), 30 s video, backup screen recording
 - [ ] P+V Project page on the NASA portal, first save by Sun 14:00

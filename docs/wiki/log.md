@@ -25,3 +25,4 @@ Append-only. Format: `YYYY-MM-DD op: what changed`.
 - 2026-11-14 build: static agent layer files. data-contract.md: `regions/{id}.csv`, `data/v1/schema/*.schema.json` (JSON Schema 2020-12, tested against all files), `/llms.txt`.
 - 2026-11-14 build: web scaffold in `web/` (Vite 8.3.8, TypeScript 7.0.2, maplibre-gl 6.18.0, @observablehq/plot 0.6.19, vitest 5.1.0, pinned exact). Offline basemap `web/public/data/base/land.geojson` from Natural Earth 1:50M (`pipeline/basemap.py`). personas.md: colour ramp is inferno.
 - 2026-11-14 build: MCP smoke test passed on Vercel (agent-access.md). New Vercel project `burning-calendar`, production https://burning-calendar.vercel.app (decisions.md).
+- 2026-11-14 decide: Vercel Git auto-deploy connected, root `web/` (decisions.md). The first Git deploy broke the MCP data path; production rolled back, `api/mcp.ts` fixed (agent-access.md).

@@ -1,12 +1,18 @@
 // MCP endpoint (Streamable HTTP, stateless, read-only). Smoke test: one tool over the static index.
 // Data comes from public/data/** bundled via vercel.json functions."api/mcp.ts".includeFiles.
+import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { createMcpHandler } from "mcp-handler";
 import { z } from "zod";
 import type { CountryCode, IndexFile } from "../src/lib/contract.ts";
 
-const DATA_DIR = join(process.cwd(), "public", "data", "v1");
+// Vercel bundles includeFiles at their repo-relative path: /var/task/public/... for a CLI deploy
+// from web/, /var/task/web/public/... for a Git deploy with root directory web/. Locally cwd is web/.
+const DATA_DIR =
+  [join(process.cwd(), "public", "data", "v1"), join(process.cwd(), "web", "public", "data", "v1")].find((d) =>
+    existsSync(join(d, "gr", "index.json")),
+  ) ?? join(process.cwd(), "public", "data", "v1");
 
 async function loadIndex(country: CountryCode): Promise<IndexFile> {
   return JSON.parse(await readFile(join(DATA_DIR, country, "index.json"), "utf8")) as IndexFile;
