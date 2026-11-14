@@ -206,11 +206,15 @@ const swatch = (inner: string) =>
   `<svg width="${SW}" height="${SW}" viewBox="0 0 ${SW} ${SW}" aria-hidden="true">${inner}</svg>`;
 
 /** Key for the calendar marks; items appear only when they can occur for this view. */
-export function marksKey(hasRange: boolean): string {
+export function marksKey(hasRange: boolean, own: Series = "harm", shown: Series = own): string {
   const pale = "#fbe7a6";
+  // The calendar marks anomalies only on the region's own series, so the key says so instead (audit R2-004).
+  const anomalyItem: [string, string] = shown === own
+    ? [swatch(`<rect x="1" y="1" width="12" height="12" fill="#c33b4c"/><rect x="2.25" y="2.25" width="9.5" height="9.5" fill="none" stroke="${ANOMALY_STROKE}" stroke-width="1.5"/><path d="M6.5 2.5H11.5V7.5Z" fill="${WEDGE_FILL}" stroke="${WEDGE_EDGE}" stroke-width="0.75"/>`),
+      "Anomaly: above the 90th percentile of the preceding 10 years"]
+    : [swatch(""), `Anomaly marks show on the ${SERIES_LABEL[own]} series only`];
   const items: [string, string][] = [
-    [swatch(`<rect x="1" y="1" width="12" height="12" fill="#c33b4c"/><rect x="2.25" y="2.25" width="9.5" height="9.5" fill="none" stroke="${ANOMALY_STROKE}" stroke-width="1.5"/><path d="M6.5 2.5H11.5V7.5Z" fill="${WEDGE_FILL}" stroke="${WEDGE_EDGE}" stroke-width="0.75"/>`),
-      "Anomaly: above the 90th percentile of the preceding 10 years"],
+    anomalyItem,
     [swatch(`<rect x="1" y="1" width="12" height="12" fill="${pale}"/><rect x="1.25" y="1.25" width="11.5" height="11.5" fill="none" stroke="${RING_OUTER}" stroke-width="2.5"/><rect x="3.4" y="3.4" width="7.2" height="7.2" fill="none" stroke="${RING_INNER}" stroke-width="1.5"/>`),
       "Month compared with its median"],
   ];

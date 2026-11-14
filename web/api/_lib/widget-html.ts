@@ -4,7 +4,7 @@
 // ui/notifications/host-context-changed, ui/notifications/size-changed, ui/open-link) instead of bundling
 // @modelcontextprotocol/ext-apps (532 KB with deps).
 // Colours follow web/src/charts/heatmap.ts: reversed inferno on a sqrt scale, anomaly outline #2a9df4,
-// grey for missing values, a cross for known MODIS outages. Back-cast months get a hatch.
+// grey for missing values, a cross for known satellite outages (MODIS or VIIRS, whichever the value comes from). Back-cast months get a hatch.
 // Keep this file free of backticks and dollar-brace pairs: it is one String.raw template.
 
 export const CALENDAR_HTML = String.raw`<!doctype html>
@@ -203,7 +203,7 @@ a { color: var(--bc-link); }
       var lines = [c.ym + "  " + String(d.series_label || d.series) + ": " + fmt(c.v)];
       if (back) lines.push("back-cast from MODIS (" + c.src + "), range " + fmt(c.lo) + " to " + fmt(c.hi));
       if (showAnom && c.anom) lines.push("ANOMALY: above the 90th percentile of the preceding 10 years");
-      if (c.outage) lines.push("known MODIS data gap of 3 or more days");
+      if (c.outage) lines.push("known " + (c.outage === "viirs" ? "VIIRS S-NPP" : "MODIS") + " data gap of 3 or more days");
       g.appendChild(sv("title", null, lines.join("\n")));
       svg.appendChild(g);
     });
@@ -233,7 +233,7 @@ a { color: var(--bc-link); }
       hs.appendChild(sv("rect", { x: 1, y: 1, width: 12, height: 12, fill: "url(#bc-hatch-key)" }));
       item(hs, "Back-cast from MODIS (before Feb 2012), modelled");
     }
-    if (cells.some(function (c) { return c.outage; })) item(swatch([sv("rect", { x: 1, y: 1, width: 12, height: 12, fill: "#fbe7a6" }), sv("text", { x: 7, y: 11, "text-anchor": "middle", style: "fill:#1d1b19;font-size:12px;font-weight:600" }, "×")]), "Known MODIS outage");
+    if (cells.some(function (c) { return c.outage; })) item(swatch([sv("rect", { x: 1, y: 1, width: 12, height: 12, fill: "#fbe7a6" }), sv("text", { x: 7, y: 11, "text-anchor": "middle", style: "fill:#1d1b19;font-size:12px;font-weight:600" }, "×")]), "Known satellite outage");
     if (cells.some(function (c) { return c.v == null; })) item(swatch([sv("rect", { x: 1, y: 1, width: 12, height: 12, style: "fill:var(--bc-none)" })]), "No value");
     app.appendChild(lg);
 

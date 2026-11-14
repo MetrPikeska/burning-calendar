@@ -300,7 +300,7 @@ function renderPanel(): void {
       ${narrow ? `<details class="range-details" ${rangeOpen || hasRange ? "open" : ""}><summary>Date range${hasRange ? `: ${state.from ?? "start"} to ${state.to ?? "end"}` : ""}</summary>${rangeHtml}</details>` : rangeHtml}
     </div>
     <div id="chart" tabindex="0" role="group" aria-label="Burning calendar, years by months. Arrow keys change the compared month."></div>
-    ${marksKey(hasRange)}
+    ${marksKey(hasRange, shownSeries(region.mode, "harm"), series)}
     <p class="foot">${matchMedia("(pointer: coarse)").matches ? "Tap" : "Click"} a cell or use the arrows to compare another month.${series === "harm"
       ? ` Nov 2000 to Jan 2012 back-cast from MODIS (range in the tooltip), Feb 2012 to ${endYear} VIIRS observed${provisionalNote}.`
       : ""}</p>

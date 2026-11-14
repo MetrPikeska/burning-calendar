@@ -87,6 +87,19 @@ describe("AOI geometry and GeoJSON", () => {
     expect(parseGeoJson(JSON.stringify({ type: "Polygon", coordinates: [square] })).polygons).toHaveLength(1);
   });
 
+  it("round-trips its own export: same parts, radius, area and containment (audit R2-002)", () => {
+    for (const radius_km of [2, 5, 50]) {
+      const a = { polygons: [[square]], points: [[23, 39]], lines: [[[22, 38], [24, 38]]], radius_km };
+      let b = a;
+      for (let i = 0; i < 3; i++) b = parseGeoJson(JSON.stringify(aoiToGeoJson(b)), 5); // picker at 5 km
+      expect([b.polygons.length, b.points.length, b.lines.length, b.radius_km]).toEqual([1, 1, 1, radius_km]);
+      expect(areaKm2(b)).toBeCloseTo(areaKm2(a), 6);
+      for (const [lon, lat] of [[23.03, 39], [23.04, 39.0], [23.05, 38.0], [25, 41]]) expect(contains(b, lon, lat)).toBe(contains(a, lon, lat));
+    }
+    // A foreign file without radius_km takes the picker radius.
+    expect(parseGeoJson(JSON.stringify({ type: "Point", coordinates: [23, 39] }), 3).radius_km).toBe(3);
+  });
+
   it("rejects broken, empty, projected and oversized input with a readable message", () => {
     expect(() => parseGeoJson("{nope")).toThrow(AoiError);
     expect(() => parseGeoJson(JSON.stringify({ type: "FeatureCollection", features: [] }))).toThrow(/no polygon, point or line/);

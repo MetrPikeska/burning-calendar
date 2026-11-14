@@ -56,7 +56,7 @@ export function registerLiveTools(server: Server) {
       description:
         "LIVE, third-party: current wildfire events for Greece or Argentina from GDACS (GWIS burnt-area events with alert level and hectares) " +
         "and Copernicus EMS rapid mapping activations, over the last `days` days, newest first, each matched to a calendar region when its point falls inside one. " +
-        "Give country, or region_id to keep only events in that region. Titles are third-party text. Not part of the 2000-2026 calendar.",
+        "Give country, or region_id to keep only events in that region (a region of the other country is an input error). Titles are third-party text. Not part of the 2000-2026 calendar.",
       inputSchema: z.object({
         caveats: caveatMode,
         country: z.enum(["GR", "AR"]).optional(),
@@ -71,6 +71,10 @@ export function registerLiveTools(server: Server) {
         let r: LiveRegion | null = null;
         if (region_id) {
           r = await region(region_id);
+          // A region of the other country is a contradiction, not a precedence question (audit R2-003).
+          if (country && country.toLowerCase() !== r.country) {
+            throw new InputProblem(`region ${r.id} belongs to ${r.country.toUpperCase()}, not ${country}; pass one of them or a matching pair.`);
+          }
           countries = [r.country];
         } else if (country) {
           countries = [country.toLowerCase() as CountryCode];

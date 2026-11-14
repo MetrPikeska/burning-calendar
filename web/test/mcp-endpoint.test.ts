@@ -78,6 +78,16 @@ describe("show_calendar data", () => {
     expect(d.months.some((m) => "anom" in m)).toBe(false);
     expect(d.anomaly_months).toBeUndefined();
     expect(d.anomaly_months_omitted).toMatch(/harm series/);
+    // R2-001: no anomaly months at any level, no harm-only caveats on MODIS values.
+    expect(JSON.stringify(d)).not.toMatch(/"anomaly_months"/);
+    const codes = d.caveats.map((c) => c.code);
+    expect(codes).not.toContain("small_counts");
+    expect(codes).not.toContain("backcast");
+    expect(d.caveats.find((c) => c.code === "outage")?.message ?? "").not.toMatch(/VIIRS/);
+    expect(own.totals[0].anomaly_months).toEqual(["2024-05", "2024-06", "2024-07", "2024-08"]);
+    expect(own.caveats.map((c) => c.code)).toContain("small_counts");
+    const v = calendarData(el52, { from: "2024-01", to: "2024-12", series: "viirs" }, period);
+    expect(JSON.stringify(v)).not.toMatch(/"anomaly_months"|"anom"/);
   });
 
   it("strips control, bidi and zero-width characters from names", () => {

@@ -15,6 +15,9 @@ export interface Aoi {
 export const MAX_FILE_BYTES = 5 * 1024 * 1024;
 export const MAX_VERTICES = 20_000;
 export const DEFAULT_RADIUS_KM = 5;
+/** Limits of the radius picker in the draw bar. */
+export const RADIUS_MIN_KM = 0.5;
+export const RADIUS_MAX_KM = 50;
 
 export class AoiError extends Error {}
 
@@ -61,9 +64,16 @@ export function parseGeoJson(text: string, radius_km = DEFAULT_RADIUS_KM): Aoi {
   }
   const crs = obj?.crs?.properties?.name;
   if (crs && !/CRS84|EPSG::?4326/i.test(crs)) throw new AoiError(`Coordinates must be WGS 84 lon/lat; the file declares ${crs}.`);
-  const aoi = emptyAoi(radius_km);
-  if (obj?.type === "FeatureCollection") (obj.features ?? []).forEach((f) => addGeometry(aoi, (f as { geometry?: unknown }).geometry));
-  else if (obj?.type === "Feature") addGeometry(aoi, obj.geometry);
+  type Feat = { geometry?: unknown; properties?: { role?: unknown; radius_km?: unknown } | null };
+  const feats: Feat[] = obj?.type === "FeatureCollection" ? ((obj.features ?? []) as Feat[]) : obj?.type === "Feature" ? [obj as Feat] : [];
+  // Our own export (aoiToGeoJson) round-trips: its point circles are map decoration next to the point, and the
+  // radius it was drawn with travels in radius_km (audit R2-002: re-import doubled the area and took the picker radius).
+  const ours = feats.filter((f) => f.properties?.role === "point" || f.properties?.role === "line")
+    .map((f) => f.properties?.radius_km).find((r): r is number => typeof r === "number" && r >= RADIUS_MIN_KM && r <= RADIUS_MAX_KM);
+  const aoi = emptyAoi(ours ?? radius_km);
+  if (obj?.type === "FeatureCollection" || obj?.type === "Feature") {
+    for (const f of feats) if (f.properties?.role !== "point-buffer") addGeometry(aoi, f.geometry);
+  }
   else addGeometry(aoi, obj);
   if (isEmpty(aoi)) throw new AoiError("The file holds no polygon, point or line.");
   if (vertexCount(aoi) > MAX_VERTICES) throw new AoiError(`The area has more than ${MAX_VERTICES.toLocaleString("en")} vertices; simplify it first.`);

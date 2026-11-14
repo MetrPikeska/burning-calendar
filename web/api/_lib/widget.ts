@@ -3,7 +3,7 @@
 import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import type { MonthRecord, RegionFile, Series } from "../../src/lib/contract.ts";
-import { countryOf, type Period, regionSeries, SCALE, viewUrl } from "./tools.ts";
+import { type Caveat, countryOf, type Period, regionSeries, SCALE, viewUrl } from "./tools.ts";
 import { CALENDAR_HTML } from "./widget-html.ts";
 
 /** Same values as RESOURCE_MIME_TYPE and RESOURCE_URI_META_KEY in @modelcontextprotocol/ext-apps 2.0.4 (server/index.js). */
@@ -26,20 +26,42 @@ export function safeText(s: string, max = 80): string {
 
 const r1 = (x: number | null) => (x === null ? null : Math.round(x * 10) / 10);
 
+/** Satellite whose known gap (data/outages.csv) affects the shown value: VIIRS for raw VIIRS and observed harm, MODIS otherwise. */
+function outageSensor(m: MonthRecord, series: Series, mode: RegionFile["mode"]): "modis" | "viirs" | null {
+  if (series === "viirs" || (series === "harm" && mode === "harmonized" && m.src === "observed")) return m.outage_viirs ? "viirs" : null;
+  return m.outage ? "modis" : null;
+}
+
 /** One calendar cell: value of the shown series, the back-cast range on harm, anomaly and outage flags. Nulls omitted. */
 function cell(m: MonthRecord, series: Series, mode: RegionFile["mode"], showAnom: boolean) {
   const v = series === "harm" ? r1(m.harm) : m[series];
   const backcast = series === "harm" && m.src !== "observed";
-  // data/outages.csv lists MODIS (Aqua) gaps only: they matter where the shown value comes from MODIS.
-  const outage = m.outage && (series === "modis" || backcast || (series === "harm" && mode === "relative"));
+  const outage = outageSensor(m, series, mode);
   return {
     ym: m.ym,
     v,
     ...(backcast ? { lo: r1(m.harm_lo), hi: r1(m.harm_hi) } : {}),
     src: m.src,
     ...(showAnom && m.anom ? { anom: true } : {}),
-    ...(outage ? { outage: true } : {}),
+    ...(outage ? { outage } : {}),
   };
+}
+
+const SENSOR = { modis: "MODIS", viirs: "VIIRS S-NPP" } as const;
+
+/**
+ * Caveats of the shown series. regionSeries builds them for the region's own series; on another series the
+ * small-count anomaly note and the back-cast notes do not apply and the outage note must name the gaps behind the
+ * shown values (audit R2-001).
+ */
+function caveatsForSeries(caveats: Caveat[], cells: ReturnType<typeof cell>[], series: Series, own: Series): Caveat[] {
+  if (series === own) return caveats;
+  const drop = new Set(["small_counts", "outage", ...(series === "harm" ? [] : ["backcast", "backcast_terra"])]);
+  const gaps = cells.filter((c) => c.outage).map((c) => `${c.ym} (${SENSOR[c.outage!]})`);
+  return [
+    ...caveats.filter((c) => !drop.has(c.code)),
+    ...(gaps.length ? [{ code: "outage" as const, message: `Known satellite data gaps of 3 or more days in: ${gaps.join(", ")}; counts there may be low.` }] : []),
+  ];
 }
 
 /**
@@ -63,8 +85,11 @@ export function calendarData(region: RegionFile, p: { from?: string; to?: string
   const cells = months.map((m) => cell(m, series, region.mode, showAnom));
   const values = cells.map((c) => c.v).filter((v): v is number => v !== null);
   const explicit = p.from !== undefined || p.to !== undefined;
+  // Calendar-year totals carry anomaly_months of the region's own series; drop them with the cell flags (audit R2-001).
+  const totals = showAnom ? records : (records as Record<string, unknown>[]).map(({ anomaly_months: _a, ...t }) => t);
   return {
     ...rest,
+    caveats: caveatsForSeries(rest.caveats, cells, series, anomalySeries),
     name: safeText(region.name),
     unit: `${SCALE[series]} per month`,
     series,
@@ -76,7 +101,7 @@ export function calendarData(region: RegionFile, p: { from?: string; to?: string
     anomaly_months_omitted: showAnom ? undefined
       : `anomaly flags refer to the ${anomalySeries} series, not to the ${series} values shown; call show_calendar without series or get_anomalies`,
     backcast_months: series === "harm" ? months.filter((m) => m.src !== "observed").length : 0,
-    totals: records,
+    totals,
     view_url: viewUrl(country, region.id, explicit && ret ? ret.from : null, explicit && ret ? ret.to : null, series),
     months: cells,
   };
@@ -137,7 +162,8 @@ export function registerCalendar(server: McpServer, d: CalendarDeps) {
       description:
         "Show the burning calendar of one region as an interactive heat strip in the chat (years x months; MCP Apps widget). " +
         "Harmonized regions show harm (VIIRS-equivalent), relative regions raw MODIS. Back-cast months (before Feb 2012) are hatched, " +
-        "anomalies (above baseline_p90) outlined. Default range: all of 2000-11 to 2025-12. Hosts without widgets get calendar-year " +
+        "anomalies (above baseline_p90) outlined on the region's own series only: with another series cells, totals and anomaly_months carry no " +
+        "anomaly flags (anomaly_months_omitted says why). Default range: the whole coverage. Hosts without widgets get calendar-year " +
         "totals, anomaly months, caveats and a view_url; for monthly numbers use get_region_series. Pass on the caveats.",
       inputSchema: z.object({
         caveats: d.caveatMode,

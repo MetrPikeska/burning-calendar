@@ -55,6 +55,13 @@ describe("live tools over MCP", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it("reject a region of the other country in get_fire_alerts (audit R2-003)", async () => {
+    const r = await rpc("tools/call", { name: "get_fire_alerts", arguments: { country: "AR", region_id: "EL52" } });
+    expect(r.isError).toBe(true);
+    expect(r.content[0].text).toMatch(/EL52 belongs to GR, not AR/);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("reject days that do not exist instead of calling the upstream (audit BC-005)", async () => {
     for (const from of ["2026-02-30", "2025-02-29", "2026-04-31"]) {
       const r = await rpc("tools/call", { name: "get_fire_weather", arguments: { region_id: "EL52", from, to: "2026-05-01" } });
