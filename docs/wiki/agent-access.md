@@ -80,6 +80,11 @@ Jury path in 1 minute: claude.ai connector with no auth. Keep a recorded fallbac
 - MCP resources and an MCP Apps widget are not built.
 - Smoke test: `cd web && npm run smoke:mcp` (production) or `node scripts/smoke-mcp.mjs <base-url> [--no-static]` calls all 10 tools over Streamable HTTP, checks known values (Evia Aug 2021 flagged in EL64, EL30 2007-06 back-cast band, EL62 blocks ranking, point 38.8 N 23.4 E in EL64) plus `llms.txt` and the CORS header on `/data/v1`, and exits 1 on any failure. Run it after every push to `main`.
 
+## Web entry and demo (14 Nov 2026)
+
+- "Use with AI" button in the web header (`web/src/ui/agent-panel.ts`, native `<dialog>`, Esc and backdrop close it): MCP URL with copy button, claude.ai and Claude Code steps, one line each for ChatGPT, Cursor and VS Code, links to `/llms.txt` and both JSON Schemas, three example prompts with a deep link each (EL64 2021, Argentine density ranking, Entre Ríos 2020). Bead burncal-a2o.
+- Pitch script for the 20 s live agent segment, slide, pre-flight and fallback recording: `docs/notes/2026-11-14-agent-demo.md`. Live prompt answers from one `get_anomalies` call: EL64 Aug 2021 = 4,235 detections, median 63.1 (2011-2020), 67.1×.
+
 ## Proposed tools (13 Nov design)
 
 All read-only (`readOnlyHint: true`, `openWorldHint: false`), enums for `country` (`GR`, `AR`), `YYYY-MM` patterns, `structuredContent` plus a short text summary with caveats first.

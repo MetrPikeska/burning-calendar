@@ -64,6 +64,7 @@ The MCP server is stateless, read-only and needs no key. It answers questions su
 
 - claude.ai or Claude Desktop: Customize > Connectors > Add custom connector, paste the URL above.
 - Claude Code: `claude mcp add --transport http burncal https://burning-calendar.vercel.app/api/mcp`
+- Cursor, VS Code, ChatGPT: add the URL as a remote (HTTP) MCP server. The "Use with AI" button in the web app header shows the config lines, a copy button for the URL and three example questions.
 - Tools and outputs: [agent-access.md](docs/wiki/agent-access.md). Plain-text summary for crawlers: `/llms.txt`.
 
 ## How to run

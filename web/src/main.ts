@@ -11,6 +11,7 @@ import { defaultMonth, renderMedianPanel } from "./charts/median.ts";
 import { rampColors } from "./charts/ramp.ts";
 import { renderValidation } from "./charts/validation.ts";
 import { createRegionMap } from "./map.ts";
+import { initAgentPanel } from "./ui/agent-panel.ts";
 
 const monthName = formatMonth("en", "short");
 const monthInitial = formatMonth("en", "narrow");
@@ -284,6 +285,7 @@ async function setCountry(country: CountryCode): Promise<void> {
   await selectRegion(known && state.region ? state.region : index.regions[0].id);
 }
 
+initAgentPanel($("#ai-open"));
 const regionMap = await createRegionMap($("#map"), (id) => void selectRegion(id), forceLocalBasemap);
 
 document.querySelectorAll<HTMLButtonElement>("#country button").forEach((b) =>
