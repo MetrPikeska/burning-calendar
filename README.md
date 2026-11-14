@@ -66,6 +66,7 @@ The MCP server is stateless, read-only and needs no key. It answers questions su
 - Claude Code: `claude mcp add --transport http burncal https://burning-calendar.vercel.app/api/mcp`
 - Cursor, VS Code, ChatGPT: add the URL as a remote (HTTP) MCP server. The "Use with AI" button in the web app header shows the config lines, a copy button for the URL and three example questions.
 - Tools and outputs: [agent-access.md](docs/wiki/agent-access.md). Plain-text summary for crawlers: `/llms.txt`.
+- Live context: four more tools fetch current wildfire alerts (GDACS, Copernicus EMS), model weather (Open-Meteo), station records (Meteostat) and NASA FIRMS near-real-time detections (needs `FIRMS_MAP_KEY` on the server), each with source, licence and fetch time.
 
 ## How to run
 

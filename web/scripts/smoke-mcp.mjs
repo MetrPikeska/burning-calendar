@@ -4,7 +4,7 @@
 // --no-static skips llms.txt and /data (for a local server that serves only the function).
 // Calls every tool once over Streamable HTTP (2025-06-18 era, stateless), checks key fields
 // and known values, the MCP Apps resource, one 2026-07-28 request and the Origin check,
-// prints one line per check, exits 1 on any failure.
+// live tools: upstream_error / not_configured only warn. Prints one line per check, exits 1 on any failure.
 
 const args = process.argv.slice(2);
 const STATIC = !args.includes("--no-static");
@@ -20,6 +20,8 @@ const MODERN_META = {
   "io.modelcontextprotocol/clientInfo": { name: "smoke-mcp", version: "1" },
   "io.modelcontextprotocol/clientCapabilities": {},
 };
+// Live context tools (third-party upstreams): upstream_error or not_configured is a warning, not a failure.
+const LIVE_TOOLS = ["get_fire_alerts", "get_fire_weather", "get_weather_stations", "get_recent_detections"];
 
 let id = 0;
 /** modern: 2026-07-28 request (per-request _meta envelope plus MCP-Protocol-Version and Mcp-Method headers). */
@@ -76,8 +78,9 @@ const checks = [
   ["tools/list", async () => {
     const r = await rpc("tools/list", {});
     const names = r.tools.map((t) => t.name).sort();
-    must(JSON.stringify(names) === JSON.stringify([...TOOLS].sort()), `tools: ${names.join(",")}`);
+    must(JSON.stringify(names) === JSON.stringify([...TOOLS, ...LIVE_TOOLS].sort()), `tools: ${names.join(",")}`);
     must(r.tools.every((t) => t.annotations?.readOnlyHint === true), "a tool lacks readOnlyHint");
+    must(r.tools.filter((t) => LIVE_TOOLS.includes(t.name)).every((t) => t.annotations?.openWorldHint === true), "a live tool lacks openWorldHint");
     const cal = r.tools.find((t) => t.name === "show_calendar");
     must(cal._meta?.ui?.resourceUri === WIDGET_URI, "show_calendar lacks _meta.ui.resourceUri");
     return `${names.length} tools, all readOnlyHint, show_calendar -> ${WIDGET_URI}`;
@@ -165,6 +168,37 @@ checks.push(
     return `evil.example ${bad.status} (${bad.status === 403 ? "enforced" : "report-only"}), claude.ai 200`;
   }],
 );
+
+/** Checks shared by the live tools; returns the warning codes (upstream_error, not_configured) found. */
+function live(r) {
+  must(!r.isError, `isError: ${r.content?.[0]?.text?.slice(0, 200)}`);
+  const s = r.structuredContent;
+  must(s && s.fetched_at && Array.isArray(s.source) && s.source.every((x) => x.attribution), "fetched_at or source missing");
+  const codes = s.caveat_codes ?? s.caveats.map((c) => c.code);
+  must(codes[0] === "live_upstream", "live_upstream caveat missing");
+  must(r.content[0].text.startsWith("CAVEAT"), "text block does not start with caveats");
+  return { s, warn: codes.filter((c) => c === "upstream_error" || c === "not_configured") };
+}
+const liveChecks = [
+  ["get_fire_alerts", async () => {
+    const { s, warn } = live(await call("get_fire_alerts", { country: "AR", days: 30 }));
+    return { warn, info: `${s.count} AR events in 30 days` };
+  }],
+  ["get_fire_weather", async () => {
+    const { s, warn } = live(await call("get_fire_weather", { region_id: "EL64", caveats: "codes" }));
+    must(warn.length || s.days.length >= 10, `only ${s.days.length} days`);
+    return { warn, info: `EL64 ${s.days.length} days, tmax max ${s.summary.tmax_c_max} C` };
+  }],
+  ["get_weather_stations", async () => {
+    const { s, warn } = live(await call("get_weather_stations", { region_id: "30", caveats: "codes" }));
+    return { warn, info: `Entre Ríos ${s.stations.length} stations, last measured ${s.stations[0]?.last_measured_date ?? "-"}` };
+  }],
+  ["get_recent_detections", async () => {
+    const { s, warn } = live(await call("get_recent_detections", { region_id: "EL64", days: 3, caveats: "codes" }));
+    return { warn, info: s.configured ? `EL64 VIIRS N20 ${s.totals.viirs_noaa20} in 3 days` : "FIRMS_MAP_KEY not set" };
+  }],
+];
+
 const staticChecks = [
   ["static: llms.txt", async () => {
     const res = await fetch(`${BASE}/llms.txt`);
@@ -188,17 +222,21 @@ const staticChecks = [
 ];
 
 let failed = 0;
+let warned = 0;
 console.log(`smoke ${BASE}`);
+checks.push(...liveChecks);
 if (STATIC) checks.push(...staticChecks);
 for (const [name, fn] of checks) {
   const t0 = performance.now();
   try {
-    const info = await fn();
-    console.log(`ok   ${name.padEnd(20)} ${String(Math.round(performance.now() - t0)).padStart(5)} ms  ${info}`);
+    const out = await fn();
+    const { warn = [], info = out } = typeof out === "object" ? out : {};
+    if (warn.length) warned++;
+    console.log(`${warn.length ? "WARN" : "ok  "} ${name.padEnd(20)} ${String(Math.round(performance.now() - t0)).padStart(5)} ms  ${info}${warn.length ? ` (${warn.join(", ")})` : ""}`);
   } catch (e) {
     failed++;
     console.log(`FAIL ${name.padEnd(20)} ${String(Math.round(performance.now() - t0)).padStart(5)} ms  ${e.message}`);
   }
 }
-console.log(failed ? `${failed} of ${checks.length} checks failed` : `all ${checks.length} checks passed`);
+console.log(failed ? `${failed} of ${checks.length} checks failed` : `all ${checks.length} checks passed${warned ? `, ${warned} with live warnings` : ""}`);
 process.exit(failed ? 1 : 0);

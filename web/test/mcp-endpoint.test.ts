@@ -111,7 +111,7 @@ describe("MCP endpoint, 2025 stateless clients", () => {
     expect(tool._meta.ui.resourceUri).toBe(CALENDAR_URI);
     expect(tool._meta["ui/resourceUri"]).toBe(CALENDAR_URI);
     expect(tool.annotations.readOnlyHint).toBe(true);
-    expect(r.body.result.tools).toHaveLength(11);
+    expect(r.body.result.tools).toHaveLength(15);
   });
 
   it("lists and reads the ui:// resource", async () => {

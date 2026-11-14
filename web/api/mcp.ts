@@ -33,6 +33,7 @@ import {
 } from "./_lib/tools.ts";
 import { withOriginCheck } from "./_lib/origin.ts";
 import { registerCalendar } from "./_lib/widget.ts";
+import { registerLiveTools } from "./_lib/live/register.ts";
 
 // Vercel bundles includeFiles at their repo-relative path: /var/task/public/... for a CLI deploy
 // from web/, /var/task/web/public/... for a Git deploy with root directory web/. Locally cwd is web/.
@@ -361,6 +362,7 @@ const handler = createMcpHandler(
 
     // MCP Apps render tool and its ui:// resource (web/api/_lib/widget.ts).
     registerCalendar(server, { ok, fail, loadRegion, period, regionId, ym, caveatMode, annotations: RO });
+    registerLiveTools(server);
   },
   { serverInfo: { name: "burning-calendar", version: "0.5.0" } },
 );

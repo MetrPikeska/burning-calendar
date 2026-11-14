@@ -1,11 +1,11 @@
 ---
 title: Agent access (MCP, llms.txt, deep links)
 updated: 2026-11-14
-verified_by: `cd web && npm test` (test/mcp-endpoint.test.ts) and `node scripts/smoke-mcp.mjs http://127.0.0.1:3210 --no-static` against a local node:http wrapper of api/mcp.ts (14 Nov 2026); smoke test on https://burning-calendar.vercel.app/api/mcp (14 Nov 2026); mcp-handler 2.4.0 and @modelcontextprotocol/server 2.4.0 source in web/node_modules; ext-apps 2.0.4 npm tarball (dist/src/spec.types.d.ts, server/index.js); npm registry mcp-handler 2.4.0 (published 12 Nov 2026, `next` optional peer); modelcontextprotocol.io/specification/versioning.md (current 2026-07-28); ext-apps client-matrix.mdx on GitHub (13 Nov 2026)
-sources: [sources/2026-11-13-research-agent-access.md, https://modelcontextprotocol.io/specification/2026-07-28/changelog.md, https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http.md, https://github.com/modelcontextprotocol/ext-apps/blob/main/specification/2026-01-26/apps.mdx, https://github.com/vercel-labs/mcp-handler, https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/extensions/client-matrix.mdx]
+verified_by: `cd web && npm test` (test/mcp-endpoint.test.ts) and `node scripts/smoke-mcp.mjs http://127.0.0.1:3210 --no-static` against a local node:http wrapper of api/mcp.ts (14 Nov 2026); smoke test on https://burning-calendar.vercel.app/api/mcp (14 Nov 2026); mcp-handler 2.4.0 and @modelcontextprotocol/server 2.4.0 source in web/node_modules; ext-apps 2.0.4 npm tarball (dist/src/spec.types.d.ts, server/index.js); npm registry mcp-handler 2.4.0 (published 12 Nov 2026, `next` optional peer); modelcontextprotocol.io/specification/versioning.md (current 2026-07-28); ext-apps client-matrix.mdx on GitHub (13 Nov 2026); live tools: `node scripts/live-harness.mjs` and the smoke script against a local in-process server (14 Nov 2026, not deployed)
+sources: [sources/2026-11-13-research-agent-access.md, https://modelcontextprotocol.io/specification/2026-07-28/changelog.md, https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http.md, https://github.com/modelcontextprotocol/ext-apps/blob/main/specification/2026-01-26/apps.mdx, https://github.com/vercel-labs/mcp-handler, https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/extensions/client-matrix.mdx, sources/2026-11-14-research-live-sources.md]
 ---
 
-How AI agents can use the burning calendar. Architecture, priority, language and owners decided 13 Nov ([decisions.md](decisions.md), Made). The 11 tools and the calendar widget are built (Implemented tools, MCP Apps).
+How AI agents can use the burning calendar. Architecture, priority, language and owners decided 13 Nov ([decisions.md](decisions.md), Made). The 15 tools (10 data, 1 widget, 4 live context) are built (Implemented tools, MCP Apps).
 
 ## Proposed architecture
 
@@ -87,12 +87,46 @@ Jury path in 1 minute: claude.ai connector with no auth. Keep a recorded fallbac
 - Every tool except `get_methodology` takes `caveats: "full" | "codes"`. `codes` replaces the caveat texts with `caveat_codes`; `get_methodology` topic `caveats` explains them.
 - `outage` (caveat and month field, with `outage_affects: "modis"`) only for months whose value comes from MODIS, because `data/outages.csv` lists Aqua gaps only. Changes from Petr's first claude.ai test (beads burncal-w7p, -nmk, -j03, -17x, -zgm).
 - The only MCP resource is the widget; no `burncal://methodology` resources.
-- Smoke test: `cd web && npm run smoke:mcp` (production) or `node scripts/smoke-mcp.mjs <base-url> [--no-static]` calls all 11 tools over Streamable HTTP, checks `resources/list` and `resources/read` of the widget, one 2026-07-28 `server/discover` and the Origin check (foreign Origin 200 report-only or 403 enforced, claude.ai 200), checks known values (Evia Aug 2021 flagged in EL64, EL30 2007-06 back-cast band, EL62 blocks ranking, point 38.8 N 23.4 E in EL64) plus `llms.txt` and the CORS header on `/data/v1`, and exits 1 on any failure. Run it after every push to `main`.
+- Smoke test: `cd web && npm run smoke:mcp` (production) or `node scripts/smoke-mcp.mjs <base-url> [--no-static]` calls all 15 tools over Streamable HTTP, checks `resources/list` and `resources/read` of the widget, one 2026-07-28 `server/discover` and the Origin check (foreign Origin 200 report-only or 403 enforced, claude.ai 200), checks known values (Evia Aug 2021 flagged in EL64, EL30 2007-06 back-cast band, EL62 blocks ranking, point 38.8 N 23.4 E in EL64) plus `llms.txt` and the CORS header on `/data/v1`, and exits 1 on any failure. Run it after every push to `main`.
 
 ## Web entry and demo (14 Nov 2026)
 
 - "Use with AI" button in the web header (`web/src/ui/agent-panel.ts`, native `<dialog>`, Esc and backdrop close it): MCP URL with copy button, claude.ai and Claude Code steps, one line each for ChatGPT, Cursor and VS Code, links to `/llms.txt` and both JSON Schemas, three example prompts with a deep link each (EL64 2021, Argentine density ranking, Entre Ríos 2020). Bead burncal-a2o.
 - Pitch script for the 20 s live agent segment, slide, pre-flight and fallback recording: `docs/notes/2026-11-14-agent-demo.md`. Live prompt answers from one `get_anomalies` call: EL64 Aug 2021 = 4,235 detections, median 63.1 (2011-2020), 67.1×.
+
+## Live context tools (14 Nov 2026, branch `mcp-live`, not deployed)
+
+Four more read-only tools fetch third-party data at call time (beads burncal-2s3). Code in `web/api/_lib/live/`, registered by `registerLiveTools(server)` from `web/api/mcp.ts`. Source research: [sources/2026-11-14-research-live-sources.md](sources/2026-11-14-research-live-sources.md).
+
+| Tool | Inputs | Upstream | Returns |
+|---|---|---|---|
+| `get_fire_alerts` | `country?` or `region_id?`, `days` 1-30 (14) | GDACS event API (wildfire, all alert levels), Copernicus EMS rapid mapping activations (category Wildfire) | up to 50 items, newest first: `source`, `id`, `title`, `date`, `url`, `severity` (GDACS level and hectares), `lat`/`lon`, `matched_region`; with `region_id` only events whose point falls in the region |
+| `get_fire_weather` | `region_id` or `lat`+`lon`, `from`/`to` (default today -7 to +7, max 31 days, 1940 to 15 days ahead) | Open-Meteo archive (every past day) and forecast (future days) | daily `tmax_c`, `rh_min_pct`, `wind_max_kmh`, `gust_max_kmh`, `precip_mm`, `et0_mm`, `vpd_max_kpa`, `soil_moisture_0_7cm_m3m3`, `kind` reanalysis/forecast; `summary` (maxima, total rain, 30-30-30 days, dry spell); `fire_season` from the calendar |
+| `get_weather_stations` | `region_id`, `from`/`to` (default last 10 days, max 62), `max_stations` 1-5 (3) | Meteostat daily CSV per station and year | stations inside the region first, else within 75 km of its point: distance, elevation, days with measurements, `last_measured_date`, daily Tavg/Tmin/Tmax, RH, rain, wind; `model_fields` per day lists MOSMIX-filled values |
+| `get_recent_detections` | `region_id`, `days` 1-10 (3) | FIRMS area API, `VIIRS_NOAA20_NRT`, `VIIRS_NOAA21_NRT`, `MODIS_NRT` | counts per day and sensor inside the polygon, totals, top 10 hotspots by FRP, per-region counts for `GR`/`AR`, `calendar_context`: NOAA-20 per day against the median daily S-NPP VIIRS rate of the same calendar month in the last 10 calendar years; `configured: false` without `FIRMS_MAP_KEY` |
+
+- Annotations `readOnlyHint: true`, `openWorldHint: true`, `idempotentHint: false`. Every result has `fetched_at`, `source` (name, url, licence, attribution line per upstream), `caveats`, and `region` with `view_url` when a region applies. Text block: caveat lines first, then JSON with `caveat_codes`; `caveats: "codes"` works as in the static tools.
+- Caveat codes: `live_upstream` (always), `upstream_error`, `not_configured`, `provisional`, `forecast`, `model_not_station`, `single_point`, `station_lag`, `untrusted_text`, `detections_not_fires`, `nrt_not_harmonized`.
+- Fixed host allowlist in `web/api/_lib/live/core.ts`: `www.gdacs.org`, `rapidmapping.emergency.copernicus.eu`, `archive-api.open-meteo.com`, `api.open-meteo.com`, `data.meteostat.net`, `firms.modaps.eosdis.nasa.gov`, HTTPS only. URLs are built from zod-validated region ids, coordinates, dates and day counts; no tool takes a URL.
+- Each upstream call aborts after 4 s (function `maxDuration` 10 s); calls of one tool run in parallel. Per-instance cache: GDACS, EMS and FIRMS 10 min, Open-Meteo forecast 30 min and archive 6 h, Meteostat 1 h; failures are not cached. A failing upstream gives an `upstream_error` caveat and an empty part, never an isError or HTTP 500. Bad input (unknown region, missing point) is an isError text.
+- Third-party text (titles, station names) passes `cleanText`: tags, control and bidi characters removed, whitespace collapsed, capped at 60-160 characters.
+- The FIRMS key comes only from the Vercel env `FIRMS_MAP_KEY` (20-64 alphanumerics); it is masked in error texts and never returned.
+- Meteostat station list: `web/api/_lib/live/meteostat-stations.ts`, generated by `web/scripts/build-meteostat-stations.py` from `data.meteostat.net/stations.db` (151 stations, 45 GR and 106 AR, with observations since 2020).
+- The region point is the centroid of the region's largest polygon, or its first vertex when the centroid falls outside (EL64 gives 38.6468 N 22.8261 E, Entre Ríos 32.0583 S 59.2017 W).
+- Not built: ReliefWeb (needs an approved appname), media RSS (terms per outlet), NOAA NCEI (last record 24 Aug 2025), SMN text files (no licence found, Meteostat carries SMN METARs), EFFIS FWI (GetFeatureInfo returns no attributes).
+- Tests: `web/test/live-*.test.ts` (mocked fetch: parsing, allowlist, timeouts, cache, key masking, failure paths, end-to-end through the handler). Harness: `node scripts/live-harness.mjs [out-dir]` (Node 22.18+) calls each tool for Greek and Argentine regions against the real upstreams. The smoke script checks the 4 live tools and treats `upstream_error` and `not_configured` as warnings; until this branch is deployed, `tools/list` on production fails because it expects 14 tools.
+
+Harness output, 14 Nov 2026 about 14:30 local, no FIRMS key:
+
+| Call | Result |
+|---|---|
+| `get_fire_alerts` AR, 30 days | 1 item: GDACS Green, 6291 ha, 10-14 Nov 2026, matched to 34 Formosa |
+| `get_fire_alerts` GR, 30 days | 0 items (no GDACS or EMS wildfire event in Greece since 16 Oct) |
+| `get_fire_weather` EL64, default window | 15 days, tmax max 23.1 °C, RH min 47 %, 14.5 mm rain |
+| `get_fire_weather` 38.9 N 23.3 E, 1-10 Aug 2021 | tmax max 40.3 °C, RH min 8 %, 0.6 mm rain |
+| `get_weather_stations` EL52 | Thessaloniki Airport 16622, 26.5 km, 2 of 11 days measured, last 5 Nov |
+| `get_weather_stations` 30 | Gualeguaychú, Paraná, Concordia aerodromes, 7-8 of 9-10 days measured, last 10-11 Nov |
+| `get_recent_detections` EL64, AR | `configured: false` |
 
 ## Proposed tools (13 Nov design)
 
@@ -122,5 +156,6 @@ All read-only (`readOnlyHint: true`, `openWorldHint: false`), enums for `country
   - Roll-out: first with action `log`, check the Firewall traffic view for a day (or after the demo), then switch to 429.
   - Dashboard: project `burning-calendar` > Firewall > Configure > New Rule. If `Request Path` `Equals` `/api/mcp`, Then `Rate Limit`, Fixed Window, 60 seconds, 600 requests, key `IP Address`, follow-up action `Log` (later `Too Many Requests (429)`). Save, Review Changes, Publish.
   - CLI, from a checkout linked to the project (`cd web && vercel link`): `vercel firewall rules add "Rate limit MCP" --condition '{"type":"path","op":"eq","value":"/api/mcp"}' --action rate_limit --rate-limit-window 60 --rate-limit-requests 600 --rate-limit-keys ip --rate-limit-action log --yes`, then `vercel firewall diff` and `vercel firewall publish --yes`. To enforce: `vercel firewall rules remove "Rate limit MCP" --yes`, the same `add` with `--rate-limit-action rate_limit`, `diff`, `publish --yes`.
-- The function never fetches a URL from tool input, so SSRF does not apply.
+- The function never fetches a URL from tool input, so SSRF does not apply. The live tools fetch only from the fixed host allowlist in `web/api/_lib/live/core.ts`.
+- Live upstream text reaches the model: `untrusted_text` caveat on alerts, sanitizing in `cleanText`.
 - Space Apps 2026 FAQ: AI is called "Super Intelligence (SI)"; the submission must describe how SI tools were used ([space-apps-rules.md](space-apps-rules.md)).
