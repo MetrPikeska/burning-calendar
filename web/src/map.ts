@@ -177,12 +177,17 @@ export async function createRegionMap(
       return fc;
     },
     setSelected(id) {
+      if (id === selected) return;
       selected = id;
       map.setFilter("regions-selected", ["==", ["get", "id"], selected ?? ""]);
     },
     showPoint(lonLat) {
-      marker?.remove();
-      marker = lonLat ? new Marker({ color: "#1d1b19" }).setLngLat(lonLat).addTo(map) : null;
+      // Move the existing marker; building a new one each Find costs a DOM rebuild.
+      if (!lonLat) {
+        marker?.remove();
+        marker = null;
+      } else if (marker) marker.setLngLat(lonLat);
+      else marker = new Marker({ color: "#1d1b19" }).setLngLat(lonLat).addTo(map);
     },
   };
 }

@@ -87,7 +87,7 @@ main > * { min-width: 0; }
   border-left: 1px solid var(--line);
   transition: opacity 0.15s ease-out;
 }
-#panel[aria-busy="true"] { opacity: 0.5; }
+#panel.loading { opacity: 0.5; }
 
 /* ---------- controls ---------- */
 

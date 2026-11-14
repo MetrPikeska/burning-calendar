@@ -1,7 +1,7 @@
 // Year x month burning calendar with Observable Plot.
 import * as Plot from "@observablehq/plot";
 import type { MonthRecord, RegionFile, Series } from "../lib/contract.ts";
-import { COLOR_SCHEME, NO_SCALE_GREY, countTick } from "./ramp.ts";
+import { COLOR_SCHEME, NO_SCALE_GREY, countTick, rampLegend } from "./ramp.ts";
 
 export { COLOR_SCHEME };
 
@@ -86,6 +86,7 @@ export function renderHeatmap(
   const rowH = narrow ? 20 : Math.max(12, Math.min(14, cellW * 0.36));
   const selectedYear = selectedYm ? Number(selectedYm.slice(0, 4)) : null;
   const dim = (c: Cell) => (inRange(c.rec.ym, range) ? 1 : 0.16);
+  const colorLabel = `${SERIES_LABEL[series]}, detections / month`;
 
   const plot = Plot.plot({
     width,
@@ -110,7 +111,7 @@ export function renderHeatmap(
       scheme: COLOR_SCHEME,
       reverse: true,
       unknown: NO_SCALE_GREY,
-      label: `${SERIES_LABEL[series]}, detections / month`,
+      label: colorLabel,
     },
     marks: [
       Plot.cell(cells, { x: "month", y: "year", fill: "value", fillOpacity: dim, title: (c: Cell) => title(c, series), tip: true }),
@@ -132,13 +133,10 @@ export function renderHeatmap(
     ],
   });
 
-  const legend = plot.legend("color", {
-    width: Math.min(300, width - marginLeft),
-    marginLeft: 0,
-    ticks: 4,
-    tickFormat: countTick,
-    style: { fontFamily: "inherit", fontSize: "11px" },
-  }) as HTMLElement | SVGSVGElement | undefined;
+  const colorScale = plot.scale("color");
+  const legend = colorScale
+    ? rampLegend(colorLabel, colorScale.domain as [number, number], Math.min(300, width - marginLeft), countTick)
+    : "";
 
   if (onPick) {
     // The tip's pointer keeps the hovered datum in plot.value; a click picks that month.
@@ -167,7 +165,7 @@ export function renderHeatmap(
     const lg = document.createElement("div");
     lg.className = "heatmap-legend";
     lg.style.paddingLeft = `${marginLeft}px`;
-    lg.append(legend);
+    lg.innerHTML = legend;
     wrap.append(lg);
   }
   wrap.append(plot);

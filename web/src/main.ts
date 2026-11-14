@@ -40,6 +40,10 @@ let pickedYm: string | null = null;
 let lastWidth = 0;
 /** Increments per region load; a slower, older response must not overwrite a newer one. */
 let loadToken = 0;
+/** True while a region load is in flight; country of the shown region, ids are unique per country only. */
+let loading = false;
+let dimTimer: ReturnType<typeof setTimeout> | undefined;
+let regionCountry: CountryCode | null = null;
 
 const DOWNLOAD_ICON = `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 13.5h11"/></svg>`;
 
@@ -48,6 +52,14 @@ const forceLocalBasemap = new URLSearchParams(location.search).get("basemap") ==
 function pushState(): void {
   const extra = forceLocalBasemap ? "&basemap=local" : "";
   history.replaceState(null, "", serializeState(state) + extra + location.hash);
+}
+
+/**
+ * Resolves after the browser has painted the current frame: rAF runs before the paint, the
+ * timeout after it. Heavy rendering waits for this, so the busy state shows first.
+ */
+function afterNextPaint(): Promise<void> {
+  return new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)));
 }
 
 function escapeHtml(s: string): string {
@@ -84,7 +96,8 @@ function onLatLon(e: Event): void {
     msg.textContent = `Not inside any ${index.country_name} region`;
     return;
   }
-  msg.textContent = "";
+  // Immediate, cheap feedback (also read out: the message is role=status); the panel follows.
+  msg.textContent = `Inside ${hit.properties.name} (${hit.properties.id})`;
   void selectRegion(hit.properties.id);
 }
 
@@ -248,25 +261,46 @@ async function downloadCsv(): Promise<void> {
 // ---------- wiring ----------
 
 async function selectRegion(id: string): Promise<void> {
+  // Same region as shown (a second Find inside it, a map click on it): nothing to reload or redraw.
+  if (region?.id === id && regionCountry === state.country && state.region === id && !loading) return;
   state.region = id;
   pushState();
   regionMap.setSelected(id);
   $<HTMLSelectElement>("#region").value = id;
   const panel = $("#panel");
   const token = ++loadToken;
+  loading = true;
   panel.setAttribute("aria-busy", "true");
+  // Dim only a slow load: a fast one swaps the panel before the dimming would show, and
+  // painting it into the interaction's frame cost more than it told the user.
+  clearTimeout(dimTimer);
+  dimTimer = setTimeout(() => panel.classList.add("loading"), 150);
+  let loaded: RegionFile;
   try {
-    const loaded = await loadRegion(state.country, id);
+    loaded = await loadRegion(state.country, id);
     if (token !== loadToken) return;
-    region = loaded;
+    // Let the map selection, the marker and the status text paint before the panel is rebuilt.
+    await afterNextPaint();
+    if (token !== loadToken) return;
   } catch {
-    if (token === loadToken) showError(`Could not load the data for ${id}. Check the connection.`, () => void selectRegion(id));
+    if (token === loadToken) {
+      endLoad(panel);
+      showError(`Could not load the data for ${id}. Check the connection.`, () => void selectRegion(id));
+    }
     return;
-  } finally {
-    if (token === loadToken) panel.removeAttribute("aria-busy");
   }
+  region = loaded;
+  regionCountry = state.country;
   pickedYm = null;
   renderPanel();
+  endLoad(panel);
+}
+
+function endLoad(panel: HTMLElement): void {
+  loading = false;
+  clearTimeout(dimTimer);
+  panel.classList.remove("loading");
+  panel.removeAttribute("aria-busy");
 }
 
 async function setCountry(country: CountryCode): Promise<void> {
@@ -290,7 +324,13 @@ async function setCountry(country: CountryCode): Promise<void> {
 }
 
 initAgentPanel($("#ai-open"));
-const regionMap = await createRegionMap($("#map"), (id) => void selectRegion(id), forceLocalBasemap);
+/** A pick from the map or the list makes an old lat/lon message stale. */
+function pickRegion(id: string): void {
+  $("#latlon-msg").textContent = "";
+  void selectRegion(id);
+}
+
+const regionMap = await createRegionMap($("#map"), pickRegion, forceLocalBasemap);
 
 document.querySelectorAll<HTMLButtonElement>("#country button").forEach((b) =>
   b.addEventListener("click", () => {
@@ -303,7 +343,7 @@ document.querySelectorAll<HTMLButtonElement>("#country button").forEach((b) =>
 new ResizeObserver(() => {
   if (region && document.querySelector("#chart") && Math.abs(chartWidth() - lastWidth) > 8) renderPanel();
 }).observe($("#panel"));
-$<HTMLSelectElement>("#region").addEventListener("change", (e) => void selectRegion((e.target as HTMLSelectElement).value));
+$<HTMLSelectElement>("#region").addEventListener("change", (e) => pickRegion((e.target as HTMLSelectElement).value));
 $("#latlon-form").addEventListener("submit", onLatLon);
 
 await setCountry(state.country);
