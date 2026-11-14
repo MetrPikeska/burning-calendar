@@ -17,6 +17,32 @@ from harmonize import CLIM_END, FIT_YEARS, FULL_YEARS, SEASON, VIIRS_START, fit,
 
 MDAPE_MAX = 25.0
 PEAK_MARGIN = 1  # season years
+# Quality note on harmonized regions (does not change the mode): "limited" when the held-out 2020-2025 test has a
+# median annual error above MDAPE_MAX, or any held-out year (LOYO or 2020-2025) misses VIIRS by more than this.
+YEAR_ERR_MAX = 50.0
+
+
+def quality(res: dict) -> dict | None:
+    """Worst held-out year and the quality note of a harmonized region; None in relative mode."""
+    if res["mode"] != "harmonized":
+        return None
+    errs = [(abs(e), int(y), test, e) for test, key in (("loyo", "loyo"), ("time_split", "time_split"))
+            for y, e in (res[key]["annual_err_pct"] or {}).items() if e is not None]
+    worst = max(errs) if errs else None
+    ts = res["time_split"]["annual_mdape_pct"]
+    reasons = []
+    if ts is not None and ts > MDAPE_MAX:
+        reasons.append(f"time_split_mdape {ts} > {MDAPE_MAX}")
+    if worst and worst[0] > YEAR_ERR_MAX:
+        reasons.append(f"{worst[2]} {worst[1]} error {worst[3]:+.1f} % beyond +-{YEAR_ERR_MAX:.0f} %")
+    return {
+        "level": "limited" if reasons else "ok",
+        "reasons": reasons,
+        "worst_year": worst[1] if worst else None,
+        "worst_test": worst[2] if worst else None,
+        "worst_err_pct": worst[3] if worst else None,
+        "time_split_mdape_pct": ts,
+    }
 
 
 def _obs(m: pd.DataFrame) -> pd.Series:
@@ -174,6 +200,7 @@ def validate(m: pd.DataFrame, national: pd.DataFrame | None, start_month: int) -
         "mode": "relative" if reasons else "harmonized",
         "mode_reasons": reasons,
     }
+    res["quality"] = quality(res)
     return res, band(lo)
 
 

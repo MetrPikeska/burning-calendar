@@ -642,3 +642,40 @@ describe("honest caveats (15 Nov)", () => {
     expect(jan.outage_viirs).toBe(true);
   });
 });
+
+// burncal-jtd (audit P0-06): harmonized regions with a weak held-out record say so.
+describe("validation_limits", () => {
+  const el42 = read<RegionFile>("gr/regions/EL42.json");
+  const el52 = read<RegionFile>("gr/regions/EL52.json");
+  const codes = (r: { caveats: { code: string }[] }) => r.caveats.map((c) => c.code);
+
+  it("flags EL42 with its worst held-out year and leaves EL52 and relative EL62 alone", () => {
+    const s = regionSeries(el42, { from: "2025-01", to: "2025-12", aggregate: "month" }, grIndex.period);
+    const c = s.caveats.find((x) => x.code === "validation_limits")!;
+    expect(c.message).toMatch(/2025 \(2020-2025 test.*-77\.7 %/);
+    expect(codes(regionSeries(el52, { from: "2025-01", to: "2025-12", aggregate: "month" }, grIndex.period))).not.toContain("validation_limits");
+    expect(codes(regionSeries(el62, { from: "2025-01", to: "2025-12", aggregate: "month" }, grIndex.period))).not.toContain("validation_limits");
+    expect(codes(anomaliesFor(el42, 2025, grIndex.period))).toContain("validation_limits");
+    expect(codes(seasonCalendar(el42, 2024, grIndex.period))).toContain("validation_limits");
+  });
+
+  it("lists quality in search_regions and get_validation without changing the mode", () => {
+    const r = searchRegions([grIndex], { country: "GR", level: "nuts2", limit: 20 });
+    const row = (id: string) => r.regions.find((x) => x.id === id) as Record<string, unknown>;
+    expect(row("EL42")).toMatchObject({ mode: "harmonized", quality: "limited", worst_heldout_year: 2025, worst_heldout_err_pct: -77.7 });
+    expect(row("EL54")).toMatchObject({ mode: "harmonized", quality: "limited", worst_heldout_year: 2023, worst_heldout_err_pct: 80.4 });
+    expect(row("EL52")).toMatchObject({ quality: "ok" });
+    expect(row("EL62")).not.toHaveProperty("quality");
+    expect(r.caveats.find((c) => c.code === "validation_limits")!.message).toMatch(/EL42.*EL54/);
+    expect(r.units.quality).toBeDefined();
+    const v = validationFor(el42);
+    expect(v.quality).toMatchObject({ level: "limited", worst_year: 2025, worst_test: "time_split" });
+    expect(codes(v)).toContain("validation_limits");
+  });
+
+  it("names limited regions once in aggregate on harm", () => {
+    const a = aggregate([el42, el52], { from: "2024-01", to: "2024-12", top: 3 }, grIndex.period);
+    expect(a.caveats.filter((c) => c.code === "validation_limits")).toHaveLength(1);
+    expect(a.caveats.find((c) => c.code === "validation_limits")!.message).toMatch(/^EL42 passed/);
+  });
+});

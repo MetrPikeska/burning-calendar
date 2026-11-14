@@ -111,3 +111,20 @@ def test_loyo_compares_2012_from_february():
     lo = loyo(monthly_counts(detections(rows)), None)
     assert not ((lo["year"] == 2012) & (lo["month"] == 1)).any()
     assert ((lo["year"] == 2012) & (lo["month"] == 2)).any()
+
+
+def test_quality_note_flags_large_held_out_errors_without_changing_mode():
+    """burncal-jtd: EL42-like errors (time split 2025 -77.7 %) give 'limited'; relative regions get no note."""
+    from validate import quality
+
+    def res(mode, loyo, ts, ts_mdape):
+        return {"mode": mode, "loyo": {"annual_err_pct": loyo},
+                "time_split": {"annual_err_pct": ts, "annual_mdape_pct": ts_mdape}}
+
+    q = quality(res("harmonized", {2018: -61.9, 2019: -54.2}, {2022: -62.0, 2025: -77.7}, 22.8))
+    assert q["level"] == "limited"
+    assert (q["worst_year"], q["worst_test"], q["worst_err_pct"]) == (2025, "time_split", -77.7)
+    ok = quality(res("harmonized", {2018: 10.0}, {2023: -27.4, 2025: None}, 11.8))
+    assert ok["level"] == "ok" and ok["reasons"] == []
+    assert quality(res("harmonized", {2018: 5.0}, {2023: 5.0}, 30.0))["reasons"] == ["time_split_mdape 30.0 > 25.0"]
+    assert quality(res("relative", {2018: 99.0}, {}, None)) is None

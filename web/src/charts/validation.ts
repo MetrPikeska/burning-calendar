@@ -1,6 +1,6 @@
 // Panel "how well the harmonization holds here": back-cast check per region, from regions/{id}.json -> validation.
 import * as Plot from "@observablehq/plot";
-import type { CountryCode, RegionFile, RegionValidation } from "../lib/contract.ts";
+import { type CountryCode, type RegionFile, type RegionValidation, worstYearText } from "../lib/contract.ts";
 import { dataUrl } from "../lib/data.ts";
 
 /** Mode rule: relative when the LOYO median annual error is above this (docs/wiki/decisions.md). */
@@ -42,8 +42,12 @@ export function renderValidation(region: RegionFile, country: CountryCode, width
   const nSeasons = season?.season_years.length ?? 0;
   // The error limit is restated in the numbers below, so only other reasons are spelled out here.
   const otherReasons = (v.mode_reasons ?? []).filter((r) => !r.startsWith("loyo_mdape"));
+  const q = v.quality;
+  const limited = region.mode === "harmonized" && q?.level === "limited" && q.worst_err_pct != null;
   const verdict = region.mode === "harmonized"
-    ? `<strong>Passed validation.</strong>`
+    ? limited
+      ? `<strong>Passed validation, with limits:</strong> worst held-out year ${worstYearText(q!)}, ${q!.worst_err_pct! > 0 ? "+" : ""}${q!.worst_err_pct!.toFixed(1)} % against observed VIIRS.`
+      : `<strong>Passed validation.</strong>`
     : `<strong>Did not pass</strong>${otherReasons.length ? `: ${otherReasons.join("; ")}` : ""}, so the calendar shows MODIS and VIIRS counts as they are.`;
   const peak = season?.harm && season.modis_raw && nSeasons
     ? ` Peak month right in ${season.harm.peak_hits} of ${nSeasons} left-out seasons (raw MODIS ${season.modis_raw.peak_hits} of ${nSeasons}).`

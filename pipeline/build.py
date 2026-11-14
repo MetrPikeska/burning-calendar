@@ -61,7 +61,11 @@ def build_region(rid: str, name: str, level: str, parent: str | None, m: pd.Data
              "density_per_1000km2": density,
              "loyo_mdape_pct": val["loyo"]["annual_mdape_pct"],
              "peak_hit_rate": val["loyo"]["season"]["harm"]["peak_hit_rate"],
-             "peak_hit_rate_raw": val["loyo"]["season"]["modis_raw"]["peak_hit_rate"]}
+             "peak_hit_rate_raw": val["loyo"]["season"]["modis_raw"]["peak_hit_rate"],
+             "time_split_mdape_pct": val["time_split"]["annual_mdape_pct"],
+             "quality": val["quality"]["level"] if val["quality"] else None,
+             "worst_heldout_year": val["quality"]["worst_year"] if val["quality"] else None,
+             "worst_heldout_err_pct": val["quality"]["worst_err_pct"] if val["quality"] else None}
     factors = pd.concat([F.assign(kind="viirs_over_modis", window="2012-02..2019-12"),
                          G.assign(kind="modis_over_terra", window="2003-2011")])
     detail = {"id": rid, "name": name, "level": level, "parent": parent, "mode": mode, "area_km2": area_km2,

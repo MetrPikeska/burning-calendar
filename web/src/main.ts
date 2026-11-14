@@ -1,7 +1,7 @@
 import "@fontsource-variable/ibm-plex-sans";
 import "./style.css";
 import { formatMonth } from "@observablehq/plot";
-import { availableSeries, shownSeries, type CountryCode, type IndexFile, type RegionFile, type Series } from "./lib/contract.ts";
+import { availableSeries, shownSeries, worstYearText, type CountryCode, type IndexFile, type RegionFile, type RegionValidation, type Series } from "./lib/contract.ts";
 import { csvFileName, filterCsvByRange } from "./lib/csv.ts";
 import { nowText, type RecentBody } from "./lib/now.ts";
 import { buildReport, reportFileName } from "./lib/report.ts";
@@ -193,6 +193,14 @@ function aoiHead(area: number): string {
 }
 
 /** What the area holds and how its numbers are made. */
+/** Harmonized region with a weak held-out record (burncal-jtd): one sentence above the calendar. */
+function limitsNote(region: RegionFile): string {
+  const q = (region.validation as RegionValidation | undefined)?.quality;
+  if (region.mode !== "harmonized" || q?.level !== "limited" || q.worst_err_pct == null) return "";
+  const err = `${q.worst_err_pct > 0 ? "+" : ""}${q.worst_err_pct.toFixed(1)} %`;
+  return `<p class="note">Harmonized with limits: in ${worstYearText(q)} the harmonized total missed observed VIIRS by <strong>${err}</strong>. Read single years here as approximate; the validation panel below has every year.</p>`;
+}
+
 function aoiNoteHtml(o: Extract<AoiOutcome, { kind: "calendar" }>): string {
   const regions = o.result.regions.filter((r) => r.detections > 0)
     .map((r) => `${escapeHtml(index.regions.find((x) => x.id === r.id)?.name ?? r.id)} (${escapeHtml(r.id)}) ${r.detections.toLocaleString("en")}`);
@@ -278,6 +286,7 @@ function renderPanel(): void {
     ${region.mode === "relative" && !aoi
       ? `<p class="note">Relative mode: harmonization did not pass validation here, so the calendar shows MODIS 2000-${endYear} and VIIRS as separate series.</p>`
       : ""}
+    ${!aoi ? limitsNote(region) : ""}
     <div class="median-card">
       <div class="stepper" role="group" aria-label="Compared month">
         <button type="button" id="month-prev" class="btn btn-icon" aria-label="Previous month" ${atStart ? "disabled" : ""}>${CHEVRON_LEFT}</button>

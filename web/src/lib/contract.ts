@@ -33,6 +33,25 @@ export interface IndexRegion extends Climatology {
   loyo_mdape_pct: number | null;
   peak_hit_rate: number | null;
   peak_hit_rate_raw: number | null;
+  /** Median absolute annual error, fitted 2012-2019 and tested on 2020-2025. */
+  time_split_mdape_pct?: number | null;
+  /** Quality note of a harmonized region (null in relative mode); see RegionQuality. */
+  quality?: "ok" | "limited" | null;
+  worst_heldout_year?: number | null;
+  worst_heldout_err_pct?: number | null;
+}
+
+/**
+ * Quality note of a harmonized region (pipeline/validate.py quality()): "limited" when the 2020-2025 test has a median
+ * annual error above 25 % or any held-out year misses VIIRS by more than 50 %. It does not change the mode.
+ */
+export interface RegionQuality {
+  level: "ok" | "limited";
+  reasons: string[];
+  worst_year: number | null;
+  worst_test: "loyo" | "time_split" | null;
+  worst_err_pct: number | null;
+  time_split_mdape_pct: number | null;
 }
 
 export interface IndexFile {
@@ -132,6 +151,13 @@ export interface RegionValidation {
   mode?: Mode;
   /** e.g. "loyo_mdape 32.0 > 25.0". */
   mode_reasons?: string[];
+  /** null in relative mode. */
+  quality?: RegionQuality | null;
+}
+
+/** "in 2025 (2020-2025 test)" / "in 2018 (left out of the fit)": where the worst held-out year comes from. */
+export function worstYearText(q: RegionQuality): string {
+  return `${q.worst_year} (${q.worst_test === "time_split" ? "2020-2025 test, after the 2012-2019 fit" : "left out of the 2012-2019 fit"})`;
 }
 
 export interface RegionFile {
