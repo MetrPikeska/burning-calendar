@@ -127,6 +127,7 @@ Harness output, 14 Nov 2026 about 14:30 local, no FIRMS key:
 | `get_weather_stations` EL52 | Thessaloniki Airport 16622, 26.5 km, 2 of 11 days measured, last 5 Nov |
 | `get_weather_stations` 30 | Gualeguaychú, Paraná, Concordia aerodromes, 7-8 of 9-10 days measured, last 10-11 Nov |
 | `get_recent_detections` EL64, AR | `configured: false` |
+| `get_recent_detections` on production with `FIRMS_MAP_KEY` (14 Nov, 15:10, after 075f9d5), 5 days | EL64: NOAA-20 4, NOAA-21 10, MODIS 5; 30 Entre Ríos: NOAA-20 39, NOAA-21 35, MODIS 11; caveats `live_upstream`, `detections_not_fires`, `nrt_not_harmonized`, `provisional` |
 
 ## Proposed tools (13 Nov design)
 
