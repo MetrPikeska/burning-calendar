@@ -2,6 +2,14 @@ NASA Space Apps 2026 (Thessaloniki, 14-15 Nov): harmonized MODIS + VIIRS burning
 @docs/wiki/index.md
 When a fact changes or new material arrives, update the wiki page, follow docs/wiki/AGENTS.md, and add a line to docs/wiki/log.md.
 
+## Parallel sessions: one worktree each
+
+- `~/projects/burning-calendar` stays on `main` and clean. It is only for merging and pushing; nobody edits files there.
+- Each session works in its own worktree and branch: `bd worktree create ../burning-calendar-wt/<area> --branch <area>` (areas: `pipeline-mcp` for pipeline/ and web/api/, `web` for web/src/ and index.html, `docs` for wiki, slides, README).
+- Setup in a new worktree: `ln -s ~/projects/burning-calendar/data/raw data/raw && ln -s ~/projects/burning-calendar/data/interim data/interim`, then `uv sync` and `cd web && npm ci`. Raw data stay read-only.
+- To land work: in the worktree `git rebase main`, then in the main checkout `git merge --ff-only <area>`. Push only when Petr asks; every push to `main` deploys production.
+- Shared append-only files (`docs/wiki/log.md`, `docs/si-use.md`, `TODO.md`): add lines at the end; in a conflict keep both sides.
+
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:1105d646 -->
 ## Beads Issue Tracker
