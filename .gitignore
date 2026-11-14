@@ -1,5 +1,5 @@
-data/raw/
-data/interim/
+data/raw
+data/interim
 data/*.log
 output/
 .venv/
