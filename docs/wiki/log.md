@@ -37,3 +37,4 @@ Append-only. Format: `YYYY-MM-DD op: what changed`.
 - 2026-11-14 build: web UI polish after an impeccable critique (21/40): inferno map ramp with legend and labels on top, IBM Plex Sans, country toggle, season strip, calendar marks key, charts sized from the panel (no scroll at 390 px), double ring for the compared month, error and loading states, keyboard month stepping, skip link. Default compared month = strongest of the last 12 months (decisions.md). Map colours harmonized regions by `density_per_1000km2` (Petr, 14 Nov), relative regions stay grey.
 - 2026-11-14 docs: README rewritten: problem, app features, method, validation table (LOYO 5.4 % GR, 1.5 % AR), limits, MCP connection, how to run.
 - 2026-11-14 docs: project page draft in docs/project-page.md (all 2026 portal fields; demo link still TODO).
+- 2026-11-14 build: MCP tool `get_validation` (per-year errors, band, region table) and `caveats: codes` mode on every tool (agent-access.md).

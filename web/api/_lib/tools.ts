@@ -504,6 +504,86 @@ export function regionSummary(country: CountryCode, entry: Entry, region: Region
   };
 }
 
+// ---------- get_validation ----------
+
+type Scores = { bias_pct: number | null; r: number | null; rmse_log1p: number | null; n_months: number };
+type SeasonScores = { peak_hit_rate: number | null; peak_hits: number; onset_mad_months: number | null;
+                      end_mad_months: number | null; length_mad_months: number | null };
+interface RegionValidation {
+  loyo: { years: number[]; annual_mdape_pct: number | null; annual_err_pct: Record<string, number | null>;
+          monthly: Scores; season: { season_years: number[]; harm: SeasonScores; modis_raw: SeasonScores } };
+  time_split: { fit: string; test: string; annual_err_pct: Record<string, number | null>;
+                annual_mdape_pct: number | null; monthly: Scores };
+  fit_window_gap_pct: number | null;
+  ratio_trend: Record<"D" | "N", { slope_pct_per_year: number; ratio_by_year: Record<string, number> } | null>;
+  mode: RegionFile["mode"];
+  mode_reasons: string[];
+}
+export interface CountryValidation {
+  static_filter: object;
+  assignment: object;
+  regions: Record<string, unknown>;
+}
+
+export const MODE_RULE =
+  "A region is 'relative' when its leave-one-year-out median absolute annual error is above 25 %, or when the harmonized series misses the VIIRS peak month in more than one more held-out season year than raw MODIS (peak-month part amended 14 Nov 2026 after seeing results).";
+
+function absSummary(errs: Record<string, number | null>) {
+  const a = Object.values(errs).filter((x): x is number => x !== null).map(Math.abs).sort((x, y) => x - y);
+  if (!a.length) return { min: null, median: null, max: null };
+  const mid = a.length / 2;
+  const median = a.length % 2 ? a[Math.floor(mid)] : (a[mid - 1] + a[mid]) / 2;
+  return { min: a[0], median: r1(median), max: a[a.length - 1] };
+}
+
+/** Validation of one region; for a country region also a table of all its regions. */
+export function validationFor(region: RegionFile, country?: { validation: CountryValidation; index: IndexFile }) {
+  const v = region.validation as unknown as RegionValidation;
+  const cc = countryOf(region.id)!;
+  const out = {
+    region_id: region.id, name: clean(region.name), mode: v.mode, mode_reasons: v.mode_reasons, rule: MODE_RULE,
+    loyo: {
+      method: "Leave one year out over 2012-2019: refit without the year, predict it from MODIS, compare with VIIRS.",
+      years: v.loyo.years, annual_mdape_pct: v.loyo.annual_mdape_pct, annual_err_pct: v.loyo.annual_err_pct,
+      abs_err_summary: absSummary(v.loyo.annual_err_pct), monthly: v.loyo.monthly,
+      peak_month: { season_years: v.loyo.season.season_years, harmonized: v.loyo.season.harm, raw_modis: v.loyo.season.modis_raw },
+    },
+    time_split: { ...v.time_split, abs_err_summary: absSummary(v.time_split.annual_err_pct) },
+    fit_window_gap_pct: v.fit_window_gap_pct,
+    ratio_trend_pct_per_year: { day: v.ratio_trend.D?.slope_pct_per_year ?? null, night: v.ratio_trend.N?.slope_pct_per_year ?? null },
+    ratio_by_year: { day: v.ratio_trend.D?.ratio_by_year ?? null, night: v.ratio_trend.N?.ratio_by_year ?? null },
+    band: region.band,
+    band_note: "harm_lo / harm_hi of back-cast months are the modelled value times q_lo / q_hi of the calendar month (10th / 90th percentile of LOYO obs/pred, pooled by season).",
+    caveats: caveatsFor(region.mode, []),
+    view_url: viewUrl(cc, region.id),
+    data_url: `${PUBLIC_URL}data/v1/${cc}/validation.json`,
+  };
+  if (!country || region.level !== "country") {
+    return { ...out, static_filter: undefined, assignment: undefined, regions: undefined };
+  }
+  const regions = country.index.regions.filter((r) => r.level !== "country").map((r) => {
+    const rv = country.validation.regions[r.id] as RegionValidation | undefined;
+    return {
+      id: r.id, name: clean(r.name), mode: r.mode,
+      loyo_mdape_pct: rv?.loyo.annual_mdape_pct ?? null,
+      time_split_mdape_pct: rv?.time_split.annual_mdape_pct ?? null,
+      peak_hit_rate: rv?.loyo.season.harm.peak_hit_rate ?? null,
+      peak_hit_rate_raw: rv?.loyo.season.modis_raw.peak_hit_rate ?? null,
+      fit_window_gap_pct: rv?.fit_window_gap_pct ?? null,
+    };
+  });
+  return { ...out, static_filter: country.validation.static_filter, assignment: country.validation.assignment, regions };
+}
+
+// ---------- compact caveats ----------
+
+/** caveats: "codes" mode: replace the caveat texts by their codes; get_methodology topic "caveats" explains them. */
+export function compactCaveats<T extends { caveats?: Caveat[] }>(result: T) {
+  const { caveats, ...rest } = result;
+  return { ...rest, caveat_codes: [...new Set((caveats ?? []).map((c) => c.code))],
+           caveat_help: "get_methodology topic 'caveats' explains each code" };
+}
+
 // ---------- get_methodology ----------
 
 export const METHODOLOGY: Record<string, string> = {
@@ -519,6 +599,8 @@ export const METHODOLOGY: Record<string, string> = {
     "anom_pct is the percentile rank of a month among the same calendar month of the preceding 10 years; for years before 2012 the baseline is 2002-2011 without the target year. anom is true above the baseline 90th percentile. baseline_median and baseline_p90 are stored per month. Computed on harm in harmonized mode, on MODIS in relative mode.",
   calendar:
     "Season year starts at the climatological minimum month of the region's MODIS series and is labelled with the calendar year holding most of its months. Onset and end: months where the cumulative season count passes 10 % and 90 % (Freeborn 2014). Peak month: highest mean count (Giglio 2006). bimodal: two peaks at least 2 months apart with a trough below 50 % of the smaller one.",
+  caveats:
+    "Caveat codes: coverage = data cover 2000-11 to 2025-12, S-NPP stopped 2 Nov 2026, no NOAA-20 splice, so nothing after Dec 2025. out_of_coverage = part of the request was outside that range and was clipped. relative_mode = the region failed validation; harm is null and counts are raw MODIS, not comparable with harmonized regions. backcast = months before 2012 are modelled from MODIS; quote harm_lo..harm_hi. backcast_terra = Nov 2000 to Jun 2002 use Terra only with a chained factor; wider uncertainty. outage = a known MODIS (Aqua) data gap of 3 or more days affects a MODIS-based value. detections_not_fires = counts are satellite detections, not fires or burned area. size_bias = absolute counts favour large regions; use density_per_1000km2.",
   limits:
     "Detections are not fires or burned area. Back-cast months (before 2012) are modelled. Factors are constant per region-month and do not follow land-cover change. acq_date is UTC, so some Argentine night detections fall on the next day. Known satellite outages are listed manually (Aqua Aug-Sep 2020). Series ends Dec 2025; S-NPP ended 2 Nov 2026 and the NOAA-20 splice is not done.",
 };

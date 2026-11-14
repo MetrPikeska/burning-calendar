@@ -5,6 +5,7 @@ import type { RegionCollection } from "../src/lib/geo.ts";
 import {
   aggregate,
   anomaliesFor,
+  compactCaveats,
   compareRegions,
   countryOf,
   locate,
@@ -13,6 +14,7 @@ import {
   regionSeries,
   searchRegions,
   seasonCalendar,
+  validationFor,
   viewUrl,
   withCoverage,
 } from "../api/_lib/tools.ts";
@@ -370,5 +372,41 @@ describe("aggregate", () => {
     const r = aggregate([er], { from: "2025-06", to: "2026-06", top: 3 }, period);
     expect(r.regions[0].n_months).toBe(7);
     expect(r.caveats.map((c) => c.code)).toContain("out_of_coverage");
+  });
+});
+
+// burncal-n8a: validation details
+describe("validationFor", () => {
+  it("returns per-year LOYO and time-split errors, band and mode reasons for a region", () => {
+    const v = validationFor(el62);
+    expect(v.mode).toBe("relative");
+    expect(v.mode_reasons[0]).toMatch(/loyo_mdape/);
+    expect(Object.keys(v.loyo.annual_err_pct)).toEqual(["2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019"]);
+    expect(v.loyo.abs_err_summary.median).toBeCloseTo(v.loyo.annual_mdape_pct as number, 0); // per-year errors are rounded
+    expect(v.time_split.annual_err_pct).toHaveProperty("2023");
+    expect(v.band).toHaveLength(12);
+    expect(v.rule).toMatch(/25 %/);
+  });
+
+  it("adds a table of all regions for a country", () => {
+    const ar = read<RegionFile>("ar/regions/AR.json");
+    const cv = read<{ static_filter: object; assignment: object; regions: Record<string, unknown> }>("ar/validation.json");
+    const v = validationFor(ar, { validation: cv, index: arIndex });
+    expect(v.regions).toHaveLength(24);
+    const row = v.regions!.find((r) => r.id === "58")!;
+    expect(row).toMatchObject({ name: "Neuquén", mode: "relative" });
+    expect(row.loyo_mdape_pct).toBeGreaterThan(25);
+    expect(v.static_filter).toBeDefined();
+  });
+});
+
+// burncal-sgu: compact caveats
+describe("compactCaveats", () => {
+  it("replaces caveat texts by unique codes", () => {
+    const full = withCoverage(regionSeries(er, { from: "2005-01", to: "2005-03", aggregate: "month" }, period), period);
+    const c = compactCaveats(full);
+    expect(c).not.toHaveProperty("caveats");
+    expect(c.caveat_codes).toEqual(["backcast", "detections_not_fires", "coverage"]);
+    expect(c.records).toEqual(full.records);
   });
 });

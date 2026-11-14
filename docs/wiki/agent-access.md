@@ -56,7 +56,7 @@ Jury path in 1 minute: claude.ai connector with no auth. Keep a recorded fallbac
 
 ## Implemented tools (14 Nov 2026)
 
-`web/api/mcp.ts` registers 9 read-only tools; the logic is in `web/api/_lib/tools.ts` (pure, tested in `web/test/mcp-tools.test.ts`).
+`web/api/mcp.ts` registers 10 read-only tools; the logic is in `web/api/_lib/tools.ts` (pure, tested in `web/test/mcp-tools.test.ts`).
 
 | Tool | Inputs | Notes |
 |---|---|---|
@@ -68,10 +68,12 @@ Jury path in 1 minute: claude.ai connector with no auth. Keep a recorded fallbac
 | `aggregate` | `region_ids` (1-40), `from`, `to`, `top` | totals per region and overall, top months of the sum; harm when all regions are harmonized, else MODIS for all with a caveat; refuses a country together with its own regions |
 | `rank_regions` | `metric`, `country?`, `level?`, `year?`, `top`, `order` | metrics `annual_mean`, `density_per_1000km2`, `season_total`, `season_length`, `loyo_mdape_pct`; count metrics rank harmonized regions only, relative ones in `excluded_relative`; country rows only with `level: country`; caveat `size_bias` for absolute counts |
 | `find_region_at` | `lat`, `lon` | point in polygon (`regionAt` from `web/src/lib/geo.ts`); returns climatology, annual mean, last 3 season years, `view_url`, `data_url`; outside both countries the nearest region within 5 km |
+| `get_validation` | `region_id` | LOYO and time-split errors per year with min/median/max, monthly scores, peak-month hit rates vs raw MODIS, fit-window gap, ratio trend, band, mode reasons; for `GR`/`AR` a table of all regions plus filter and assignment counts |
 | `get_methodology` | `topic` | static text: overview, harmonization, validation, modes, anomalies, calendar, limits |
 
 - The country comes from the region id (`GR`, `EL..` vs `AR`, two digits), so no tool needs a country argument besides `search_regions`.
 - Every result has `source` (method version, FIRMS download dates, links to the full `source` block in each `index.json`) and `coverage` (`start`, `end` from `index.json` `period`) and `caveats` with codes `coverage` (S-NPP end, no NOAA-20 splice), `out_of_coverage`, `relative_mode`, `backcast`, `backcast_terra`, `outage`, `detections_not_fires`. Series and anomaly results carry `anomaly_definition` (above `baseline_p90`). The text block lists them first, then the JSON; `structuredContent` carries the same object (no `outputSchema`).
+- Every tool except `get_methodology` takes `caveats: "full" | "codes"`. `codes` replaces the caveat texts with `caveat_codes`; `get_methodology` topic `caveats` explains them.
 - `outage` (caveat and month field, with `outage_affects: "modis"`) only for months whose value comes from MODIS, because `data/outages.csv` lists Aqua gaps only. Changes from Petr's first claude.ai test (beads burncal-w7p, -nmk, -j03, -17x, -zgm).
 - MCP resources and an MCP Apps widget are not built.
 
