@@ -146,6 +146,15 @@ export function availableSeries(mode: Mode): Series[] {
   return mode === "harmonized" ? ["harm", "modis", "viirs"] : ["modis", "viirs"];
 }
 
+/**
+ * Series shown for a region: the user's choice when the mode offers it, else the mode's first.
+ * The choice itself is never overwritten, so a relative region does not leave MODIS behind.
+ */
+export function shownSeries(mode: Mode, chosen: Series): Series {
+  const options = availableSeries(mode);
+  return options.includes(chosen) ? chosen : options[0];
+}
+
 /** Value the anomaly baseline is computed on: harm in harmonized mode, modis in relative mode. */
 export function baselineValue(rec: MonthRecord, mode: Mode): number | null {
   return mode === "harmonized" ? rec.harm : rec.modis;

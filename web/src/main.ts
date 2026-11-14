@@ -1,7 +1,7 @@
 import "@fontsource-variable/ibm-plex-sans";
 import "./style.css";
 import { formatMonth } from "@observablehq/plot";
-import { availableSeries, type CountryCode, type IndexFile, type RegionFile, type Series } from "./lib/contract.ts";
+import { availableSeries, shownSeries, type CountryCode, type IndexFile, type RegionFile, type Series } from "./lib/contract.ts";
 import { csvFileName, filterCsvByRange } from "./lib/csv.ts";
 import { dataUrl, loadIndex, loadRegion } from "./lib/data.ts";
 import { parseLatLon, regionAt, type RegionCollection } from "./lib/geo.ts";
@@ -29,6 +29,7 @@ const LEVEL_LABEL: Record<string, string> = {
   department: "Departments",
 };
 
+/** URL state; `series` is the user's choice, the panel shows shownSeries(region.mode, state.series). */
 let state: AppState = parseState(location.search);
 let index: IndexFile;
 let geometry: RegionCollection = { type: "FeatureCollection", features: [] };
@@ -148,7 +149,8 @@ function renderPanel(): void {
   }
   const s = region.summary;
   const options = availableSeries(region.mode);
-  if (!options.includes(state.series)) state.series = options[0];
+  // A relative region shows MODIS without overwriting the choice, which comes back on a harmonized region.
+  const series = shownSeries(region.mode, state.series);
   const { min, max } = rangeBounds();
 
   const hasRange = !!(state.from || state.to);
@@ -166,7 +168,7 @@ function renderPanel(): void {
     <div class="controls">
       <div class="controls-row">
         <div class="toggle" role="group" aria-label="Series">
-          ${options.map((o) => `<button type="button" data-series="${o}" aria-pressed="${o === state.series}">${SERIES_BUTTON[o]}</button>`).join("")}
+          ${options.map((o) => `<button type="button" data-series="${o}" aria-pressed="${o === series}">${SERIES_BUTTON[o]}</button>`).join("")}
         </div>
         <button type="button" id="csv" class="btn">${DOWNLOAD_ICON}Download CSV${hasRange ? " (range)" : ""}</button>
       </div>
@@ -177,8 +179,8 @@ function renderPanel(): void {
       </div>
     </div>
     <div id="chart" tabindex="0" role="group" aria-label="Burning calendar, years by months. Arrow keys change the month compared below."></div>
-    ${marksKey(state.series, hasRange)}
-    <p class="foot">${matchMedia("(pointer: coarse)").matches ? "Tap" : "Click"} a cell to compare that month with its median.${state.series === "harm"
+    ${marksKey(series, hasRange)}
+    <p class="foot">${matchMedia("(pointer: coarse)").matches ? "Tap" : "Click"} a cell to compare that month with its median.${series === "harm"
       ? " 2000-2011 back-cast from MODIS (range in the tooltip), 2012-2025 VIIRS observed."
       : ""}</p>
     <section id="median" aria-live="polite"></section>
@@ -188,7 +190,7 @@ function renderPanel(): void {
   const width = chartWidth();
   lastWidth = width;
   $("#chart").append(
-    renderHeatmap(region, state.series, { from: state.from, to: state.to }, ym, (picked) => {
+    renderHeatmap(region, series, { from: state.from, to: state.to }, ym, (picked) => {
       pickedYm = picked;
       renderPanel();
     }, width),
@@ -199,6 +201,8 @@ function renderPanel(): void {
 
   panel.querySelectorAll<HTMLButtonElement>("button[data-series]").forEach((b) =>
     b.addEventListener("click", () => {
+      // Pressing the series already shown is not a choice; it must not pin a series forced by relative mode.
+      if (b.dataset.series === series) return;
       state.series = b.dataset.series as Series;
       pushState();
       renderPanel();
