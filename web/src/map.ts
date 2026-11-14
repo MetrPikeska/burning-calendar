@@ -15,9 +15,9 @@ const RAMP = rampColors(9, MAP_RAMP_MAX, MAP_RAMP_MIN);
 const compact = new Intl.NumberFormat("en", { notation: "compact", maximumSignificantDigits: 2 });
 const si = (n: number) => compact.format(n).replace("K", "k");
 
-/** Legend overlay: the fill is sqrt(annual_mean / max), so max / 4 sits in the middle. */
+/** Legend overlay: the fill is sqrt(density / max), so max / 4 sits in the middle. */
 function legendHtml(harmMax: number, hasRelative: boolean): string {
-  return `<div class="map-legend-title">Mean detections / year, harmonized</div>
+  return `<div class="map-legend-title">Detections per 1000 km² per year, harmonized</div>
     <div class="map-legend-ramp" style="background: linear-gradient(to right, ${RAMP.join(", ")})"></div>
     <div class="map-legend-ticks"><span>0</span><span>${si(harmMax / 4)}</span><span>${si(harmMax)}</span></div>
     ${hasRelative ? `<div class="map-legend-rel"><i style="background:${NO_SCALE_GREY}"></i>Not harmonized (relative mode)</div>` : ""}`;
@@ -98,7 +98,7 @@ export async function createRegionMap(
     type: "fill",
     source: "regions",
     paint: {
-      // Harmonized regions coloured by sqrt(annual_mean); relative regions grey (their mean is MODIS scale).
+      // Harmonized regions coloured by sqrt(density); relative regions grey (their density is MODIS scale).
       "fill-color": [
         "case",
         ["==", ["get", "mode"], "relative"], NO_SCALE_GREY,
@@ -152,15 +152,19 @@ export async function createRegionMap(
       const res = await fetch(regionsGeojsonUrl(country));
       const fc = (await res.json()) as Geo;
       const byId = new Map(index.regions.map((r) => [r.id, r]));
+      // Density (annual_mean per 1000 km2), so large and small regions compare fairly.
+      const density = (r: IndexFile["regions"][number]) =>
+        r.annual_mean_of === "harm" ? r.density_per_1000km2 ?? null : null;
       const harmMax = Math.max(
         1,
-        ...index.regions.filter((r) => r.level !== "country" && r.annual_mean_of === "harm").map((r) => r.annual_mean),
+        ...index.regions.filter((r) => r.level !== "country").map((r) => density(r) ?? 0),
       );
       for (const f of fc.features) {
         const r = byId.get(f.properties.id);
         const props = f.properties as Record<string, unknown>;
         props.mode = r?.mode ?? "relative";
-        props.level_value = r && r.annual_mean_of === "harm" ? Math.sqrt(r.annual_mean / harmMax) : 0;
+        const d = r ? density(r) : null;
+        props.level_value = d != null ? Math.sqrt(d / harmMax) : 0;
       }
       const hasRelative = index.regions.some((r) => r.level !== "country" && r.mode === "relative");
       legend.innerHTML = legendHtml(harmMax, hasRelative);

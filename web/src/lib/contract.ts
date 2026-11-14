@@ -26,6 +26,10 @@ export interface IndexRegion extends Climatology {
   mode: Mode;
   annual_mean: number;
   annual_mean_of: "harm" | "modis";
+  /** Area of the assignment polygons, EPSG:6933. */
+  area_km2?: number;
+  /** annual_mean per 1000 km2 per year, same series as annual_mean_of. */
+  density_per_1000km2?: number | null;
   loyo_mdape_pct: number | null;
   peak_hit_rate: number | null;
   peak_hit_rate_raw: number | null;
