@@ -18,7 +18,8 @@ function loadJson<T>(rel: string): Promise<T> {
   if (!files.has(rel)) files.set(rel, readFile(join(DATA_DIR, rel), "utf8").then((s) => JSON.parse(s)));
   return files.get(rel) as Promise<T>;
 }
-export const loadGeo = (c: CountryCode) => loadJson<RegionCollection>(`${c}/regions.geojson`);
+// Same 1:1M-based geometry as find_region_at (regions_mcp.geojson, burncal-x9p), so a point gets the same region in every tool.
+export const loadGeo = (c: CountryCode) => loadJson<RegionCollection>(`${c}/regions_mcp.geojson`);
 const loadIndex = (c: CountryCode) => loadJson<IndexFile>(`${c}/index.json`);
 export const loadRegionFile = (c: CountryCode, id: string) => loadJson<RegionFile>(`${c}/regions/${id}.json`);
 

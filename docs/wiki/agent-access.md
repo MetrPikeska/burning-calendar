@@ -63,7 +63,7 @@ Jury path in 1 minute: claude.ai connector with no auth. Keep a recorded fallbac
 
 ## Implemented tools (14 Nov 2026)
 
-`web/api/mcp.ts` registers 11 read-only tools and 1 resource; the data logic is in `web/api/_lib/tools.ts` (pure, tested in `web/test/mcp-tools.test.ts`), the widget in `web/api/_lib/widget.ts`. `web/test/mcp-endpoint.test.ts` calls the exported handler with web Requests in both protocol eras.
+`web/api/mcp.ts` registers 15 read-only tools (10 data tools, the `show_calendar` widget, 4 live context tools from `web/api/_lib/live/register.ts`) and 1 resource; the data logic is in `web/api/_lib/tools.ts` (pure, tested in `web/test/mcp-tools.test.ts`), the widget in `web/api/_lib/widget.ts`. `web/test/mcp-endpoint.test.ts` calls the exported handler with web Requests in both protocol eras.
 
 | Tool | Inputs | Notes |
 |---|---|---|

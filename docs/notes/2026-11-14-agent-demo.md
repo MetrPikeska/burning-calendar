@@ -54,7 +54,7 @@ Název: **Ask the calendar from any AI assistant**
 
 - Vlevo screenshot odpovědi z generálky (claude.ai, zoom 125 %), zvýrazněné 4,235, 67× a caveat.
 - Vpravo tři řádky:
-  - MCP server, 10 read-only tools, no key: `burning-calendar.vercel.app/api/mcp`
+  - MCP server, 15 read-only tools, no key: `burning-calendar.vercel.app/api/mcp`
   - Every answer carries caveats and a `view_url` back to the map
   - Same numbers as the map: Evia, Aug 2021: 4,235 detections, 67× the 2011-2020 median
 - Dole QR kód na https://burning-calendar.vercel.app (tlačítko „Use with AI“ v hlavičce, URL a kroky pro claude.ai) a řádek "Claude (Anthropic) as MCP client".

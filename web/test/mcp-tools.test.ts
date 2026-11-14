@@ -534,7 +534,8 @@ describe("back-cast and incomplete season years", () => {
     const missing = r.incomplete_season!.map((x) => x.id);
     expect(missing).toEqual(expect.arrayContaining(["EL41", "EL42", "EL51", "EL52", "EL53", "EL54"]));
     expect(ranked.filter((id) => missing.includes(id))).toEqual([]);
-    expect(ranked.length + r.excluded_relative.filter((x) => !missing.includes(x.id)).length + missing.length).toBe(13);
+    expect(r.excluded_relative.map((x) => x.id).filter((id) => missing.includes(id))).toEqual([]);
+    expect(ranked.length + r.excluded_relative.length + missing.length).toBe(13);
     expect(r.incomplete_season!.find((x) => x.id === "EL52")!.season_window).toEqual({ from: "2025-04", to: "2026-03" });
     const oc = r.caveats.find((c) => c.code === "out_of_coverage")!;
     expect(oc.message).toMatch(/EL52/);

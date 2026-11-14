@@ -55,3 +55,14 @@ describe("live tools over MCP", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });
+
+describe("live caveat codes", () => {
+  it("are all explained by get_methodology topic caveats", async () => {
+    const { METHODOLOGY } = await import("../api/_lib/tools.ts");
+    const { readFileSync, readdirSync } = await import("node:fs");
+    const src = readdirSync("api/_lib/live").map((f) => readFileSync(`api/_lib/live/${f}`, "utf8")).join("\n");
+    const codes = [...new Set([...src.matchAll(/code: "([a-z_]+)"/g)].map((m) => m[1]))];
+    expect(codes.length).toBeGreaterThan(5);
+    for (const c of codes) expect(METHODOLOGY.caveats, c).toMatch(new RegExp(`\\b${c} =`));
+  });
+});
