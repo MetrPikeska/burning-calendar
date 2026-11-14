@@ -47,8 +47,8 @@ All numbers computed on 14 Nov 2026 from FIRMS SP country CSVs (MODIS 2000-2025,
 | 66 | Salta | harmonized | 7.2 | 0.857 / 1.0 | 7.5 | 11.4 |
 | 70 | San Juan | harmonized | 7.6 | 1.0 / 0.714 | 6.5 | 2.7 |
 | 74 | San Luis | harmonized | 3.9 | 0.857 / 0.714 | 7.0 | -2.8 |
-| 78 | Santa Cruz | harmonized | 15.1 | 0.571 / 0.571 | 13.1 | -7.2 |
-| 82 | Santa Fe | harmonized | 4.6 | 0.857 / 0.857 | 7.9 | 3.2 |
+| 78 | Santa Cruz | harmonized | 15.1 | 0.714 / 0.714 | 13.1 | -7.2 |
+| 82 | Santa Fe | harmonized | 4.6 | 1.0 / 1.0 | 7.9 | 3.2 |
 | 86 | Santiago del Estero | harmonized | 3.8 | 0.857 / 0.857 | 9.0 | -2.7 |
 | 90 | Tucumán | harmonized | 7.5 | 1.0 / 1.0 | 2.8 | -0.5 |
 | 94 | Tierra del Fuego, Antártida e Islas del Atlántico Sur | relative | 62.1 | 0.143 / 0.143 | 60.1 | 140.2 |
@@ -78,3 +78,39 @@ National VIIRS counts after filters, against the median of the same month in 201
 | Oct (NRT) | 5,161 | 20,512 | 0 |
 
 The 2026 winter-spring season is the weakest of the record in July, August and October. July loses 6 days to the S-NPP gap; August and October have no gap in both countries, and the NRT file has 91 of 92 days. Not yet checked against SNMF reports. Months to Dec 2025 and all validation numbers are unchanged by the 2026 addition.
+
+## Ablation and band coverage (15 Nov, audit round 3)
+
+Same tests for three models: ours (region x month x day/night with fallbacks), one constant VIIRS/MODIS ratio `k`, and one ratio per calendar month; all fitted on Feb 2012 - Dec 2019. Time split = held-out 2020-2025, LOYO = 2012-2019. Band coverage = share of the 72 held-out 2020-2025 months whose observed VIIRS lies inside the back-cast band (nominal 80 %). Data: `validation.json`, fields `baselines` and `band_coverage`.
+
+| id | mode | time split ours | constant | per month | LOYO ours | constant | per month | k | band coverage % |
+|---|---|---|---|---|---|---|---|---|---|
+| AR | harmonized | 6.7 | 7.5 | 6.6 | 1.5 | 2.9 | 2.3 | 3.298 | 61.1 |
+| 02 | relative | 100.0 | 100.0 | 100.0 | 115.6 | 78.8 | 83.8 | 1.417 | 88.9 |
+| 06 | harmonized | 22.4 | 29.9 | 27.9 | 8.1 | 14.0 | 13.0 | 2.578 | 54.2 |
+| 10 | harmonized | 15.0 | 25.3 | 23.9 | 12.8 | 4.4 | 10.4 | 4.336 | 69.4 |
+| 14 | harmonized | 5.7 | 9.2 | 5.0 | 10.4 | 16.2 | 13.8 | 3.333 | 66.7 |
+| 18 | harmonized | 4.7 | 18.3 | 14.4 | 7.2 | 6.6 | 5.6 | 3.054 | 59.7 |
+| 22 | harmonized | 8.3 | 5.7 | 5.3 | 2.3 | 4.3 | 2.8 | 3.201 | 65.3 |
+| 26 | harmonized | 33.6 | 29.8 | 30.7 | 12.8 | 17.3 | 23.4 | 4.463 | 68.1 |
+| 30 | harmonized | 11.5 | 18.7 | 17.8 | 6.5 | 12.4 | 10.7 | 3.161 | 76.4 |
+| 34 | harmonized | 4.2 | 4.5 | 4.0 | 2.3 | 4.5 | 1.9 | 3.318 | 76.4 |
+| 38 | harmonized | 18.1 | 14.0 | 16.9 | 5.6 | 13.4 | 7.6 | 3.111 | 68.1 |
+| 42 | harmonized | 4.0 | 13.1 | 4.1 | 6.4 | 13.5 | 12.4 | 3.873 | 68.1 |
+| 46 | harmonized | 9.0 | 7.9 | 12.0 | 13.0 | 19.9 | 11.5 | 4.013 | 80.6 |
+| 50 | harmonized | 20.0 | 21.6 | 19.4 | 9.3 | 12.6 | 9.7 | 3.174 | 52.8 |
+| 54 | harmonized | 11.6 | 7.0 | 7.8 | 2.3 | 2.7 | 3.1 | 3.381 | 75.0 |
+| 58 | harmonized | 25.8 | 22.9 | 20.4 | 20.5 | 10.6 | 9.1 | 4.855 | 77.8 |
+| 62 | harmonized | 7.6 | 6.5 | 8.0 | 6.3 | 12.7 | 11.8 | 3.752 | 76.4 |
+| 66 | harmonized | 7.5 | 7.2 | 6.6 | 7.2 | 10.3 | 9.7 | 3.386 | 68.1 |
+| 70 | harmonized | 6.5 | 7.6 | 3.0 | 7.6 | 9.7 | 8.1 | 3.462 | 72.2 |
+| 74 | harmonized | 7.0 | 7.1 | 6.0 | 3.9 | 6.5 | 3.9 | 3.303 | 70.8 |
+| 78 | harmonized | 13.1 | 22.4 | 19.7 | 15.1 | 18.7 | 22.3 | 4.812 | 87.5 |
+| 82 | harmonized | 7.9 | 10.9 | 10.3 | 4.6 | 2.9 | 2.6 | 3.408 | 73.6 |
+| 86 | harmonized | 9.0 | 8.6 | 9.0 | 3.8 | 7.1 | 6.0 | 3.145 | 76.4 |
+| 90 | harmonized | 2.8 | 5.4 | 3.8 | 7.5 | 6.0 | 5.1 | 3.062 | 59.7 |
+| 94 | relative | 60.1 | 27.7 | 49.7 | 62.1 | 31.6 | 40.9 | 6.11 | 93.1 |
+
+- Ours is best on the time split in 8 of 22 harmonized regions and on LOYO in 15 of 22. Median time split over those regions: ours 8.65 %, constant 10.05 %, per month 9.65 %.
+- Band coverage over harmonized regions: median 70.1 %, range 52.8-87.5 %; the band is narrower than its nominal 80 % in most regions, so it is a "likely range", not a calibrated interval.
+- The validation season window now comes from MODIS 2001-2011 (`season_start_month_validation`); peak hit rates changed: 78 0.571 / 0.571 -> 0.714 / 0.714, 82 0.857 / 0.857 -> 1.0 / 1.0. No region changed mode.

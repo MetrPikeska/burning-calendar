@@ -27,6 +27,24 @@ Seven priorities. What the code showed and what changed (branches pipeline-mcp, 
 
 Tests after the round and the code review fixes: 122 pytest, 209 vitest, typecheck and build pass; the smoke test against a local server passed all 24 checks (FIRMS without key: warning). The code review (standards and spec) found a methodology topic `units` no MCP call could reach, a GR vs NUTS2 test that compared MODIS instead of VIIRS, a wrong unit on `aggregate` `top_months`, a fragile `baseline_kind` parse and a Now line that showed a rate without a ratio; all fixed.
 
+## External audit round 3 (red team, HEAD 0a3dcea, 14 Nov evening)
+
+Source: `docs/wiki/sources/2026-11-14-audit-external-round3.md` (7.2/10 on the auditor's own weights). A fourth audit of 3dbb123 by another auditor is in `...-round4.md`. Fixed on branch audit-r3:
+
+| ID | Finding | Status | Change or reason |
+|---|---|---|---|
+| BC3-001 | AOI area added overlapping parts (two identical 5 km discs: 157 km2) | Fixed | Union area: exact spherical area for polygons that cannot overlap, grid estimate of the union otherwise; two identical discs give 78.5 km2 (test within 1 %) |
+| BC3-002 | Season window for validation took the climatology to 2025, held-out years included | Fixed | Validation window from MODIS 2001-2011 (`season_start_month_validation`); peak hits changed in EL51, EL52, AR 78, 82; no mode changed |
+| BC3-003 | AOI applies NUTS2 factors to unvalidated smaller areas | Limit, labelled | Panel: "Exploratory estimate, not validated for this area" with the MODIS count in the fit window; monthly CSV column `aoi_estimate`; GeoJSON note. A spatial validation stays a bead (burncal-a3y) |
+| BC3-004 | Band coverage not shown; zero estimates gave [0, 0] | Fixed and measured | `band_coverage` per region on 2020-2025; medians 74 % (GR regions), 70 % (AR provinces) against nominal 80 %, so the band is a likely range, not a calibrated interval. `zero_hi` gives zero estimates an upper bound |
+| BC3-005 | `show_calendar` VIIRS before 2012 mixed harm/modis totals and backcast counts | Fixed | Totals of the shown series only, `src` no_data/observed on raw series, caveat `series_not_available` |
+| BC3-006 | No evidence the full model beats a constant ratio | Measured, published | `baselines`: ours best on the 2020-2025 test in 4 of 12 Greek and 8 of 22 Argentine harmonized regions, on LOYO in 7 of 12 and 15 of 22; GR: ours 7.1 %, constant 6.0 % |
+| BC3-007 | GR 2021 VIIRS 9,578 vs 9,576 for the NUTS2 sum | Explained | Caveat `country_unassigned` in `aggregate` and `compare_regions` (detections within 5 km offshore that no region claims) |
+| BC3-008 | GeoJSON ring closure and self-crossing not checked; AOI region pick by map bbox | Fixed | Unclosed rings and bowties rejected (also while drawing); region boxes grown by the 5 km assignment band |
+| P2-01 | `get_fire_weather` with `region_id` and `lat/lon` used the region silently | Fixed | `INVALID_ARGUMENT` |
+
+Safe wording for the pitch (from the audit): "We harmonize monthly counts of active fire detections per region and validate them against observed VIIRS; before 2012 the values are estimates." Not: number of fires, burned area, a validated AOI back-cast, an 80 % prediction interval.
+
 ## Next steps (slide, no code before the freeze)
 
 1. NOAA-20/21 splice to continue after S-NPP (2 Nov 2026), with its own fit and validation.

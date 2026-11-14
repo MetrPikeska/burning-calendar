@@ -32,8 +32,8 @@ All numbers recomputed on 14 Nov 2026 from FIRMS SP country CSVs (MODIS C6.1 200
 | EL41 | Voreio Aigaio | harmonized | 9.7 | 1.0 / 0.857 | 23.7 | 0.1 |
 | EL42 | Notio Aigaio | harmonized | 25.0 | 0.429 / 0.286 | 22.8 | -12.6 |
 | EL43 | Kriti | harmonized | 13.9 | 0.714 / 0.714 | 15.8 | 1.5 |
-| EL51 | Anatoliki Makedonia, Thraki | harmonized | 7.5 | 0.857 / 1.0 | 11.1 | 0.9 |
-| EL52 | Kentriki Makedonia | harmonized | 4.0 | 0.857 / 0.857 | 11.8 | 0.5 |
+| EL51 | Anatoliki Makedonia, Thraki | harmonized | 7.5 | 0.714 / 0.714 | 11.1 | 0.9 |
+| EL52 | Kentriki Makedonia | harmonized | 4.0 | 1.0 / 1.0 | 11.8 | 0.5 |
 | EL53 | Dytiki Makedonia | harmonized | 6.3 | 1.0 / 1.0 | 30.5 | -6.6 |
 | EL54 | Ipeiros | harmonized | 24.2 | 0.571 / 0.429 | 31.9 | -10.3 |
 | EL61 | Thessalia | harmonized | 4.2 | 0.714 / 0.857 | 19.5 | -6.1 |
@@ -65,3 +65,28 @@ National VIIRS counts after filters, against the median of the same month in 201
 | Oct (NRT) | 524 | 618.5 | 40 |
 
 No month of 2026 is an anomaly at the national level. March, April and July lose 3, 3 and 6 days to S-NPP gaps (`outage_viirs`). Adding 2026 left every month to Dec 2025 and every validation number unchanged; `annual_mean` moved in some regions because season year 2025 became complete.
+
+## Ablation and band coverage (15 Nov, audit round 3)
+
+Same tests for three models: ours (region x month x day/night with fallbacks), one constant VIIRS/MODIS ratio `k`, and one ratio per calendar month; all fitted on Feb 2012 - Dec 2019. Time split = held-out 2020-2025, LOYO = 2012-2019. Band coverage = share of the 72 held-out 2020-2025 months whose observed VIIRS lies inside the back-cast band (nominal 80 %). Data: `validation.json`, fields `baselines` and `band_coverage`.
+
+| id | mode | time split ours | constant | per month | LOYO ours | constant | per month | k | band coverage % |
+|---|---|---|---|---|---|---|---|---|---|
+| GR | harmonized | 7.1 | 6.0 | 7.6 | 5.4 | 7.1 | 5.3 | 3.5 | 59.7 |
+| EL30 | harmonized | 18.1 | 16.6 | 11.1 | 16.1 | 25.4 | 47.5 | 3.734 | 73.6 |
+| EL41 | harmonized | 23.7 | 28.6 | 38.9 | 9.7 | 24.5 | 23.7 | 3.564 | 72.2 |
+| EL42 | harmonized | 22.8 | 46.9 | 53.3 | 25.0 | 30.1 | 29.9 | 4.218 | 80.6 |
+| EL43 | harmonized | 15.8 | 9.3 | 20.8 | 13.9 | 9.3 | 20.0 | 3.481 | 79.2 |
+| EL51 | harmonized | 11.1 | 4.9 | 7.6 | 7.5 | 9.6 | 8.0 | 3.342 | 81.9 |
+| EL52 | harmonized | 11.8 | 11.7 | 9.4 | 4.0 | 4.3 | 2.4 | 3.633 | 81.9 |
+| EL53 | harmonized | 30.5 | 33.0 | 33.6 | 6.3 | 12.7 | 9.9 | 4.021 | 76.4 |
+| EL54 | harmonized | 31.9 | 29.7 | 28.7 | 24.2 | 22.1 | 23.1 | 3.765 | 62.5 |
+| EL61 | harmonized | 19.5 | 13.1 | 15.9 | 4.2 | 12.0 | 4.8 | 3.854 | 68.1 |
+| EL62 | relative | 40.5 | 41.0 | 44.0 | 32.0 | 29.4 | 38.3 | 2.794 | 86.1 |
+| EL63 | harmonized | 22.4 | 17.7 | 4.0 | 19.4 | 12.4 | 12.7 | 3.051 | 75.0 |
+| EL64 | harmonized | 13.0 | 18.0 | 16.9 | 16.3 | 19.9 | 22.9 | 2.483 | 70.8 |
+| EL65 | harmonized | 16.1 | 13.3 | 20.3 | 17.5 | 16.7 | 14.3 | 3.057 | 66.7 |
+
+- Ours is best on the time split in 4 of 12 harmonized regions and on LOYO in 7 of 12. Median time split over those regions: ours 18.8 %, constant 17.15 %, per month 18.6 %.
+- Band coverage over harmonized regions: median 74.3 %, range 62.5-81.9 %; the band is narrower than its nominal 80 % in most regions, so it is a "likely range", not a calibrated interval.
+- The validation season window now comes from MODIS 2001-2011 (`season_start_month_validation`); peak hit rates changed: EL51 0.857 / 1.0 -> 0.714 / 0.714, EL52 0.857 / 0.857 -> 1.0 / 1.0. No region changed mode.
