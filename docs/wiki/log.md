@@ -38,3 +38,4 @@ Append-only. Format: `YYYY-MM-DD op: what changed`.
 - 2026-11-14 docs: README rewritten: problem, app features, method, validation table (LOYO 5.4 % GR, 1.5 % AR), limits, MCP connection, how to run.
 - 2026-11-14 docs: project page draft in docs/project-page.md (all 2026 portal fields; demo link still TODO).
 - 2026-11-14 build: MCP tool `get_validation` (per-year errors, band, region table) and `caveats: codes` mode on every tool (agent-access.md).
+- 2026-11-14 build: web shows uncertainty per region (burncal-7s7): back-cast months get the harm_lo..harm_hi range as a whisker and text in the month panel; new panel "How well the harmonization holds here" with LOYO and held-out errors, peak-month hits, mode reason, annual error bars and links to validation.json and the region JSON.

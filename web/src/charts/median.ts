@@ -7,6 +7,8 @@ const monthYear = (ym: string) =>
   new Date(`${ym}-15T00:00:00Z`).toLocaleDateString("en", { month: "long", year: "numeric", timeZone: "UTC" });
 const monthOnly = (ym: string) =>
   new Date(`${ym}-15T00:00:00Z`).toLocaleDateString("en", { month: "long", timeZone: "UTC" });
+/** Whisker colour for the back-cast range: reads on the dark month bar and on the page. */
+const RANGE_STROKE = "#f08c1a";
 const num = (n: number) => (n >= 100 ? Math.round(n).toLocaleString("en") : n.toFixed(1));
 
 /**
@@ -48,6 +50,7 @@ export function renderMedianPanel(region: RegionFile, ym: string, width = 520): 
     return el;
   }
 
+  const backcast = region.mode === "harmonized" && rec.src !== "observed" && rec.harm_lo != null && rec.harm_hi != null;
   const verdict = rec.anom
     ? `<span class="flag">Anomaly</span> above the 90th percentile (${num(rec.baseline_p90)})`
     : `below the 90th percentile (${num(rec.baseline_p90)})`;
@@ -57,7 +60,7 @@ export function renderMedianPanel(region: RegionFile, ym: string, width = 520): 
       of ${monthOnly(ym)} ${rec.baseline_years} (${num(rec.baseline_median)}).
       Percentile ${rec.anom_pct == null ? "n/a" : Math.round(rec.anom_pct)}, ${verdict}.
       ${rec.outage && (region.mode === "relative" || rec.src !== "observed") ? `<br>Known MODIS outage: ${rec.outage_days} days, the count may be too low.` : ""}
-      ${region.mode === "harmonized" && rec.src !== "observed" ? `<br>Back-cast month, range ${num(rec.harm_lo ?? 0)}-${num(rec.harm_hi ?? 0)}.` : ""}</p>`;
+      ${backcast ? `<br>Back-cast month: modelled from MODIS, likely range <strong>${num(rec.harm_lo!)}-${num(rec.harm_hi!)}</strong> (10th-90th percentile of the back-cast check).` : ""}</p>`;
 
   const bars = [
     { label: monthYear(ym), v: value, kind: "month" },
@@ -74,13 +77,23 @@ export function renderMedianPanel(region: RegionFile, ym: string, width = 520): 
       marginRight: 52,
       marginTop: 0,
       style: { fontFamily: "inherit", fontSize: "11px" },
-      x: { label: null, grid: true, nice: true, domain: [0, Math.max(1, ...bars.map((b) => b.v))], ticks: width < 440 ? 3 : 5, tickFormat: countTick },
+      x: { label: null, grid: true, nice: true, domain: [0, Math.max(1, ...bars.map((b) => b.v), backcast ? rec.harm_hi! : 0)], ticks: width < 440 ? 3 : 5, tickFormat: countTick },
       y: { label: null, domain: bars.map((b) => b.label), axis: null, padding: 0 },
       color: { domain: ["month", "base"], range: ["#1d1b19", "#c5bbb0"] },
       marks: [
         Plot.barX(bars, { x: "v", y: "label", fill: "kind", insetTop: 17, insetBottom: 3 }),
         Plot.text(bars, { x: 0, y: "label", text: "label", dx: 3, dy: -11, textAnchor: "start", fill: "currentColor", fontSize: 12 }),
-        Plot.text(bars, { x: "v", y: "label", text: (b: { v: number }) => num(b.v), dx: 5, dy: 7, textAnchor: "start", fontWeight: 600 }),
+        // Back-cast months: the likely range as a whisker over the month bar.
+        ...(backcast
+          ? [
+              Plot.ruleY([bars[0]], { y: "label", x1: () => rec.harm_lo, x2: () => rec.harm_hi, dy: 7, stroke: RANGE_STROKE, strokeWidth: 2 }),
+              Plot.tickX([rec.harm_lo!, rec.harm_hi!], { x: (d: number) => d, y: () => bars[0].label, stroke: RANGE_STROKE, strokeWidth: 2, insetTop: 15, insetBottom: 1 }),
+            ]
+          : []),
+        Plot.text(bars, {
+          x: (b: { v: number; kind: string }) => (backcast && b.kind === "month" ? Math.max(b.v, rec.harm_hi!) : b.v),
+          y: "label", text: (b: { v: number }) => num(b.v), dx: 5, dy: 7, textAnchor: "start", fontWeight: 600,
+        }),
         Plot.ruleX([0]),
       ],
     }),

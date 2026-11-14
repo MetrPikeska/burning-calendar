@@ -9,6 +9,7 @@ import { parseState, serializeState, type AppState } from "./lib/url-state.ts";
 import { marksKey, renderHeatmap } from "./charts/heatmap.ts";
 import { defaultMonth, renderMedianPanel } from "./charts/median.ts";
 import { rampColors } from "./charts/ramp.ts";
+import { renderValidation } from "./charts/validation.ts";
 import { createRegionMap } from "./map.ts";
 
 const monthName = formatMonth("en", "short");
@@ -179,7 +180,8 @@ function renderPanel(): void {
     <p class="foot">Click a cell to compare that month with its median.${state.series === "harm"
       ? " 2000-2011 back-cast from MODIS (range in the tooltip), 2012-2025 VIIRS observed."
       : ""}</p>
-    <section id="median" aria-live="polite"></section>`;
+    <section id="median" aria-live="polite"></section>
+    <div id="method"></div>`;
 
   const ym = pickedYm ?? defaultMonth(region, state.from, state.to);
   const width = chartWidth();
@@ -191,6 +193,7 @@ function renderPanel(): void {
     }, width),
   );
   $("#median").append(renderMedianPanel(region, ym, width));
+  $("#method").append(renderValidation(region, state.country, width));
   $("#chart").addEventListener("keydown", onChartKey);
 
   panel.querySelectorAll<HTMLButtonElement>("button[data-series]").forEach((b) =>

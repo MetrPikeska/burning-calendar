@@ -224,6 +224,13 @@ h2 { margin: 0; font-size: var(--fs-xl); font-weight: 650; letter-spacing: -0.01
 .median h3 { margin: 0 0 var(--s1); font-size: var(--fs-lg); font-weight: 650; }
 .median p { margin: 0 0 var(--s3); font-size: var(--fs-base); max-width: 62ch; }
 .median strong { font-weight: 650; }
+.method { margin-top: var(--s5); padding-top: var(--s4); border-top: 1px solid var(--line); }
+.method h3 { margin: 0 0 var(--s1); font-size: var(--fs-lg); font-weight: 650; }
+.method p { margin: 0 0 var(--s3); font-size: var(--fs-base); max-width: 62ch; }
+.method strong { font-weight: 650; }
+.method-chart { margin: 0 0 var(--s2); }
+.method-chart figcaption { font-size: var(--fs-xs); color: var(--muted); margin-bottom: var(--s1); }
+.method a { color: inherit; text-underline-offset: 2px; }
 .flag {
   background: var(--anomaly-strong);
   color: #fff;

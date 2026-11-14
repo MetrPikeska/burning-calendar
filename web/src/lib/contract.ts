@@ -93,6 +93,37 @@ export interface BandRow {
   q_hi: number;
 }
 
+interface ValidationMonthly {
+  bias_pct: number | null;
+  r: number | null;
+  n_months: number;
+}
+
+/** Subset of `regions/{id}.json` -> `validation` the web reads (full object in validation.json). */
+export interface RegionValidation {
+  loyo?: {
+    years: number[];
+    annual_mdape_pct: number | null;
+    annual_err_pct: Record<string, number | null>;
+    monthly?: ValidationMonthly;
+    season?: {
+      season_years: number[];
+      harm?: { peak_hits: number };
+      modis_raw?: { peak_hits: number };
+    };
+  };
+  time_split?: {
+    fit: string;
+    test: string;
+    annual_mdape_pct: number | null;
+    annual_err_pct: Record<string, number | null>;
+    monthly?: ValidationMonthly;
+  };
+  mode?: Mode;
+  /** e.g. "loyo_mdape 32.0 > 25.0". */
+  mode_reasons?: string[];
+}
+
 export interface RegionFile {
   schema_version: string;
   generated_at: string;
