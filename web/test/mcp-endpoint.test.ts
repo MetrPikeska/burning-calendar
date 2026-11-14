@@ -110,6 +110,21 @@ describe("show_calendar data", () => {
     }
   });
 
+  it("units describe the shown series' totals and cells, not regionSeries year records", () => {
+    const labels = new Set(["year", "series", "partial", "anomaly_months", "ym", "src", "anom", "outage"]);
+    const keysOf = (d: ReturnType<typeof calendarData>) =>
+      new Set([...d.totals, ...d.months].flatMap((r) => Object.keys(r)).filter((k) => !labels.has(k)));
+    const v = calendarData(el64, { from: "2003-01", to: "2003-02", series: "viirs" }, period);
+    expect(new Set(Object.keys(v.units))).toEqual(keysOf(v));
+    expect(v.units.v).toMatch(/VIIRS S-NPP/);
+    expect(v.units.total).toMatch(/VIIRS S-NPP/);
+    expect(JSON.stringify(v.units)).not.toMatch(/harm|VIIRS-equivalent|backcast/);
+    const h = calendarData(el64, { from: "2011-01", to: "2012-12" }, period);
+    expect(new Set(Object.keys(h.units))).toEqual(keysOf(h));
+    expect(Object.keys(h.units)).toEqual(expect.arrayContaining(["v", "lo", "hi", "total", "n_values", "backcast_months"]));
+    expect(h.units.total).toMatch(/VIIRS-equivalent/);
+  });
+
   it("strips control, bidi and zero-width characters from names", () => {
     expect(safeText("Ke\u0000ntr‮iki​ Ellada\u0085", 80)).toBe("Kentriki Ellada");
     expect(safeText("x".repeat(200))).toHaveLength(80);

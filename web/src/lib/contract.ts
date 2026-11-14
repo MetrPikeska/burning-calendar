@@ -155,10 +155,31 @@ export interface RegionValidation {
   mode_reasons?: string[];
   /** null in relative mode. */
   quality?: RegionQuality | null;
+  /** Season start month 1-12 used by the validation, from MODIS 2001-2011 only (audit BC3-002). */
+  season_start_month_validation?: number;
   /** Ablation on the same tests (audit BC3-006): a constant VIIRS/MODIS ratio and a per-month ratio. */
-  baselines?: Record<"constant_ratio" | "month_ratio" | "full_model", { loyo_mdape_pct: number | null; time_split_mdape_pct: number | null; k?: number | null }>;
+  baselines?: ValidationBaselines;
   /** Share of held-out 2020-2025 months inside the back-cast band (audit BC3-004). */
-  band_coverage?: { nominal_pct: number; pct: number | null; n: number };
+  band_coverage?: BandCoverage;
+}
+
+export type ValidationBaselines = Record<"constant_ratio" | "month_ratio" | "full_model",
+  { loyo_mdape_pct: number | null; time_split_mdape_pct: number | null; k?: number | null }>;
+
+/** Percent of held-out months inside the band (null without months) and the number of months. */
+export interface BandShare {
+  pct: number | null;
+  n: number;
+}
+
+export interface BandCoverage extends BandShare {
+  nominal_pct: number;
+  test?: string;
+  band_from?: string;
+  /** By observed VIIRS count class: "0", "1-19", "20-99", "100+". */
+  by_observed_count?: Record<string, BandShare>;
+  /** Months where the harmonized estimate is 0 (the band is 0 to zero_hi). */
+  zero_prediction?: BandShare;
 }
 
 /** "in 2025 (2020-2025 test)" / "in 2018 (left out of the fit)": where the worst held-out year comes from. */

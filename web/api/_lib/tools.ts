@@ -1,6 +1,7 @@
 // Pure logic behind the MCP tools: takes loaded JSON, returns plain objects. No I/O, no DOM.
 // Data contract: docs/wiki/data-contract.md. Tool design: docs/wiki/agent-access.md.
 import type {
+  BandCoverage,
   CountryCode,
   IndexFile,
   IndexRegion,
@@ -9,6 +10,7 @@ import type {
   RegionFile,
   RegionQuality,
   Series,
+  ValidationBaselines,
 } from "../../src/lib/contract.ts";
 import { worstYearText } from "../../src/lib/contract.ts";
 import { regionAt, type RegionCollection, type RegionFeature } from "../../src/lib/geo.ts";
@@ -235,8 +237,30 @@ function smallCountsCaveat(mode: RegionFile["mode"], months: Month[]): Caveat[] 
 /** A country's counts include detections up to 5 km offshore that no region polygon claims (audit BC3-007 / P1-04). */
 const COUNTRY_UNASSIGNED: Caveat = {
   code: "country_unassigned",
-  message: "A country's counts include detections within 5 km of its coast that the region assignment gives to no region (Greece: 240 detections 2000-2026), so a country can exceed the sum of its regions by a few detections. That is expected, not a missing region.",
+  message: "A country's counts include detections within 5 km of its coast that the region assignment gives to no region (Greece: 240 detections 2000-2026), so a country can exceed the sum of its regions by a few detections.",
 };
+/** show_calendar: the chosen series has no value for some months (VIIRS before 20 Jan 2012); null is not zero. */
+export function seriesNotAvailableCaveat(series: Series, missing: string[]): Caveat[] {
+  return series === "viirs" && missing.length
+    ? [{ code: "series_not_available", message: `VIIRS S-NPP starts on 20 Jan 2012: ${missing.length} month(s) (${missing[0]} to ${missing[missing.length - 1]}) have no VIIRS value (v null, total null), which is not zero detections. For those years use series "harm" (VIIRS-equivalent estimate) or "modis".` }]
+    : [];
+}
+
+/** show_calendar units: cells hold one month of the shown series, totals one calendar year of it. */
+export function calendarUnits(series: Series, keys: Iterable<string>): Record<string, string> {
+  return unitsFor(keys, series === "modis" ? "relative" : "harmonized", "year", {
+    v: `${SCALE[series]} per month`,
+    lo: `${SCALE.harm} per month; lower end of the likely range of a back-cast month`,
+    hi: `${SCALE.harm} per month; upper end of the likely range of a back-cast month`,
+    total: `${SCALE[series]} per calendar year: sum of the months with a value (n_values)`,
+    n_months: "months of the calendar year inside the returned range",
+    n_values: `months with a ${series} value`,
+    backcast_months: "months before Feb 2012 modelled from MODIS",
+    year: undefined, series: undefined, partial: undefined, anomaly_months: undefined,
+    ym: undefined, src: undefined, anom: undefined, outage: undefined,
+  });
+}
+
 const hasCountry = (ids: string[]) => ids.some((id) => id === "GR" || id === "AR");
 
 /** annual_mean and density average every complete season year, so the years before Feb 2012 are modelled. */
@@ -990,6 +1014,9 @@ interface RegionValidation {
   mode: RegionFile["mode"];
   mode_reasons: string[];
   quality?: RegionQuality | null;
+  season_start_month_validation?: number;
+  baselines?: ValidationBaselines;
+  band_coverage?: BandCoverage;
 }
 export interface CountryValidation {
   static_filter: object;
@@ -1061,9 +1088,9 @@ export function validationFor(region: RegionFile, country?: { validation: Countr
     ratio_trend_pct_per_year: { day: v.ratio_trend.D?.slope_pct_per_year ?? null, night: v.ratio_trend.N?.slope_pct_per_year ?? null },
     ratio_by_year: { day: v.ratio_trend.D?.ratio_by_year ?? null, night: v.ratio_trend.N?.ratio_by_year ?? null },
     band: region.band,
-    season_start_month_validation: (v as unknown as { season_start_month_validation?: number }).season_start_month_validation ?? null,
-    baselines: (v as unknown as { baselines?: unknown }).baselines ?? null,
-    band_coverage: (v as unknown as { band_coverage?: unknown }).band_coverage ?? null,
+    season_start_month_validation: v.season_start_month_validation ?? null,
+    baselines: v.baselines ?? null,
+    band_coverage: v.band_coverage ?? null,
     band_note: "harm_lo / harm_hi of back-cast months are the modelled value times q_lo / q_hi of the calendar month (10th / 90th percentile of LOYO obs/pred, pooled by season).",
     units: VALIDATION_UNITS,
     caveats: [...caveatsFor(region.mode, []), ...limitsCaveat(region)],

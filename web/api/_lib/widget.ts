@@ -3,7 +3,7 @@
 import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import type { MonthRecord, RegionFile, Series } from "../../src/lib/contract.ts";
-import { type Caveat, countryOf, type Period, regionSeries, SCALE, viewUrl } from "./tools.ts";
+import { calendarUnits, type Caveat, countryOf, type Period, regionSeries, SCALE, seriesNotAvailableCaveat, viewUrl } from "./tools.ts";
 import { CALENDAR_HTML } from "./widget-html.ts";
 
 /** Same values as RESOURCE_MIME_TYPE and RESOURCE_URI_META_KEY in @modelcontextprotocol/ext-apps 2.0.4 (server/index.js). */
@@ -78,7 +78,7 @@ export function calendarData(region: RegionFile, p: { from?: string; to?: string
   }
   // regionSeries checks from <= to, clips to coverage and builds caveats and links; year mode has no record cap.
   const base = regionSeries(region, { from: p.from ?? period.start, to: p.to ?? period.end, aggregate: "year" }, period);
-  const { records, aggregate: _aggregate, ...rest } = base;
+  const { records, aggregate: _aggregate, units: _units, ...rest } = base;
   const ret = base.returned;
   const months = ret ? region.months.filter((m) => m.ym >= ret.from && m.ym <= ret.to) : [];
   // Anomaly flags belong to the region's own series: on another series they would mark e.g. a MODIS 0 month (audit BC-001).
@@ -101,9 +101,7 @@ export function calendarData(region: RegionFile, p: { from?: string; to?: string
     };
   });
   const missing = cells.filter((c) => c.v === null).map((c) => c.ym);
-  const seriesGap: Caveat[] = series === "viirs" && missing.length
-    ? [{ code: "series_not_available", message: `VIIRS S-NPP starts on 20 Jan 2012: ${missing.length} month(s) (${missing[0]} to ${missing[missing.length - 1]}) have no VIIRS value (v null, total null), which is not zero detections. For those years use series "harm" (VIIRS-equivalent estimate) or "modis".` }]
-    : [];
+  const seriesGap = seriesNotAvailableCaveat(series, missing);
   return {
     ...rest,
     caveats: [...caveatsForSeries(rest.caveats, cells, series, anomalySeries), ...seriesGap],
@@ -119,6 +117,8 @@ export function calendarData(region: RegionFile, p: { from?: string; to?: string
       : `anomaly flags refer to the ${anomalySeries} series, not to the ${series} values shown; call show_calendar without series or get_anomalies`,
     backcast_months: series === "harm" ? months.filter((m) => m.src !== "observed").length : 0,
     totals,
+    // units of the totals and cells above (regionSeries' own units describe its year records).
+    units: calendarUnits(series, [...totals, ...cells].flatMap((r) => Object.keys(r))),
     view_url: viewUrl(country, region.id, explicit && ret ? ret.from : null, explicit && ret ? ret.to : null, series),
     months: cells,
   };

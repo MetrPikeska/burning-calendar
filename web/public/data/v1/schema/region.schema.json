@@ -479,6 +479,138 @@
           "items": {
             "type": "string"
           }
+        },
+        "season_start_month_validation": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12,
+          "description": "Season start month used by the validation, from MODIS 2001-2011 only."
+        },
+        "baselines": {
+          "type": "object",
+          "description": "Ablation on the LOYO and 2020-2025 tests: one VIIRS/MODIS ratio, one ratio per calendar month, and the full model.",
+          "properties": {
+            "constant_ratio": {
+              "type": "object",
+              "required": [
+                "loyo_mdape_pct",
+                "time_split_mdape_pct"
+              ],
+              "properties": {
+                "loyo_mdape_pct": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "time_split_mdape_pct": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "k": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                }
+              }
+            },
+            "month_ratio": {
+              "type": "object",
+              "required": [
+                "loyo_mdape_pct",
+                "time_split_mdape_pct"
+              ],
+              "properties": {
+                "loyo_mdape_pct": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "time_split_mdape_pct": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "k": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                }
+              }
+            },
+            "full_model": {
+              "type": "object",
+              "required": [
+                "loyo_mdape_pct",
+                "time_split_mdape_pct"
+              ],
+              "properties": {
+                "loyo_mdape_pct": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "time_split_mdape_pct": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "k": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "band_coverage": {
+          "type": "object",
+          "description": "Share of held-out 2020-2025 months whose observed VIIRS lies inside the back-cast band.",
+          "required": [
+            "nominal_pct",
+            "pct",
+            "n"
+          ],
+          "properties": {
+            "nominal_pct": {
+              "type": "number"
+            },
+            "test": {
+              "type": "string"
+            },
+            "band_from": {
+              "type": "string"
+            },
+            "pct": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "n": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "by_observed_count": {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/$defs/band_share"
+              }
+            },
+            "zero_prediction": {
+              "$ref": "#/$defs/band_share"
+            }
+          }
         }
       }
     },
@@ -505,6 +637,25 @@
         },
         "n_months": {
           "type": "integer"
+        }
+      }
+    },
+    "band_share": {
+      "type": "object",
+      "required": [
+        "pct",
+        "n"
+      ],
+      "properties": {
+        "pct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "n": {
+          "type": "integer",
+          "minimum": 0
         }
       }
     }
