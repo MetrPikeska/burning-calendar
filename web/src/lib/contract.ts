@@ -66,6 +66,29 @@ export interface MonthRecord {
   baseline_p90: number | null;
   /** "2010-2019" or "2002-2011 without 2005". */
   baseline_years: string | null;
+  /** Optional context, null or absent when the factor files were not available at build time. */
+  fwi?: number | null;
+  fwi_pct?: number | null;
+  fwi_level?: FwiLevel | null;
+  spei3?: number | null;
+  spei6?: number | null;
+  spei3_level?: SpeiLevel | null;
+  spei6_level?: SpeiLevel | null;
+}
+
+export type FwiLevel = "normal" | "elevated" | "critical";
+export type SpeiLevel = "dry" | "normal" | "wet";
+
+export interface RegionContext {
+  available: boolean;
+  landcover: {
+    cropland_pct: number;
+    tree_pct: number;
+    shrub_grass_pct: number;
+    other_pct: number;
+    source: string;
+  } | null;
+  sources: Record<string, { name: string; url: string }>;
 }
 
 export interface SeasonYear {
@@ -139,6 +162,7 @@ export interface RegionFile {
   factors: Factor[];
   band: BandRow[];
   validation: Record<string, unknown>;
+  context?: RegionContext;
 }
 
 /** Series a region can show: `harm` is null in relative mode. */

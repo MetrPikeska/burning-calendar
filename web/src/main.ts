@@ -7,6 +7,7 @@ import { dataUrl, loadIndex, loadRegion } from "./lib/data.ts";
 import { parseLatLon, regionAt, type RegionCollection } from "./lib/geo.ts";
 import { parseState, serializeState, type AppState } from "./lib/url-state.ts";
 import { marksKey, renderHeatmap } from "./charts/heatmap.ts";
+import { renderContextPanel } from "./charts/context.ts";
 import { defaultMonth, renderMedianPanel } from "./charts/median.ts";
 import { rampColors } from "./charts/ramp.ts";
 import { renderValidation } from "./charts/validation.ts";
@@ -181,6 +182,7 @@ function renderPanel(): void {
       ? " 2000-2011 back-cast from MODIS (range in the tooltip), 2012-2025 VIIRS observed."
       : ""}</p>
     <section id="median" aria-live="polite"></section>
+    <section id="context" aria-live="polite"></section>
     <div id="method"></div>`;
 
   const ym = pickedYm ?? defaultMonth(region, state.from, state.to);
@@ -193,6 +195,8 @@ function renderPanel(): void {
     }, width),
   );
   $("#median").append(renderMedianPanel(region, ym, width));
+  const ctx = renderContextPanel(region, ym);
+  if (ctx) $("#context").append(ctx);
   $("#method").append(renderValidation(region, state.country, width));
   $("#chart").addEventListener("keydown", onChartKey);
 
