@@ -10,6 +10,13 @@ ROOT = Path(__file__).resolve().parent.parent
 WEB_DATA = ROOT / "web" / "public" / "data" / "v1"
 SCHEMA_VERSION = "1"
 UNITS = "VIIRS-equivalent active fire detections per month (S-NPP 375 m scale)"
+UNITS_RELATIVE = ("raw MODIS Collection 6.1 active fire detections per month (Terra+Aqua, 1 km); "
+                  "not VIIRS-equivalent (region in relative mode)")
+
+
+def units_of(mode: str) -> str:
+    """Unit of the region's main series: harm in harmonized mode, raw MODIS in relative mode."""
+    return UNITS if mode == "harmonized" else UNITS_RELATIVE
 
 
 def _clean(o):
@@ -62,7 +69,8 @@ def export_country(country: str, country_name: str, regions: list[dict], meta: d
     }
     write_json(out / "index.json", index)
     for r in regions:
-        body = {"schema_version": SCHEMA_VERSION, "generated_at": generated, "units": UNITS, **r["detail"]}
+        body = {"schema_version": SCHEMA_VERSION, "generated_at": generated,
+                "units": units_of(r["entry"]["mode"]), **r["detail"]}
         write_json(out / "regions" / f"{r['entry']['id']}.json", body)
         write_csv(out / "regions" / f"{r['entry']['id']}.csv", r["entry"]["id"], r["entry"]["mode"],
                   r["detail"]["months"])

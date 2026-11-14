@@ -8,7 +8,7 @@ from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "pipeline"))
-from export import WEB_DATA, write_csv  # noqa: E402
+from export import UNITS, UNITS_RELATIVE, WEB_DATA, units_of, write_csv  # noqa: E402
 
 SCHEMA_DIR = WEB_DATA / "schema"
 
@@ -61,3 +61,15 @@ def test_detection_csv_adds_up_to_monthly_counts(path):
         for sensor in ("modis", "viirs"):
             assert counts.pop((m["ym"], sensor), 0) == (m[sensor] or 0), (m["ym"], sensor)
     assert not counts, f"rows outside the monthly series: {sorted(counts)[:3]}"
+
+
+def test_units_follow_the_mode():
+    assert units_of("harmonized") == UNITS
+    assert "raw MODIS" in units_of("relative") and units_of("relative") == UNITS_RELATIVE
+
+
+@pytest.mark.parametrize("path", sorted(WEB_DATA.glob("*/regions/*.json")),
+                         ids=lambda p: f"{p.parent.parent.name}-{p.stem}")
+def test_region_units_match_its_mode(path):
+    body = json.loads(path.read_text())
+    assert body["units"] == units_of(body["mode"])
