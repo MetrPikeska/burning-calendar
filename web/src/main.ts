@@ -241,7 +241,7 @@ function renderPanel(): void {
       renderPanel();
     }, width),
   );
-  $("#median").append(renderMedianPanel(region, ym, width));
+  $("#median").append(renderMedianPanel(region, ym, width, series));
   showNow(region.id);
   $("#method").append(renderValidation(region, state.country, width));
   $("#chart").addEventListener("keydown", onChartKey);

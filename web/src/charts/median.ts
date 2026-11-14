@@ -1,6 +1,6 @@
 // Panel "chosen month vs median of the preceding 10 years", from the pipeline's baseline_* fields.
 import * as Plot from "@observablehq/plot";
-import { baselineValue, detectionDaysText, outageNote, type MonthRecord, type RegionFile } from "../lib/contract.ts";
+import { baselineValue, detectionDaysText, outageNote, type MonthRecord, type RegionFile, type Series } from "../lib/contract.ts";
 import { countTick } from "./ramp.ts";
 
 const monthYear = (ym: string) =>
@@ -27,15 +27,36 @@ export function defaultMonth(region: RegionFile, from: string | null, to: string
   return (best ?? region.months[region.months.length - 1]).ym;
 }
 
-function ratioText(value: number, median: number): string {
+/** Below this median a ratio swings with one fire ("61x a median of 1"), so the text gives the difference instead. */
+export const SMALL_MEDIAN = 5;
+
+/** How the month compares with the median, in words (burncal-0kc). */
+export function ratioText(value: number, median: number): string {
   if (median <= 0) return value > 0 ? "above a zero median" : "equal to the median";
+  if (median < SMALL_MEDIAN) {
+    const d = value - median;
+    if (Math.abs(d) < 0.5) return "equal to the median";
+    return `<strong>${num(Math.abs(d))} ${d > 0 ? "more" : "fewer"}</strong> than the median`;
+  }
   const r = value / median;
-  if (r >= 1.5) return `<strong>${r >= 10 ? Math.round(r) : r.toFixed(1)}×</strong> the median`;
-  if (r <= 0.67) return `<strong>${Math.round((1 - r) * 100)} % below</strong> the median`;
-  return "close to the median";
+  if (r >= 2) return `<strong>${r >= 10 ? Math.round(r) : r.toFixed(1)}×</strong> the median`;
+  const pct = Math.round(Math.abs(r - 1) * 100);
+  if (pct < 5) return "about the median";
+  return `<strong>${pct} % ${r > 1 ? "above" : "below"}</strong> the median`;
 }
 
-export function renderMedianPanel(region: RegionFile, ym: string, width = 520): HTMLElement {
+/** Anomaly verdict in one statement: "higher than every August" instead of "Percentile 100, Anomaly above ...". */
+export function verdictText(rec: MonthRecord & { baseline_p90: number }, ym: string): string {
+  const years = rec.baseline_years ?? "the baseline years";
+  if (rec.anom && rec.anom_pct != null && rec.anom_pct >= 100) {
+    return `<span class="flag">Anomaly</span>: higher than every ${monthOnly(ym)} in ${years}.`;
+  }
+  return rec.anom
+    ? `<span class="flag">Anomaly</span>: above the 90th percentile of those years (${num(rec.baseline_p90)}).`
+    : `Not an anomaly: below the 90th percentile of those years (${num(rec.baseline_p90)}).`;
+}
+
+export function renderMedianPanel(region: RegionFile, ym: string, width = 520, shown?: Series): HTMLElement {
   const el = document.createElement("div");
   el.className = "median";
   const rec = region.months.find((m) => m.ym === ym);
@@ -54,14 +75,16 @@ export function renderMedianPanel(region: RegionFile, ym: string, width = 520): 
   const gap = outageNote(rec, usesViirs);
   const daysText = detectionDaysText(rec, usesViirs);
   const backcast = region.mode === "harmonized" && rec.src !== "observed" && rec.harm_lo != null && rec.harm_hi != null;
-  const verdict = rec.anom
-    ? `<span class="flag">Anomaly</span> above the 90th percentile (${num(rec.baseline_p90)})`
-    : `below the 90th percentile (${num(rec.baseline_p90)})`;
+  // The comparison and the anomaly flags always use the region's own series (burncal-5od).
+  const own: Series = region.mode === "harmonized" ? "harm" : "modis";
+  const otherSeries = shown && shown !== own
+    ? `<br><span class="series-note">The calendar shows ${shown === "viirs" ? "raw VIIRS" : "raw MODIS"}; this comparison and the anomaly flags use the ${seriesName} series.</span>`
+    : "";
   el.innerHTML = `
     <h3>${monthYear(ym)} vs the median</h3>
     <p><strong>${num(value)}</strong> ${seriesName} detections, ${ratioText(value, rec.baseline_median)}
       of ${monthOnly(ym)} ${rec.baseline_years} (${num(rec.baseline_median)}).
-      Percentile ${rec.anom_pct == null ? "n/a" : Math.round(rec.anom_pct)}, ${verdict}.
+      ${verdictText({ ...rec, baseline_p90: rec.baseline_p90 }, ym)}${otherSeries}
       ${daysText ? `<br><span class="days">${daysText}.</span>` : ""}
       ${gap ? `<br>${gap[0].toUpperCase()}${gap.slice(1)}, the count may be too low.` : ""}
       ${rec.provisional ? "<br>Provisional: built from FIRMS near real-time data, may change when standard processing replaces it." : ""}

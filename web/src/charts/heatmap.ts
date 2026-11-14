@@ -10,6 +10,20 @@ export const ANOMALY_STROKE = "#2a9df4";
 const RING_OUTER = "#111";
 const RING_INNER = "#fff";
 const OUTAGE_FILL = "#1d1b19";
+/** Corner wedge on anomaly cells: white with a dark edge, so it reads without hue (burncal-m2s). */
+const WEDGE_FILL = "#fff";
+const WEDGE_EDGE = "#111";
+const WEDGE_PX = 6;
+/** Right triangle in the top-right corner of a WEDGE_PX square centred on the dot (size is the d3 symbol area). */
+const wedge = {
+  draw(ctx: CanvasPath, size: number) {
+    const h = Math.sqrt(size) / 2;
+    ctx.moveTo(-h, -h);
+    ctx.lineTo(h, -h);
+    ctx.lineTo(h, h);
+    ctx.closePath();
+  },
+};
 
 const SERIES_LABEL: Record<Series, string> = {
   harm: "Harmonized (VIIRS-equivalent)",
@@ -119,9 +133,15 @@ export function renderHeatmap(
     },
     marks: [
       Plot.cell(cells, { x: "month", y: "year", fill: "value", fillOpacity: dim, title: (c: Cell) => title(c, series), tip: true }),
-      // Anomalies: thin outline, inset so neighbouring outlines do not merge.
+      // Anomalies: thin outline, inset so neighbouring outlines do not merge, plus a white corner wedge with a
+      // dark edge that stays visible in grayscale and red-green colour vision deficiency.
       Plot.cell(cells.filter((c) => c.rec.anom && inRange(c.rec.ym, range)), {
         x: "month", y: "year", fill: null, stroke: ANOMALY_STROKE, strokeWidth: 1.5, inset: 1.5,
+      }),
+      Plot.dot(cells.filter((c) => c.rec.anom && inRange(c.rec.ym, range)), {
+        x: "month", y: "year", symbol: wedge, r: WEDGE_PX / Math.sqrt(Math.PI),
+        dx: (cellW * 0.92) / 2 - WEDGE_PX / 2 - 1, dy: -(rowH * 0.92) / 2 + WEDGE_PX / 2 + 1,
+        fill: WEDGE_FILL, stroke: WEDGE_EDGE, strokeWidth: 0.75,
       }),
       // Known satellite outages: a cross with a white halo, readable on every ramp colour.
       Plot.text(cells.filter((c) => showsOutage(c, series)), {
@@ -184,7 +204,7 @@ const swatch = (inner: string) =>
 export function marksKey(hasRange: boolean): string {
   const pale = "#fbe7a6";
   const items: [string, string][] = [
-    [swatch(`<rect x="1" y="1" width="12" height="12" fill="#c33b4c"/><rect x="2.25" y="2.25" width="9.5" height="9.5" fill="none" stroke="${ANOMALY_STROKE}" stroke-width="1.5"/>`),
+    [swatch(`<rect x="1" y="1" width="12" height="12" fill="#c33b4c"/><rect x="2.25" y="2.25" width="9.5" height="9.5" fill="none" stroke="${ANOMALY_STROKE}" stroke-width="1.5"/><path d="M6.5 2.5H11.5V7.5Z" fill="${WEDGE_FILL}" stroke="${WEDGE_EDGE}" stroke-width="0.75"/>`),
       "Anomaly: above the 90th percentile of the preceding 10 years"],
     [swatch(`<rect x="1" y="1" width="12" height="12" fill="${pale}"/><rect x="1.25" y="1.25" width="11.5" height="11.5" fill="none" stroke="${RING_OUTER}" stroke-width="2.5"/><rect x="3.4" y="3.4" width="7.2" height="7.2" fill="none" stroke="${RING_INNER}" stroke-width="1.5"/>`),
       "Month compared with its median"],

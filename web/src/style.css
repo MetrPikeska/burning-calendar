@@ -255,6 +255,7 @@ a.btn { text-decoration: none; height: var(--control-h); box-sizing: border-box;
 }
 .now { margin: var(--s2) 0 var(--s1); padding-top: var(--s2); border-top: 1px solid var(--line); font-size: var(--fs-sm); line-height: 1.45; }
 .now-note { color: var(--muted); }
+.series-note { color: var(--muted); }
 .stepper { position: absolute; top: var(--s2); right: var(--s2); display: flex; gap: var(--s1); z-index: 1; }
 /* As tall as the stepper buttons beside it, so the sentence below never runs under them. */
 .median h3 {

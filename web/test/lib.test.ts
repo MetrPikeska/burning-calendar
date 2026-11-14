@@ -105,3 +105,24 @@ describe("buildReport", () => {
     expect(md.match(/^\| 2021-\d\d \|/gm)).toHaveLength(12);
   });
 });
+
+describe("median panel wording (burncal-0kc)", async () => {
+  const { ratioText, verdictText } = await import("../src/charts/median.ts");
+  it("gives percentages near the median and a multiple only from 2x", () => {
+    expect(ratioText(1220, 838)).toBe("<strong>46 % above</strong> the median");
+    expect(ratioText(820, 838)).toBe("about the median");
+    expect(ratioText(400, 838)).toBe("<strong>52 % below</strong> the median");
+    expect(ratioText(4235, 63.1)).toBe("<strong>67×</strong> the median");
+  });
+  it("gives the difference, not a ratio, on a median under 5", () => {
+    expect(ratioText(61, 1)).toBe("<strong>60.0 more</strong> than the median");
+    expect(ratioText(0, 2)).toBe("<strong>2.0 fewer</strong> than the median");
+    expect(ratioText(0, 0)).toBe("equal to the median");
+  });
+  it("states the anomaly in one sentence", () => {
+    const base = { ym: "2025-08", modis: 0, viirs: null, harm: 1, harm_lo: null, harm_hi: null, src: "observed", fit_level: null, anom_pct: 100, anom: true, outage: false, baseline_years: "2015-2024", baseline_p90: 1488 } as never;
+    expect(verdictText(base, "2025-08")).toMatch(/Anomaly<\/span>: higher than every August in 2015-2024\./);
+    expect(verdictText({ ...(base as object), anom_pct: 95 } as never, "2025-08")).toMatch(/above the 90th percentile of those years \(1,488\)/);
+    expect(verdictText({ ...(base as object), anom: false, anom_pct: 40 } as never, "2025-08")).toMatch(/^Not an anomaly/);
+  });
+});
