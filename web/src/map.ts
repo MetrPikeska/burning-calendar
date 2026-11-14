@@ -83,6 +83,10 @@ export async function createRegionMap(
   const map = new MlMap({ container, style, center: [22, 39], zoom: 5, attributionControl: { compact: true } });
   map.addControl(new NavigationControl({ showCompass: false }), "top-right");
   await new Promise<void>((resolve) => map.once("load", () => resolve()));
+  // On a phone the compact attribution starts expanded and covers the map; keep it behind its (i) button.
+  if (matchMedia("(max-width: 900px)").matches) {
+    container.querySelector(".maplibregl-ctrl-attrib")?.classList.remove("maplibregl-compact-show");
+  }
 
   let selected: string | null = null;
   let marker: Marker | null = null;
@@ -90,7 +94,7 @@ export async function createRegionMap(
   const beforeId = map.getStyle().layers.find((l) => l.type === "symbol")?.id;
   const legend = Object.assign(document.createElement("div"), { className: "map-legend" });
   legend.setAttribute("aria-label", "Map legend");
-  container.append(legend);
+  container.after(legend);
 
   map.addSource("regions", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
   map.addLayer({

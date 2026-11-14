@@ -177,7 +177,7 @@ function renderPanel(): void {
     </div>
     <div id="chart" tabindex="0" role="group" aria-label="Burning calendar, years by months. Arrow keys change the month compared below."></div>
     ${marksKey(state.series, hasRange)}
-    <p class="foot">Click a cell to compare that month with its median.${state.series === "harm"
+    <p class="foot">${matchMedia("(pointer: coarse)").matches ? "Tap" : "Click"} a cell to compare that month with its median.${state.series === "harm"
       ? " 2000-2011 back-cast from MODIS (range in the tooltip), 2012-2025 VIIRS observed."
       : ""}</p>
     <section id="median" aria-live="polite"></section>

@@ -81,9 +81,11 @@ export function renderHeatmap(
   const marginLeft = 40;
   const marginTop = 24;
   const cellW = (width - marginLeft - 4) / 12;
-  const rowH = Math.max(12, Math.min(14, cellW * 0.36));
-  const dim = (c: Cell) => (inRange(c.rec.ym, range) ? 1 : 0.16);
   const narrow = width < 440;
+  // Phones get taller rows so a finger can hit one year; desktop stays compact.
+  const rowH = narrow ? 20 : Math.max(12, Math.min(14, cellW * 0.36));
+  const selectedYear = selectedYm ? Number(selectedYm.slice(0, 4)) : null;
+  const dim = (c: Cell) => (inRange(c.rec.ym, range) ? 1 : 0.16);
 
   const plot = Plot.plot({
     width,
@@ -102,7 +104,7 @@ export function renderHeatmap(
       axis: "top",
       tickSize: 0,
     },
-    y: { type: "band", domain: years, label: null, ticks: years.filter((y) => y % 5 === 0), tickSize: 0 },
+    y: { type: "band", domain: years, label: null, ticks: years.filter((y) => y % 5 === 0 && Math.abs(y - (selectedYear ?? -9)) > 1), tickSize: 0 },
     color: {
       type: "sqrt",
       scheme: COLOR_SCHEME,
@@ -123,6 +125,10 @@ export function renderHeatmap(
       // Month shown in the median panel: black ring outside, white ring inside, visible on pale and black cells.
       Plot.cell(cells.filter((c) => c.rec.ym === selectedYm), { x: "month", y: "year", fill: null, stroke: RING_OUTER, strokeWidth: 2.5, inset: -1 }),
       Plot.cell(cells.filter((c) => c.rec.ym === selectedYm), { x: "month", y: "year", fill: null, stroke: RING_INNER, strokeWidth: 1.5, inset: 1.25 }),
+      // Year of the compared month, bold in the left margin, so the picked row is easy to read.
+      ...(selectedYear != null
+        ? [Plot.text([selectedYear], { y: (d: number) => d, frameAnchor: "left", dx: -6, textAnchor: "end", text: (d: number) => String(d), fontWeight: 700, fill: "currentColor" })]
+        : []),
     ],
   });
 
@@ -137,9 +143,21 @@ export function renderHeatmap(
   if (onPick) {
     // The tip's pointer keeps the hovered datum in plot.value; a click picks that month.
     plot.style.cursor = "pointer";
-    plot.addEventListener("click", () => {
-      const c = (plot as unknown as { value?: Cell | null }).value;
-      if (c) onPick(c.rec.ym);
+    // The cell comes from the click position through the band scales, so a tap works without hover.
+    const sx = plot.scale("x")!;
+    const sy = plot.scale("y")!;
+    const band = (s: typeof sx, v: number) =>
+      (s.domain as number[]).find((d) => v >= Number(s.apply(d)) && v < Number(s.apply(d)) + (s.step ?? 0));
+    const known = new Set(region.months.map((m) => m.ym));
+    plot.addEventListener("click", (ev) => {
+      const e = ev as MouseEvent;
+      const r = plot.getBoundingClientRect();
+      const k = width / r.width;
+      const month = band(sx, (e.clientX - r.left) * k);
+      const year = band(sy, (e.clientY - r.top) * k);
+      if (month == null || year == null) return;
+      const ym = `${year}-${String(month + 1).padStart(2, "0")}`;
+      if (known.has(ym)) onPick(ym);
     });
   }
 
