@@ -18,6 +18,7 @@ MODIS has flown since 2000 and is near its end. VIIRS S-NPP has flown since 2012
 - Season metrics per region: peak month, onset and end (months where the year's cumulative count reaches 10 % and 90 %), season length, bimodal seasons.
 - Anomalies: each month against the same month of the preceding 10 years, flagged above the 90th percentile, with the baseline median shown next to it.
 - A map coloured by detections per 1000 km² a year; `relative` regions stay grey.
+- Your own area (Greece): draw a polygon, place a point or a line with a radius, or drop a GeoJSON file on the map, and get the same calendar, month card and anomalies for it, with downloads of its monthly CSV, its detections and the area. Each detection keeps the factors of its NUTS2 region, so values before Feb 2012 are an estimate that was not validated for that area. Argentina has no published detection points, so there the panel lists the provinces the area touches.
 - Switch between MODIS, VIIRS and the harmonized series, pick a region on the map or by latitude/longitude, set a date range, download CSV. The URL keeps the state, for example `?country=gr&region=EL52&from=2007-01&to=2007-12&series=harm`.
 
 ## Method
@@ -56,7 +57,7 @@ Leave-one-year-out (LOYO) over 2012-2019: fit on seven years, predict the eighth
 - **The 25 % threshold** for `relative` mode is our own choice, with no literature anchor.
 - **Monthly resolution** only; one month is the smallest shift in onset or peak that the calendar can show. Dates are UTC, so some night detections in Argentina fall on the next day.
 - **Data end in Oct 2026.** Jan-Oct 2026 come from the FIRMS area API, not the yearly country files. Aug-Oct 2026 use near real-time data and are marked provisional; near real-time rows have no `type` field, so a cell mask from the standard record removes static sources. S-NPP production stopped on 2 Nov 2026 and had 14 days without data in Mar-Jul 2026; the NOAA-20 splice is on the roadmap below.
-- **Outages:** the outage list covers Aqua gaps only.
+- **Outages:** `data/outages.csv` lists Terra, Aqua and S-NPP gaps of 3 or more days from 2001 to 2026; months with one are flagged.
 
 ## AI agents (MCP)
 
@@ -66,7 +67,7 @@ The MCP server is read-only and asks clients for no key or login. It answers que
 - Claude Code: `claude mcp add --transport http burncal https://burning-calendar.vercel.app/api/mcp`
 - Cursor, VS Code, ChatGPT: add the URL as a remote (HTTP) MCP server. The "Use with AI" button in the web app header shows the config lines, a copy button for the URL and three example questions.
 - Tools and outputs: [agent-access.md](docs/wiki/agent-access.md). Plain-text summary for crawlers: `/llms.txt`.
-- Live context: four more tools fetch current wildfire alerts (GDACS, Copernicus EMS), model weather (Open-Meteo), station records (Meteostat) and NASA FIRMS near-real-time detections (needs `FIRMS_MAP_KEY` on the server), each with source, licence and fetch time.
+- Live context: five more tools; `investigate_month` answers "what happened in this region in this month" in one call, and four fetch current wildfire alerts (GDACS, Copernicus EMS), model weather (Open-Meteo), station records (Meteostat) and NASA FIRMS near-real-time detections (needs `FIRMS_MAP_KEY` on the server), each with source, licence and fetch time.
 
 ## How to run
 
@@ -105,7 +106,7 @@ Also cite NASA FIRMS for the source detections, with the acknowledgement and met
 Release v1 covers Nov 2000 to Oct 2026, by month, for Greek NUTS2 regions and Argentine provinces. Two target users tested the web and the MCP server on 14 Nov 2026, an early warning analyst and a research scientist ([feedback](docs/notes/2026-11-14-feedback-early-warning-research.md)). Their priorities set this order:
 
 1. **Near-real-time.** S-NPP FIRMS production ended on 2 Nov 2026. Splice VIIRS to NOAA-20, which overlaps S-NPP since Apr 2018, with a factor per region and day/night fitted on Apr 2018 to Oct 2026, then to NOAA-21. Add FIRMS NRT detections, and return the last update date and the delay status in every API and MCP answer.
-2. **Daily series and finer tiles.** Daily counts and days with a detection per region. A grid or municipalities instead of NUTS2: Attica or the Peloponnese hide local hotspots.
+2. **Daily series and finer tiles.** Daily counts and days with a detection per region. A grid or municipalities instead of NUTS2: Attica or the Peloponnese hide local hotspots. Custom areas work for Greece since 15 Nov; for Argentina they need a precomputed monthly grid (0.05°), and a validation of the factors for areas smaller than a region.
 3. **Risk context.** Weather and the Fire Weather Index (FWI), severity levels (normal, elevated, critical), webhook notifications.
 4. **Drought as a predictor.** SPEI/SPI, soil moisture from ERA5-Land or Copernicus, NDVI/NDMI. Test the lag: how many weeks drought leads a detection anomaly, by lag correlation and a regression that controls for season and trend.
 5. **Fires, not only detections.** Link burned area (EFFIS, MODIS MCD64A1), plot detections against burned area, cluster detections into events in space and time.

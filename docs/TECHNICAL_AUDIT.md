@@ -19,7 +19,7 @@ Seven priorities. What the code showed and what changed (branches pipeline-mcp, 
 |---|---|---|---|
 | 1 | Units and metadata | Real bug: relative regions 02, 94, EL62 said "VIIRS-equivalent" in the data files and in `get_region_series`, values are raw MODIS. Other tools gave numbers without a unit; `anom_pct` reads like a percent | `units` by mode in `pipeline/export.py`; a `units` map in every MCP answer with numbers; methodology topic `units` |
 | 2 | Live vs history | Real bug: `ratio_to_median_per_day` was 0 when the NOAA-20 source failed, came from the incomplete current day for `days=1`, and swung on medians under 1 per day | null rate and ratio with `ratio_unavailable`, `low_baseline` under 20 detections, `per_sensor_per_day`, `comparison` |
-| 3 | Custom AOI polygon | Not before the freeze: no calibration for arbitrary areas | Next steps slide |
+| 3 | Custom AOI polygon | Done for Greece in the web (15 Nov evening, Petr's call): draw, point or line with a radius, or drop GeoJSON. No calibration for arbitrary areas exists, so each detection keeps its NUTS2 region's factors and the panel calls values before Feb 2012 an estimate | `web/src/aoi/`; one region's detections reproduce its published months exactly (`web/test/aoi.test.ts`). Argentina: provinces only |
 | 4 | AI Fire Investigator | ChatGPT and Claude chain the tools already; one call was missing | MCP tool `investigate_month` |
 | 5 | Seasons and anomalies | Season windows differ per region (stated since 14 Nov); before 2012 the baseline holds later years (burncal-te4) | `year_total` (one Jan-Dec window), `baseline_kind` per month |
 | 6 | Integration tests | Missing across tools | `web/test/consistency.test.ts` (40 tests), smoke test covers the new tool and units |
@@ -33,7 +33,7 @@ Tests after the round and the code review fixes: 122 pytest, 209 vitest, typeche
 2. Daily series and days with a detection as an MCP tool; finer units than NUTS2 (municipalities or a grid).
 3. Fire events instead of detections (space-time clustering); detections next to burned area (MCD64A1, EFFIS).
 4. Drought and weather as explanatory variables: FWI (CEMS), SPEI, lag analysis with LOYO; association, not cause.
-5. Custom areas: raw VIIRS 2012-2026 for Greek points first, harmonized only after a calibration for arbitrary areas.
+5. Custom areas: in the web for Greece since 15 Nov (estimate with region factors); next a validation for sub-region areas, an Argentine monthly grid and an MCP tool.
 6. Detrended baseline and an anomaly score with an interval instead of a yes/no flag.
 7. Citable data release (Zenodo DOI, v1/v2).
 8. Alerts (webhook, e-mail) only after the splice and operational monitoring.
@@ -104,7 +104,7 @@ Test A reproduced exactly: EL52 2024 flags May-Aug, Aug 2024 = 208, median 19, r
 | Harmonize MODIS and VIIRS hotspots | Done: VIIRS-equivalent, region x month x day/night factors, LOYO + 2020-2025 time split, `relative` mode where it fails |
 | Consistent historical series | Nov 2000 - Dec 2025, GR (13 NUTS2 + country), AR (24 provinces + country) |
 | Burning calendar, seasonality, anomalies | Done: heatmap, season strip, month vs median of preceding 10 years, anomaly flags |
-| Geographic and temporal selection | Done for regions, point lookup, date range. No free AOI |
+| Geographic and temporal selection | Done for regions, point lookup, date range; custom area (polygon, point or line with radius, GeoJSON drop) for Greece |
 | Download | Per-region CSV (range-filtered), JSON, GR hotspot CSV via MCP links (web download: burncal-fd6 open) |
 | Users | Primary persona early warning analyst (personas.md); MCP adds agent access |
 
