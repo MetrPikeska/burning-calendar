@@ -255,7 +255,8 @@ export function computeAoi(dets: Detection[], regionIds: string[], regionFiles: 
   const months: MonthRecord[] = yms.map((ym, i) => {
     const observed = ym >= VIIRS_START;
     const ref = refByYm.get(ym);
-    const src: Src = observed ? "observed" : ym < AQUA_START ? "backcast_terra" : "backcast";
+    // Relative mode has no modelled series, so every value is observed (same as pipeline/harmonize.py, audit BC-003).
+    const src: Src = observed || !harmonized ? "observed" : ym < AQUA_START ? "backcast_terra" : "backcast";
     return {
       ym, modis: modis[i], viirs: ym >= VIIRS_DATA_START ? viirs[i] : null,
       harm: harmonized ? harm[i] : null,

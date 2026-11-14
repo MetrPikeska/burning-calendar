@@ -1,139 +1,139 @@
 region_id,mode,ym,modis,viirs,harm,harm_lo,harm_hi,src,fit_level,anom_pct,anom,outage_days,outage,baseline_median,baseline_p90,baseline_years,days_modis,days_viirs,outage_days_viirs,outage_viirs,provisional
-94,relative,2000-11,1,,,,,backcast_terra,national_dn,65.0,false,0,false,0.5,2.1,2002-2011,1,,0,false,false
-94,relative,2000-12,1,,,,,backcast_terra,national_dn,60.0,false,0,false,1.0,5.6,2002-2011,1,,0,false,false
-94,relative,2001-01,0,,,,,backcast_terra,national_dn,25.0,false,0,false,0.5,2.2,2002-2011,0,,0,false,false
-94,relative,2001-02,0,,,,,backcast_terra,national_dn,20.0,false,0,false,1.5,5.0,2002-2011,0,,0,false,false
-94,relative,2001-03,2,,,,,backcast_terra,national_dn,90.0,true,0,false,0.0,1.5,2002-2011,2,,0,false,false
-94,relative,2001-04,2,,,,,backcast_terra,national_dn,100.0,true,0,false,0.0,1.0,2002-2011,2,,0,false,false
-94,relative,2001-05,0,,,,,backcast_terra,national_dn,40.0,false,0,false,0.0,2.1,2002-2011,0,,0,false,false
-94,relative,2001-06,0,,,,,backcast_terra,national_dn,40.0,false,15,true,0.0,1.0,2002-2011,0,,0,false,false
-94,relative,2001-07,2,,,,,backcast_terra,national_dn,85.0,false,3,true,0.0,2.2,2002-2011,1,,0,false,false
-94,relative,2001-08,0,,,,,backcast_terra,national_dn,30.0,false,0,false,0.0,2.1,2002-2011,0,,0,false,false
-94,relative,2001-09,0,,,,,backcast_terra,national_dn,30.0,false,0,false,0.0,3.1,2002-2011,0,,0,false,false
-94,relative,2001-10,0,,,,,backcast_terra,national_dn,35.0,false,0,false,0.0,10.4,2002-2011,0,,0,false,false
-94,relative,2001-11,0,,,,,backcast_terra,national_dn,25.0,false,0,false,0.5,2.1,2002-2011,0,,0,false,false
-94,relative,2001-12,0,,,,,backcast_terra,national_dn,20.0,false,0,false,1.0,5.6,2002-2011,0,,0,false,false
-94,relative,2002-01,0,,,,,backcast_terra,national_dn,22.2,false,0,false,1.0,2.4,2002-2011 without 2002,0,,0,false,false
-94,relative,2002-02,0,,,,,backcast_terra,national_dn,16.7,false,0,false,2.0,5.0,2002-2011 without 2002,0,,0,false,false
-94,relative,2002-03,0,,,,,backcast_terra,national_dn,27.8,false,9,true,0.0,2.0,2002-2011 without 2002,0,,0,false,false
-94,relative,2002-04,1,,,,,backcast_terra,national_dn,83.3,false,0,false,0.0,1.0,2002-2011 without 2002,1,,0,false,false
-94,relative,2002-05,0,,,,,backcast_terra,national_dn,38.9,false,0,false,0.0,2.2,2002-2011 without 2002,0,,0,false,false
-94,relative,2002-06,0,,,,,backcast_terra,national_dn,38.9,false,0,false,0.0,1.0,2002-2011 without 2002,0,,0,false,false
-94,relative,2002-07,2,,,,,backcast,national_dn,88.9,true,2,false,0.0,1.6,2002-2011 without 2002,1,,0,false,false
-94,relative,2002-08,1,,,,,backcast,national_dn,72.2,false,7,true,0.0,2.2,2002-2011 without 2002,1,,0,false,false
-94,relative,2002-09,0,,,,,backcast,national_dn,27.8,false,0,false,0.0,3.2,2002-2011 without 2002,0,,0,false,false
-94,relative,2002-10,0,,,,,backcast,national_dn,33.3,false,0,false,0.0,12.8,2002-2011 without 2002,0,,0,false,false
-94,relative,2002-11,0,,,,,backcast,national_dn,22.2,false,0,false,1.0,2.2,2002-2011 without 2002,0,,0,false,false
-94,relative,2002-12,0,,,,,backcast,national_dn,16.7,false,0,false,1.0,9.2,2002-2011 without 2002,0,,0,false,false
-94,relative,2003-01,1,,,,,backcast,national_dn,66.7,false,0,false,0.0,2.4,2002-2011 without 2003,1,,0,false,false
-94,relative,2003-02,5,,,,,backcast,national_dn,94.4,true,0,false,1.0,4.2,2002-2011 without 2003,5,,0,false,false
-94,relative,2003-03,1,,,,,backcast,national_dn,77.8,false,0,false,0.0,2.0,2002-2011 without 2003,1,,0,false,false
-94,relative,2003-04,1,,,,,backcast,national_dn,83.3,false,0,false,0.0,1.0,2002-2011 without 2003,1,,0,false,false
-94,relative,2003-05,2,,,,,backcast,national_dn,88.9,true,0,false,0.0,0.6,2002-2011 without 2003,1,,0,false,false
-94,relative,2003-06,0,,,,,backcast,national_dn,38.9,false,0,false,0.0,1.0,2002-2011 without 2003,0,,0,false,false
-94,relative,2003-07,4,,,,,backcast,national_dn,100.0,true,0,false,0.0,1.2,2002-2011 without 2003,1,,0,false,false
-94,relative,2003-08,0,,,,,backcast,national_dn,27.8,false,0,false,0.0,2.2,2002-2011 without 2003,0,,0,false,false
-94,relative,2003-09,2,,,,,backcast,national_dn,77.8,false,0,false,0.0,3.2,2002-2011 without 2003,1,,0,false,false
-94,relative,2003-10,8,,,,,backcast,national_dn,88.9,true,0,false,0.0,7.2,2002-2011 without 2003,3,,0,false,false
-94,relative,2003-11,1,,,,,backcast,national_dn,66.7,false,0,false,0.0,2.2,2002-2011 without 2003,1,,0,false,false
-94,relative,2003-12,0,,,,,backcast,national_dn,16.7,false,8,true,1.0,9.2,2002-2011 without 2003,0,,0,false,false
-94,relative,2004-01,1,,,,,backcast,national_dn,66.7,false,0,false,0.0,2.4,2002-2011 without 2004,1,,0,false,false
-94,relative,2004-02,4,,,,,backcast,national_dn,77.8,false,0,false,1.0,5.0,2002-2011 without 2004,3,,0,false,false
-94,relative,2004-03,0,,,,,backcast,national_dn,27.8,false,0,false,0.0,2.0,2002-2011 without 2004,0,,0,false,false
-94,relative,2004-04,1,,,,,backcast,national_dn,83.3,false,0,false,0.0,1.0,2002-2011 without 2004,1,,0,false,false
-94,relative,2004-05,0,,,,,backcast,national_dn,38.9,false,0,false,0.0,2.2,2002-2011 without 2004,0,,0,false,false
-94,relative,2004-06,1,,,,,backcast,national_dn,94.4,true,0,false,0.0,0.2,2002-2011 without 2004,1,,0,false,false
-94,relative,2004-07,0,,,,,backcast,national_dn,33.3,false,0,false,0.0,2.4,2002-2011 without 2004,0,,0,false,false
-94,relative,2004-08,1,,,,,backcast,national_dn,72.2,false,0,false,0.0,2.2,2002-2011 without 2004,1,,0,false,false
-94,relative,2004-09,1,,,,,backcast,national_dn,66.7,false,0,false,0.0,3.2,2002-2011 without 2004,1,,0,false,false
-94,relative,2004-10,0,,,,,backcast,national_dn,33.3,false,0,false,0.0,12.8,2002-2011 without 2004,0,,0,false,false
-94,relative,2004-11,0,,,,,backcast,national_dn,22.2,false,0,false,1.0,2.2,2002-2011 without 2004,0,,0,false,false
-94,relative,2004-12,0,,,,,backcast,national_dn,16.7,false,0,false,1.0,9.2,2002-2011 without 2004,0,,0,false,false
-94,relative,2005-01,0,,,,,backcast,national_dn,22.2,false,0,false,1.0,2.4,2002-2011 without 2005,0,,0,false,false
-94,relative,2005-02,2,,,,,backcast,national_dn,61.1,false,0,false,1.0,5.0,2002-2011 without 2005,2,,0,false,false
-94,relative,2005-03,1,,,,,backcast,national_dn,77.8,false,0,false,0.0,2.0,2002-2011 without 2005,1,,0,false,false
-94,relative,2005-04,0,,,,,backcast,national_dn,27.8,false,0,false,0.0,1.0,2002-2011 without 2005,0,,0,false,false
-94,relative,2005-05,3,,,,,backcast,national_dn,100.0,true,0,false,0.0,0.4,2002-2011 without 2005,2,,0,false,false
-94,relative,2005-06,1,,,,,backcast,national_dn,94.4,true,0,false,0.0,0.2,2002-2011 without 2005,1,,0,false,false
-94,relative,2005-07,0,,,,,backcast,national_dn,33.3,false,0,false,0.0,2.4,2002-2011 without 2005,0,,0,false,false
-94,relative,2005-08,0,,,,,backcast,national_dn,27.8,false,0,false,0.0,2.2,2002-2011 without 2005,0,,0,false,false
-94,relative,2005-09,0,,,,,backcast,national_dn,27.8,false,0,false,0.0,3.2,2002-2011 without 2005,0,,0,false,false
-94,relative,2005-10,0,,,,,backcast,national_dn,33.3,false,0,false,0.0,12.8,2002-2011 without 2005,0,,0,false,false
-94,relative,2005-11,0,,,,,backcast,national_dn,22.2,false,0,false,1.0,2.2,2002-2011 without 2005,0,,0,false,false
-94,relative,2005-12,0,,,,,backcast,national_dn,16.7,false,0,false,1.0,9.2,2002-2011 without 2005,0,,0,false,false
-94,relative,2006-01,0,,,,,backcast,national_dn,22.2,false,0,false,1.0,2.4,2002-2011 without 2006,0,,0,false,false
-94,relative,2006-02,1,,,,,backcast,national_dn,44.4,false,0,false,2.0,5.0,2002-2011 without 2006,1,,0,false,false
-94,relative,2006-03,0,,,,,backcast,national_dn,27.8,false,0,false,0.0,2.0,2002-2011 without 2006,0,,0,false,false
-94,relative,2006-04,0,,,,,backcast,national_dn,27.8,false,0,false,0.0,1.0,2002-2011 without 2006,0,,0,false,false
-94,relative,2006-05,0,,,,,backcast,national_dn,38.9,false,0,false,0.0,2.2,2002-2011 without 2006,0,,0,false,false
-94,relative,2006-06,0,,,,,backcast,national_dn,38.9,false,0,false,0.0,1.0,2002-2011 without 2006,0,,0,false,false
-94,relative,2006-07,0,,,,,backcast,national_dn,33.3,false,0,false,0.0,2.4,2002-2011 without 2006,0,,0,false,false
-94,relative,2006-08,0,,,,,backcast,national_dn,27.8,false,0,false,0.0,2.2,2002-2011 without 2006,0,,0,false,false
-94,relative,2006-09,4,,,,,backcast,national_dn,100.0,true,0,false,0.0,2.2,2002-2011 without 2006,1,,0,false,false
-94,relative,2006-10,0,,,,,backcast,national_dn,33.3,false,0,false,0.0,12.8,2002-2011 without 2006,0,,0,false,false
-94,relative,2006-11,0,,,,,backcast,national_dn,22.2,false,0,false,1.0,2.2,2002-2011 without 2006,0,,0,false,false
-94,relative,2006-12,1,,,,,backcast,national_dn,61.1,false,0,false,1.0,9.2,2002-2011 without 2006,1,,0,false,false
-94,relative,2007-01,1,,,,,backcast,national_dn,66.7,false,0,false,0.0,2.4,2002-2011 without 2007,1,,0,false,false
-94,relative,2007-02,2,,,,,backcast,national_dn,61.1,false,0,false,1.0,5.0,2002-2011 without 2007,1,,0,false,false
-94,relative,2007-03,6,,,,,backcast,national_dn,100.0,true,0,false,0.0,1.0,2002-2011 without 2007,3,,0,false,false
-94,relative,2007-04,0,,,,,backcast,national_dn,27.8,false,0,false,0.0,1.0,2002-2011 without 2007,0,,0,false,false
-94,relative,2007-05,0,,,,,backcast,national_dn,38.9,false,0,false,0.0,2.2,2002-2011 without 2007,0,,0,false,false
-94,relative,2007-06,0,,,,,backcast,national_dn,38.9,false,0,false,0.0,1.0,2002-2011 without 2007,0,,0,false,false
-94,relative,2007-07,0,,,,,backcast,national_dn,33.3,false,0,false,0.0,2.4,2002-2011 without 2007,0,,0,false,false
-94,relative,2007-08,3,,,,,backcast,national_dn,100.0,true,0,false,0.0,1.2,2002-2011 without 2007,2,,0,false,false
-94,relative,2007-09,0,,,,,backcast,national_dn,27.8,false,0,false,0.0,3.2,2002-2011 without 2007,0,,0,false,false
-94,relative,2007-10,0,,,,,backcast,national_dn,33.3,false,0,false,0.0,12.8,2002-2011 without 2007,0,,0,false,false
-94,relative,2007-11,0,,,,,backcast,national_dn,22.2,false,0,false,1.0,2.2,2002-2011 without 2007,0,,0,false,false
-94,relative,2007-12,1,,,,,backcast,national_dn,61.1,false,0,false,1.0,9.2,2002-2011 without 2007,1,,0,false,false
-94,relative,2008-01,4,,,,,backcast,national_dn,100.0,true,0,false,0.0,1.2,2002-2011 without 2008,1,,0,false,false
-94,relative,2008-02,5,,,,,backcast,national_dn,94.4,true,0,false,1.0,4.2,2002-2011 without 2008,3,,0,false,false
-94,relative,2008-03,0,,,,,backcast,national_dn,27.8,false,0,false,0.0,2.0,2002-2011 without 2008,0,,0,false,false
-94,relative,2008-04,0,,,,,backcast,national_dn,27.8,false,0,false,0.0,1.0,2002-2011 without 2008,0,,0,false,false
-94,relative,2008-05,0,,,,,backcast,national_dn,38.9,false,0,false,0.0,2.2,2002-2011 without 2008,0,,0,false,false
-94,relative,2008-06,0,,,,,backcast,national_dn,38.9,false,0,false,0.0,1.0,2002-2011 without 2008,0,,0,false,false
-94,relative,2008-07,0,,,,,backcast,national_dn,33.3,false,0,false,0.0,2.4,2002-2011 without 2008,0,,0,false,false
-94,relative,2008-08,0,,,,,backcast,national_dn,27.8,false,0,false,0.0,2.2,2002-2011 without 2008,0,,0,false,false
-94,relative,2008-09,3,,,,,backcast,national_dn,88.9,true,0,false,0.0,2.4,2002-2011 without 2008,1,,0,false,false
-94,relative,2008-10,0,,,,,backcast,national_dn,33.3,false,0,false,0.0,12.8,2002-2011 without 2008,0,,0,false,false
-94,relative,2008-11,3,,,,,backcast,national_dn,100.0,true,0,false,0.0,1.2,2002-2011 without 2008,2,,0,false,false
-94,relative,2008-12,38,,,,,backcast,national_dn,100.0,true,0,false,1.0,1.2,2002-2011 without 2008,7,,0,false,false
-94,relative,2009-01,0,,,,,backcast,national_dn,22.2,false,0,false,1.0,2.4,2002-2011 without 2009,0,,0,false,false
-94,relative,2009-02,0,,,,,backcast,national_dn,16.7,false,0,false,2.0,5.0,2002-2011 without 2009,0,,0,false,false
-94,relative,2009-03,0,,,,,backcast,national_dn,27.8,false,0,false,0.0,2.0,2002-2011 without 2009,0,,0,false,false
-94,relative,2009-04,0,,,,,backcast,national_dn,27.8,false,0,false,0.0,1.0,2002-2011 without 2009,0,,0,false,false
-94,relative,2009-05,0,,,,,backcast,national_dn,38.9,false,0,false,0.0,2.2,2002-2011 without 2009,0,,0,false,false
-94,relative,2009-06,0,,,,,backcast,national_dn,38.9,false,0,false,0.0,1.0,2002-2011 without 2009,0,,0,false,false
-94,relative,2009-07,0,,,,,backcast,national_dn,33.3,false,0,false,0.0,2.4,2002-2011 without 2009,0,,0,false,false
-94,relative,2009-08,0,,,,,backcast,national_dn,27.8,false,0,false,0.0,2.2,2002-2011 without 2009,0,,0,false,false
-94,relative,2009-09,0,,,,,backcast,national_dn,27.8,false,0,false,0.0,3.2,2002-2011 without 2009,0,,0,false,false
-94,relative,2009-10,0,,,,,backcast,national_dn,33.3,false,0,false,0.0,12.8,2002-2011 without 2009,0,,0,false,false
-94,relative,2009-11,2,,,,,backcast,national_dn,88.9,true,0,false,0.0,1.4,2002-2011 without 2009,2,,0,false,false
-94,relative,2009-12,2,,,,,backcast,national_dn,88.9,false,0,false,1.0,8.4,2002-2011 without 2009,1,,0,false,false
-94,relative,2010-01,2,,,,,backcast,national_dn,88.9,true,0,false,0.0,1.6,2002-2011 without 2010,1,,0,false,false
-94,relative,2010-02,0,,,,,backcast,national_dn,16.7,false,0,false,2.0,5.0,2002-2011 without 2010,0,,0,false,false
-94,relative,2010-03,0,,,,,backcast,national_dn,27.8,false,0,false,0.0,2.0,2002-2011 without 2010,0,,0,false,false
-94,relative,2010-04,1,,,,,backcast,national_dn,83.3,false,0,false,0.0,1.0,2002-2011 without 2010,1,,0,false,false
-94,relative,2010-05,0,,,,,backcast,national_dn,38.9,false,0,false,0.0,2.2,2002-2011 without 2010,0,,0,false,false
-94,relative,2010-06,0,,,,,backcast,national_dn,38.9,false,0,false,0.0,1.0,2002-2011 without 2010,0,,0,false,false
-94,relative,2010-07,1,,,,,backcast,national_dn,77.8,false,0,false,0.0,2.4,2002-2011 without 2010,1,,0,false,false
-94,relative,2010-08,0,,,,,backcast,national_dn,27.8,false,0,false,0.0,2.2,2002-2011 without 2010,0,,0,false,false
-94,relative,2010-09,0,,,,,backcast,national_dn,27.8,false,0,false,0.0,3.2,2002-2011 without 2010,0,,0,false,false
-94,relative,2010-10,1,,,,,backcast,national_dn,77.8,false,0,false,0.0,12.8,2002-2011 without 2010,1,,0,false,false
-94,relative,2010-11,1,,,,,backcast,national_dn,66.7,false,0,false,0.0,2.2,2002-2011 without 2010,1,,0,false,false
-94,relative,2010-12,1,,,,,backcast,national_dn,61.1,false,0,false,1.0,9.2,2002-2011 without 2010,1,,0,false,false
-94,relative,2011-01,0,,,,,backcast,national_dn,22.2,false,0,false,1.0,2.4,2002-2011 without 2011,0,,0,false,false
-94,relative,2011-02,0,,,,,backcast,national_dn,16.7,false,0,false,2.0,5.0,2002-2011 without 2011,0,,0,false,false
-94,relative,2011-03,1,,,,,backcast,national_dn,77.8,false,0,false,0.0,2.0,2002-2011 without 2011,1,,0,false,false
-94,relative,2011-04,0,,,,,backcast,national_dn,27.8,false,0,false,0.0,1.0,2002-2011 without 2011,0,,0,false,false
-94,relative,2011-05,0,,,,,backcast,national_dn,38.9,false,0,false,0.0,2.2,2002-2011 without 2011,0,,0,false,false
-94,relative,2011-06,0,,,,,backcast,national_dn,38.9,false,0,false,0.0,1.0,2002-2011 without 2011,0,,0,false,false
-94,relative,2011-07,0,,,,,backcast,national_dn,33.3,false,0,false,0.0,2.4,2002-2011 without 2011,0,,0,false,false
-94,relative,2011-08,2,,,,,backcast,national_dn,88.9,true,0,false,0.0,1.4,2002-2011 without 2011,1,,0,false,false
-94,relative,2011-09,0,,,,,backcast,national_dn,27.8,false,0,false,0.0,3.2,2002-2011 without 2011,0,,0,false,false
-94,relative,2011-10,32,,,,,backcast,national_dn,100.0,true,0,false,0.0,2.4,2002-2011 without 2011,8,,0,false,false
-94,relative,2011-11,1,,,,,backcast,national_dn,66.7,false,0,false,0.0,2.2,2002-2011 without 2011,1,,0,false,false
-94,relative,2011-12,1,,,,,backcast,national_dn,61.1,false,0,false,1.0,9.2,2002-2011 without 2011,1,,0,false,false
-94,relative,2012-01,23,17,,,,backcast,national_dn,100.0,true,0,false,0.5,2.2,2002-2011,4,4,19,true,false
+94,relative,2000-11,1,,,,,observed,,65.0,false,0,false,0.5,2.1,2002-2011,1,,0,false,false
+94,relative,2000-12,1,,,,,observed,,60.0,false,0,false,1.0,5.6,2002-2011,1,,0,false,false
+94,relative,2001-01,0,,,,,observed,,25.0,false,0,false,0.5,2.2,2002-2011,0,,0,false,false
+94,relative,2001-02,0,,,,,observed,,20.0,false,0,false,1.5,5.0,2002-2011,0,,0,false,false
+94,relative,2001-03,2,,,,,observed,,90.0,true,0,false,0.0,1.5,2002-2011,2,,0,false,false
+94,relative,2001-04,2,,,,,observed,,100.0,true,0,false,0.0,1.0,2002-2011,2,,0,false,false
+94,relative,2001-05,0,,,,,observed,,40.0,false,0,false,0.0,2.1,2002-2011,0,,0,false,false
+94,relative,2001-06,0,,,,,observed,,40.0,false,15,true,0.0,1.0,2002-2011,0,,0,false,false
+94,relative,2001-07,2,,,,,observed,,85.0,false,3,true,0.0,2.2,2002-2011,1,,0,false,false
+94,relative,2001-08,0,,,,,observed,,30.0,false,0,false,0.0,2.1,2002-2011,0,,0,false,false
+94,relative,2001-09,0,,,,,observed,,30.0,false,0,false,0.0,3.1,2002-2011,0,,0,false,false
+94,relative,2001-10,0,,,,,observed,,35.0,false,0,false,0.0,10.4,2002-2011,0,,0,false,false
+94,relative,2001-11,0,,,,,observed,,25.0,false,0,false,0.5,2.1,2002-2011,0,,0,false,false
+94,relative,2001-12,0,,,,,observed,,20.0,false,0,false,1.0,5.6,2002-2011,0,,0,false,false
+94,relative,2002-01,0,,,,,observed,,22.2,false,0,false,1.0,2.4,2002-2011 without 2002,0,,0,false,false
+94,relative,2002-02,0,,,,,observed,,16.7,false,0,false,2.0,5.0,2002-2011 without 2002,0,,0,false,false
+94,relative,2002-03,0,,,,,observed,,27.8,false,9,true,0.0,2.0,2002-2011 without 2002,0,,0,false,false
+94,relative,2002-04,1,,,,,observed,,83.3,false,0,false,0.0,1.0,2002-2011 without 2002,1,,0,false,false
+94,relative,2002-05,0,,,,,observed,,38.9,false,0,false,0.0,2.2,2002-2011 without 2002,0,,0,false,false
+94,relative,2002-06,0,,,,,observed,,38.9,false,0,false,0.0,1.0,2002-2011 without 2002,0,,0,false,false
+94,relative,2002-07,2,,,,,observed,,88.9,true,2,false,0.0,1.6,2002-2011 without 2002,1,,0,false,false
+94,relative,2002-08,1,,,,,observed,,72.2,false,7,true,0.0,2.2,2002-2011 without 2002,1,,0,false,false
+94,relative,2002-09,0,,,,,observed,,27.8,false,0,false,0.0,3.2,2002-2011 without 2002,0,,0,false,false
+94,relative,2002-10,0,,,,,observed,,33.3,false,0,false,0.0,12.8,2002-2011 without 2002,0,,0,false,false
+94,relative,2002-11,0,,,,,observed,,22.2,false,0,false,1.0,2.2,2002-2011 without 2002,0,,0,false,false
+94,relative,2002-12,0,,,,,observed,,16.7,false,0,false,1.0,9.2,2002-2011 without 2002,0,,0,false,false
+94,relative,2003-01,1,,,,,observed,,66.7,false,0,false,0.0,2.4,2002-2011 without 2003,1,,0,false,false
+94,relative,2003-02,5,,,,,observed,,94.4,true,0,false,1.0,4.2,2002-2011 without 2003,5,,0,false,false
+94,relative,2003-03,1,,,,,observed,,77.8,false,0,false,0.0,2.0,2002-2011 without 2003,1,,0,false,false
+94,relative,2003-04,1,,,,,observed,,83.3,false,0,false,0.0,1.0,2002-2011 without 2003,1,,0,false,false
+94,relative,2003-05,2,,,,,observed,,88.9,true,0,false,0.0,0.6,2002-2011 without 2003,1,,0,false,false
+94,relative,2003-06,0,,,,,observed,,38.9,false,0,false,0.0,1.0,2002-2011 without 2003,0,,0,false,false
+94,relative,2003-07,4,,,,,observed,,100.0,true,0,false,0.0,1.2,2002-2011 without 2003,1,,0,false,false
+94,relative,2003-08,0,,,,,observed,,27.8,false,0,false,0.0,2.2,2002-2011 without 2003,0,,0,false,false
+94,relative,2003-09,2,,,,,observed,,77.8,false,0,false,0.0,3.2,2002-2011 without 2003,1,,0,false,false
+94,relative,2003-10,8,,,,,observed,,88.9,true,0,false,0.0,7.2,2002-2011 without 2003,3,,0,false,false
+94,relative,2003-11,1,,,,,observed,,66.7,false,0,false,0.0,2.2,2002-2011 without 2003,1,,0,false,false
+94,relative,2003-12,0,,,,,observed,,16.7,false,8,true,1.0,9.2,2002-2011 without 2003,0,,0,false,false
+94,relative,2004-01,1,,,,,observed,,66.7,false,0,false,0.0,2.4,2002-2011 without 2004,1,,0,false,false
+94,relative,2004-02,4,,,,,observed,,77.8,false,0,false,1.0,5.0,2002-2011 without 2004,3,,0,false,false
+94,relative,2004-03,0,,,,,observed,,27.8,false,0,false,0.0,2.0,2002-2011 without 2004,0,,0,false,false
+94,relative,2004-04,1,,,,,observed,,83.3,false,0,false,0.0,1.0,2002-2011 without 2004,1,,0,false,false
+94,relative,2004-05,0,,,,,observed,,38.9,false,0,false,0.0,2.2,2002-2011 without 2004,0,,0,false,false
+94,relative,2004-06,1,,,,,observed,,94.4,true,0,false,0.0,0.2,2002-2011 without 2004,1,,0,false,false
+94,relative,2004-07,0,,,,,observed,,33.3,false,0,false,0.0,2.4,2002-2011 without 2004,0,,0,false,false
+94,relative,2004-08,1,,,,,observed,,72.2,false,0,false,0.0,2.2,2002-2011 without 2004,1,,0,false,false
+94,relative,2004-09,1,,,,,observed,,66.7,false,0,false,0.0,3.2,2002-2011 without 2004,1,,0,false,false
+94,relative,2004-10,0,,,,,observed,,33.3,false,0,false,0.0,12.8,2002-2011 without 2004,0,,0,false,false
+94,relative,2004-11,0,,,,,observed,,22.2,false,0,false,1.0,2.2,2002-2011 without 2004,0,,0,false,false
+94,relative,2004-12,0,,,,,observed,,16.7,false,0,false,1.0,9.2,2002-2011 without 2004,0,,0,false,false
+94,relative,2005-01,0,,,,,observed,,22.2,false,0,false,1.0,2.4,2002-2011 without 2005,0,,0,false,false
+94,relative,2005-02,2,,,,,observed,,61.1,false,0,false,1.0,5.0,2002-2011 without 2005,2,,0,false,false
+94,relative,2005-03,1,,,,,observed,,77.8,false,0,false,0.0,2.0,2002-2011 without 2005,1,,0,false,false
+94,relative,2005-04,0,,,,,observed,,27.8,false,0,false,0.0,1.0,2002-2011 without 2005,0,,0,false,false
+94,relative,2005-05,3,,,,,observed,,100.0,true,0,false,0.0,0.4,2002-2011 without 2005,2,,0,false,false
+94,relative,2005-06,1,,,,,observed,,94.4,true,0,false,0.0,0.2,2002-2011 without 2005,1,,0,false,false
+94,relative,2005-07,0,,,,,observed,,33.3,false,0,false,0.0,2.4,2002-2011 without 2005,0,,0,false,false
+94,relative,2005-08,0,,,,,observed,,27.8,false,0,false,0.0,2.2,2002-2011 without 2005,0,,0,false,false
+94,relative,2005-09,0,,,,,observed,,27.8,false,0,false,0.0,3.2,2002-2011 without 2005,0,,0,false,false
+94,relative,2005-10,0,,,,,observed,,33.3,false,0,false,0.0,12.8,2002-2011 without 2005,0,,0,false,false
+94,relative,2005-11,0,,,,,observed,,22.2,false,0,false,1.0,2.2,2002-2011 without 2005,0,,0,false,false
+94,relative,2005-12,0,,,,,observed,,16.7,false,0,false,1.0,9.2,2002-2011 without 2005,0,,0,false,false
+94,relative,2006-01,0,,,,,observed,,22.2,false,0,false,1.0,2.4,2002-2011 without 2006,0,,0,false,false
+94,relative,2006-02,1,,,,,observed,,44.4,false,0,false,2.0,5.0,2002-2011 without 2006,1,,0,false,false
+94,relative,2006-03,0,,,,,observed,,27.8,false,0,false,0.0,2.0,2002-2011 without 2006,0,,0,false,false
+94,relative,2006-04,0,,,,,observed,,27.8,false,0,false,0.0,1.0,2002-2011 without 2006,0,,0,false,false
+94,relative,2006-05,0,,,,,observed,,38.9,false,0,false,0.0,2.2,2002-2011 without 2006,0,,0,false,false
+94,relative,2006-06,0,,,,,observed,,38.9,false,0,false,0.0,1.0,2002-2011 without 2006,0,,0,false,false
+94,relative,2006-07,0,,,,,observed,,33.3,false,0,false,0.0,2.4,2002-2011 without 2006,0,,0,false,false
+94,relative,2006-08,0,,,,,observed,,27.8,false,0,false,0.0,2.2,2002-2011 without 2006,0,,0,false,false
+94,relative,2006-09,4,,,,,observed,,100.0,true,0,false,0.0,2.2,2002-2011 without 2006,1,,0,false,false
+94,relative,2006-10,0,,,,,observed,,33.3,false,0,false,0.0,12.8,2002-2011 without 2006,0,,0,false,false
+94,relative,2006-11,0,,,,,observed,,22.2,false,0,false,1.0,2.2,2002-2011 without 2006,0,,0,false,false
+94,relative,2006-12,1,,,,,observed,,61.1,false,0,false,1.0,9.2,2002-2011 without 2006,1,,0,false,false
+94,relative,2007-01,1,,,,,observed,,66.7,false,0,false,0.0,2.4,2002-2011 without 2007,1,,0,false,false
+94,relative,2007-02,2,,,,,observed,,61.1,false,0,false,1.0,5.0,2002-2011 without 2007,1,,0,false,false
+94,relative,2007-03,6,,,,,observed,,100.0,true,0,false,0.0,1.0,2002-2011 without 2007,3,,0,false,false
+94,relative,2007-04,0,,,,,observed,,27.8,false,0,false,0.0,1.0,2002-2011 without 2007,0,,0,false,false
+94,relative,2007-05,0,,,,,observed,,38.9,false,0,false,0.0,2.2,2002-2011 without 2007,0,,0,false,false
+94,relative,2007-06,0,,,,,observed,,38.9,false,0,false,0.0,1.0,2002-2011 without 2007,0,,0,false,false
+94,relative,2007-07,0,,,,,observed,,33.3,false,0,false,0.0,2.4,2002-2011 without 2007,0,,0,false,false
+94,relative,2007-08,3,,,,,observed,,100.0,true,0,false,0.0,1.2,2002-2011 without 2007,2,,0,false,false
+94,relative,2007-09,0,,,,,observed,,27.8,false,0,false,0.0,3.2,2002-2011 without 2007,0,,0,false,false
+94,relative,2007-10,0,,,,,observed,,33.3,false,0,false,0.0,12.8,2002-2011 without 2007,0,,0,false,false
+94,relative,2007-11,0,,,,,observed,,22.2,false,0,false,1.0,2.2,2002-2011 without 2007,0,,0,false,false
+94,relative,2007-12,1,,,,,observed,,61.1,false,0,false,1.0,9.2,2002-2011 without 2007,1,,0,false,false
+94,relative,2008-01,4,,,,,observed,,100.0,true,0,false,0.0,1.2,2002-2011 without 2008,1,,0,false,false
+94,relative,2008-02,5,,,,,observed,,94.4,true,0,false,1.0,4.2,2002-2011 without 2008,3,,0,false,false
+94,relative,2008-03,0,,,,,observed,,27.8,false,0,false,0.0,2.0,2002-2011 without 2008,0,,0,false,false
+94,relative,2008-04,0,,,,,observed,,27.8,false,0,false,0.0,1.0,2002-2011 without 2008,0,,0,false,false
+94,relative,2008-05,0,,,,,observed,,38.9,false,0,false,0.0,2.2,2002-2011 without 2008,0,,0,false,false
+94,relative,2008-06,0,,,,,observed,,38.9,false,0,false,0.0,1.0,2002-2011 without 2008,0,,0,false,false
+94,relative,2008-07,0,,,,,observed,,33.3,false,0,false,0.0,2.4,2002-2011 without 2008,0,,0,false,false
+94,relative,2008-08,0,,,,,observed,,27.8,false,0,false,0.0,2.2,2002-2011 without 2008,0,,0,false,false
+94,relative,2008-09,3,,,,,observed,,88.9,true,0,false,0.0,2.4,2002-2011 without 2008,1,,0,false,false
+94,relative,2008-10,0,,,,,observed,,33.3,false,0,false,0.0,12.8,2002-2011 without 2008,0,,0,false,false
+94,relative,2008-11,3,,,,,observed,,100.0,true,0,false,0.0,1.2,2002-2011 without 2008,2,,0,false,false
+94,relative,2008-12,38,,,,,observed,,100.0,true,0,false,1.0,1.2,2002-2011 without 2008,7,,0,false,false
+94,relative,2009-01,0,,,,,observed,,22.2,false,0,false,1.0,2.4,2002-2011 without 2009,0,,0,false,false
+94,relative,2009-02,0,,,,,observed,,16.7,false,0,false,2.0,5.0,2002-2011 without 2009,0,,0,false,false
+94,relative,2009-03,0,,,,,observed,,27.8,false,0,false,0.0,2.0,2002-2011 without 2009,0,,0,false,false
+94,relative,2009-04,0,,,,,observed,,27.8,false,0,false,0.0,1.0,2002-2011 without 2009,0,,0,false,false
+94,relative,2009-05,0,,,,,observed,,38.9,false,0,false,0.0,2.2,2002-2011 without 2009,0,,0,false,false
+94,relative,2009-06,0,,,,,observed,,38.9,false,0,false,0.0,1.0,2002-2011 without 2009,0,,0,false,false
+94,relative,2009-07,0,,,,,observed,,33.3,false,0,false,0.0,2.4,2002-2011 without 2009,0,,0,false,false
+94,relative,2009-08,0,,,,,observed,,27.8,false,0,false,0.0,2.2,2002-2011 without 2009,0,,0,false,false
+94,relative,2009-09,0,,,,,observed,,27.8,false,0,false,0.0,3.2,2002-2011 without 2009,0,,0,false,false
+94,relative,2009-10,0,,,,,observed,,33.3,false,0,false,0.0,12.8,2002-2011 without 2009,0,,0,false,false
+94,relative,2009-11,2,,,,,observed,,88.9,true,0,false,0.0,1.4,2002-2011 without 2009,2,,0,false,false
+94,relative,2009-12,2,,,,,observed,,88.9,false,0,false,1.0,8.4,2002-2011 without 2009,1,,0,false,false
+94,relative,2010-01,2,,,,,observed,,88.9,true,0,false,0.0,1.6,2002-2011 without 2010,1,,0,false,false
+94,relative,2010-02,0,,,,,observed,,16.7,false,0,false,2.0,5.0,2002-2011 without 2010,0,,0,false,false
+94,relative,2010-03,0,,,,,observed,,27.8,false,0,false,0.0,2.0,2002-2011 without 2010,0,,0,false,false
+94,relative,2010-04,1,,,,,observed,,83.3,false,0,false,0.0,1.0,2002-2011 without 2010,1,,0,false,false
+94,relative,2010-05,0,,,,,observed,,38.9,false,0,false,0.0,2.2,2002-2011 without 2010,0,,0,false,false
+94,relative,2010-06,0,,,,,observed,,38.9,false,0,false,0.0,1.0,2002-2011 without 2010,0,,0,false,false
+94,relative,2010-07,1,,,,,observed,,77.8,false,0,false,0.0,2.4,2002-2011 without 2010,1,,0,false,false
+94,relative,2010-08,0,,,,,observed,,27.8,false,0,false,0.0,2.2,2002-2011 without 2010,0,,0,false,false
+94,relative,2010-09,0,,,,,observed,,27.8,false,0,false,0.0,3.2,2002-2011 without 2010,0,,0,false,false
+94,relative,2010-10,1,,,,,observed,,77.8,false,0,false,0.0,12.8,2002-2011 without 2010,1,,0,false,false
+94,relative,2010-11,1,,,,,observed,,66.7,false,0,false,0.0,2.2,2002-2011 without 2010,1,,0,false,false
+94,relative,2010-12,1,,,,,observed,,61.1,false,0,false,1.0,9.2,2002-2011 without 2010,1,,0,false,false
+94,relative,2011-01,0,,,,,observed,,22.2,false,0,false,1.0,2.4,2002-2011 without 2011,0,,0,false,false
+94,relative,2011-02,0,,,,,observed,,16.7,false,0,false,2.0,5.0,2002-2011 without 2011,0,,0,false,false
+94,relative,2011-03,1,,,,,observed,,77.8,false,0,false,0.0,2.0,2002-2011 without 2011,1,,0,false,false
+94,relative,2011-04,0,,,,,observed,,27.8,false,0,false,0.0,1.0,2002-2011 without 2011,0,,0,false,false
+94,relative,2011-05,0,,,,,observed,,38.9,false,0,false,0.0,2.2,2002-2011 without 2011,0,,0,false,false
+94,relative,2011-06,0,,,,,observed,,38.9,false,0,false,0.0,1.0,2002-2011 without 2011,0,,0,false,false
+94,relative,2011-07,0,,,,,observed,,33.3,false,0,false,0.0,2.4,2002-2011 without 2011,0,,0,false,false
+94,relative,2011-08,2,,,,,observed,,88.9,true,0,false,0.0,1.4,2002-2011 without 2011,1,,0,false,false
+94,relative,2011-09,0,,,,,observed,,27.8,false,0,false,0.0,3.2,2002-2011 without 2011,0,,0,false,false
+94,relative,2011-10,32,,,,,observed,,100.0,true,0,false,0.0,2.4,2002-2011 without 2011,8,,0,false,false
+94,relative,2011-11,1,,,,,observed,,66.7,false,0,false,0.0,2.2,2002-2011 without 2011,1,,0,false,false
+94,relative,2011-12,1,,,,,observed,,61.1,false,0,false,1.0,9.2,2002-2011 without 2011,1,,0,false,false
+94,relative,2012-01,23,17,,,,observed,,100.0,true,0,false,0.5,2.2,2002-2011,4,4,19,true,false
 94,relative,2012-02,27,123,,,,observed,,100.0,true,0,false,1.5,5.0,2002-2011,5,12,0,false,false
 94,relative,2012-03,4,5,,,,observed,,90.0,true,0,false,0.0,1.5,2002-2011,3,4,0,false,false
 94,relative,2012-04,0,8,,,,observed,,30.0,false,0,false,0.0,1.0,2002-2011,0,4,0,false,false

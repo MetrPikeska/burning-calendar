@@ -1,6 +1,6 @@
 // Year x month burning calendar with Observable Plot.
 import * as Plot from "@observablehq/plot";
-import { outageNote, type MonthRecord, type RegionFile, type Series } from "../lib/contract.ts";
+import { outageNote, shownSeries, type MonthRecord, type RegionFile, type Series } from "../lib/contract.ts";
 import { COLOR_SCHEME, NO_SCALE_GREY, countTick, rampLegend } from "./ramp.ts";
 
 export { COLOR_SCHEME };
@@ -51,15 +51,17 @@ function fmt(n: number | null): string {
   return n == null ? "n/a" : n >= 100 ? Math.round(n).toLocaleString("en") : n.toFixed(1);
 }
 
-function title(c: Cell, series: Series): string {
+function title(c: Cell, series: Series, own: Series): string {
   const r = c.rec;
   const lines = [`${r.ym}  ${SERIES_LABEL[series]}: ${fmt(c.value)}`];
   if (series === "harm" && r.src !== "observed") {
     lines.push(`back-cast from MODIS, range ${fmt(r.harm_lo)}-${fmt(r.harm_hi)}`);
   }
   lines.push(`MODIS ${fmt(r.modis)}  VIIRS ${fmt(r.viirs)}`);
-  if (r.anom_pct != null) lines.push(`percentile vs preceding 10 years: ${Math.round(r.anom_pct)}`);
-  if (r.anom) lines.push("ANOMALY: above the baseline 90th percentile");
+  // Percentile and anomaly come from the region's own series, which may not be the one shown (audit BC-001).
+  const on = series === own ? "" : ` (${SERIES_LABEL[own]})`;
+  if (r.anom_pct != null) lines.push(`percentile vs preceding 10 years${on}: ${Math.round(r.anom_pct)}`);
+  if (r.anom) lines.push(`ANOMALY${on}: above the baseline 90th percentile`);
   const gap = cellOutage(c, series);
   if (gap) lines.push(gap);
   if (r.provisional) lines.push("provisional: near real-time data, may change");
@@ -104,7 +106,9 @@ export function renderHeatmap(
   const rowH = narrow ? 16 : Math.max(12, Math.min(14, cellW * 0.36));
   const selectedYear = selectedYm ? Number(selectedYm.slice(0, 4)) : null;
   const dim = (c: Cell) => (inRange(c.rec.ym, range) ? 1 : 0.16);
-  const anomalies = cells.filter((c) => c.rec.anom && inRange(c.rec.ym, range));
+  // Outlines only on the region's own series: on raw MODIS they would mark e.g. a 0 month (audit BC-001).
+  const own = shownSeries(region.mode, "harm");
+  const anomalies = series === own ? cells.filter((c) => c.rec.anom && inRange(c.rec.ym, range)) : [];
   const colorLabel = `${SERIES_LABEL[series]}, detections / month`;
 
   const plot = Plot.plot({
@@ -133,7 +137,7 @@ export function renderHeatmap(
       label: colorLabel,
     },
     marks: [
-      Plot.cell(cells, { x: "month", y: "year", fill: "value", fillOpacity: dim, title: (c: Cell) => title(c, series), tip: true }),
+      Plot.cell(cells, { x: "month", y: "year", fill: "value", fillOpacity: dim, title: (c: Cell) => title(c, series, own), tip: true }),
       // Anomalies: thin outline, inset so neighbouring outlines do not merge, plus a white corner wedge with a
       // dark edge that stays visible in grayscale and red-green colour vision deficiency.
       Plot.cell(anomalies, {

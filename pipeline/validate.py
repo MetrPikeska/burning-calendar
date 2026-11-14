@@ -89,6 +89,7 @@ def _season_compare(pred: pd.Series, obs: pd.Series, modis: pd.Series, start: in
         d_end = [abs(_mdiff(X[y]["end"], O[y]["end"])) for y in years if X[y]["end"] and O[y]["end"]]
         d_len = [abs(X[y]["season_length"] - O[y]["season_length"]) for y in years
                  if X[y]["season_length"] and O[y]["season_length"]]
+        # *_mad_months is the MEAN absolute difference in months (audit BC-004); the field names stay for the contract.
         out[name] = {
             "peak_hit_rate": round(float(np.mean(hits)), 3) if hits else None,
             "peak_hits": int(sum(hits)),

@@ -2,7 +2,7 @@
 title: Open questions
 updated: 2026-11-14
 verified_by: n/a, a list of unknowns
-sources: [sources/2026-11-13-research-harmonization-validation.md, sources/2026-11-13-research-conae-argentina.md, sources/2026-11-13-research-anomalies-rules.md]
+sources: [sources/2026-11-14-audit-external.md, sources/2026-11-13-research-harmonization-validation.md, sources/2026-11-13-research-conae-argentina.md, sources/2026-11-13-research-anomalies-rules.md]
 ---
 
 - **Challenge author's real name.** The transcript says "Marina Companuchi". Searches found nothing. Check the challenge page in a browser.
@@ -20,4 +20,8 @@ sources: [sources/2026-11-13-research-harmonization-validation.md, sources/2026-
 - **NOAA-21 start date.** The FIRMS FAQ gives 17 Jan 2024; the Download tool gives 1 Mar 2023.
 - **NRT vs SP for 2026.** FIRMS keeps S-NPP and MODIS NRT only from the day after SP ends, so our Aug-Oct 2026 NRT counts cannot be compared with SP yet. NOAA-21 has both (NRT from Jan 2024, SP to Jul 2026) and could give a proxy NRT/SP ratio. Re-download when SP for Aug-Oct 2026 appears.
 - **Argentina 2026 low season.** July, August and October 2026 are at the 0th percentile of 2016-2025 (findings-argentina.md). Check against SNMF reports before the pitch uses it.
-
+- **Back-cast band coverage.** The external audit (14 Nov, [sources/2026-11-14-audit-external.md](sources/2026-11-14-audit-external.md)) notes that `harm_lo` / `harm_hi` have no measured coverage: nobody has checked that the 10th-90th percentile band holds about 80 % of held-out VIIRS months, per region, per count size, or for MODIS = 0 months (band width 0). Needs nested LOYO. Until then the band is an empirical error band, not an 80 % prediction interval.
+- **Harmonized regions with large time-split errors.** Audit, 14 Nov: EL42 Notio Aigaio (LOYO 25.0 %, time split 2025 -77.7 %) and EL54 Ipeiros (LOYO 24.2 %, time split 2023 +80.4 %) stay `harmonized` because the mode rule reads LOYO only. Open: show a per-region quality note in web and MCP, or add the time split to the rule.
+- **MODIS = 0, VIIRS > 0.** The ratio model has no intercept, so a back-cast month with no MODIS detection is 0 with a 0-0 band. Observed case: EL52 May 2024, MODIS 0, VIIRS 13. An intercept or zero-aware model is untested.
+- **Train-only season start.** `pipeline/build.py` takes `raw_start_month` from the whole MODIS record and passes it to validation, so season metrics in LOYO see the held-out years (audit, 14 Nov). Small leak, affects season metrics only, not the monthly back-cast.
+- **Ablation.** No out-of-sample comparison yet of raw MODIS, one global factor, region-only and region x month x day/night on the same folds (audit, 14 Nov).

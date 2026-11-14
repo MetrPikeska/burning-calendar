@@ -111,7 +111,7 @@ function dropNulls<T extends Record<string, unknown>>(o: T): Partial<T> {
 // ---------- units ----------
 
 /** Scale of each count series. harm is the VIIRS-equivalent series; modis and viirs are raw counts. */
-const SCALE: Record<Series, string> = {
+export const SCALE: Record<Series, string> = {
   harm: "VIIRS-equivalent active fire detections (S-NPP 375 m scale)",
   modis: "raw MODIS active fire detections (Terra+Aqua, 1 km; not VIIRS-equivalent)",
   viirs: "raw VIIRS S-NPP active fire detections (375 m; record starts 20 Jan 2012)",
@@ -748,7 +748,11 @@ export function aggregate(regions: RegionFile[], p: { from: string; to: string; 
     const b = series === "harm" ? backcastRange(ms) : null;
     return { id: r.id, name: clean(r.name), mode: r.mode, total: r1(total) as number, n_months: ms.length,
              ...dropNulls({ backcast_months: b?.backcast_months ?? null, total_lo: b?.lo ?? null, total_hi: b?.hi ?? null }),
-             anomaly_months: ms.filter((m) => m.anom).map((m) => m.ym) };
+             // Anomaly flags are computed on each region's own series; on a different scale they would mislabel
+             // months (EL52 May 2024: MODIS 0 but flagged on harm), so they are left out (audit BC-002).
+             anomaly_months: seriesOf(r.mode) === series ? ms.filter((m) => m.anom).map((m) => m.ym) : undefined,
+             anomaly_months_omitted: seriesOf(r.mode) === series ? undefined
+               : `anomaly flags of ${r.id} refer to its ${seriesOf(r.mode)} series, not to the ${series} totals here; call get_anomalies for ${r.id}` };
   });
   // Back-cast months of all regions together; the overall range sums the per-region ranges.
   caveats.push(...backcastCaveats(series === "harm" ? "harmonized" : "relative", used, "the totals",
@@ -955,9 +959,9 @@ const VALIDATION_UNITS: Record<string, string> = {
   peak_hit_rate: "share 0-1 of season years whose peak month matches observed VIIRS",
   peak_hit_rate_raw: "share 0-1 of season years whose raw MODIS peak month matches observed VIIRS",
   peak_hits: "season years",
-  onset_mad_months: "months: median absolute difference of the onset month",
-  end_mad_months: "months: median absolute difference of the end month",
-  length_mad_months: "months: median absolute difference of the season length",
+  onset_mad_months: "months: mean absolute difference of the onset month (mean, not median)",
+  end_mad_months: "months: mean absolute difference of the end month (mean, not median)",
+  length_mad_months: "months: mean absolute difference of the season length (mean, not median)",
   onset_exact_share: "share 0-1 of season years with the onset month exactly right",
   fit_window_gap_pct: "percent: change of the 2000-2011 back-cast total when fitted on 2012-2025 instead of 2012-2019",
   ratio_trend_pct_per_year: "percent per year: linear trend of the VIIRS / MODIS ratio, day and night",

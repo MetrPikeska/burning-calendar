@@ -3,7 +3,7 @@
 import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import type { MonthRecord, RegionFile, Series } from "../../src/lib/contract.ts";
-import { countryOf, type Period, regionSeries, viewUrl } from "./tools.ts";
+import { countryOf, type Period, regionSeries, SCALE, viewUrl } from "./tools.ts";
 import { CALENDAR_HTML } from "./widget-html.ts";
 
 /** Same values as RESOURCE_MIME_TYPE and RESOURCE_URI_META_KEY in @modelcontextprotocol/ext-apps 2.0.4 (server/index.js). */
@@ -27,7 +27,7 @@ export function safeText(s: string, max = 80): string {
 const r1 = (x: number | null) => (x === null ? null : Math.round(x * 10) / 10);
 
 /** One calendar cell: value of the shown series, the back-cast range on harm, anomaly and outage flags. Nulls omitted. */
-function cell(m: MonthRecord, series: Series, mode: RegionFile["mode"]) {
+function cell(m: MonthRecord, series: Series, mode: RegionFile["mode"], showAnom: boolean) {
   const v = series === "harm" ? r1(m.harm) : m[series];
   const backcast = series === "harm" && m.src !== "observed";
   // data/outages.csv lists MODIS (Aqua) gaps only: they matter where the shown value comes from MODIS.
@@ -37,7 +37,7 @@ function cell(m: MonthRecord, series: Series, mode: RegionFile["mode"]) {
     v,
     ...(backcast ? { lo: r1(m.harm_lo), hi: r1(m.harm_hi) } : {}),
     src: m.src,
-    ...(m.anom ? { anom: true } : {}),
+    ...(showAnom && m.anom ? { anom: true } : {}),
     ...(outage ? { outage: true } : {}),
   };
 }
@@ -58,17 +58,23 @@ export function calendarData(region: RegionFile, p: { from?: string; to?: string
   const { records, aggregate: _aggregate, ...rest } = base;
   const ret = base.returned;
   const months = ret ? region.months.filter((m) => m.ym >= ret.from && m.ym <= ret.to) : [];
-  const cells = months.map((m) => cell(m, series, region.mode));
+  // Anomaly flags belong to the region's own series: on another series they would mark e.g. a MODIS 0 month (audit BC-001).
+  const showAnom = series === anomalySeries;
+  const cells = months.map((m) => cell(m, series, region.mode, showAnom));
   const values = cells.map((c) => c.v).filter((v): v is number => v !== null);
   const explicit = p.from !== undefined || p.to !== undefined;
   return {
     ...rest,
     name: safeText(region.name),
+    unit: `${SCALE[series]} per month`,
     series,
     series_label: SERIES_LABEL[series],
     anomaly_series: anomalySeries,
     max_value: values.length ? Math.max(...values) : null,
-    anomaly_months: months.filter((m) => m.anom).map((m) => m.ym),
+    // undefined keys vanish in the JSON answer.
+    anomaly_months: showAnom ? months.filter((m) => m.anom).map((m) => m.ym) : undefined,
+    anomaly_months_omitted: showAnom ? undefined
+      : `anomaly flags refer to the ${anomalySeries} series, not to the ${series} values shown; call show_calendar without series or get_anomalies`,
     backcast_months: series === "harm" ? months.filter((m) => m.src !== "observed").length : 0,
     totals: records,
     view_url: viewUrl(country, region.id, explicit && ret ? ret.from : null, explicit && ret ? ret.to : null, series),

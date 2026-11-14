@@ -15,7 +15,12 @@ type Server = Parameters<Parameters<typeof createMcpHandler>[0]>[0];
 
 const LIVE_RO = { readOnlyHint: true, openWorldHint: true, idempotentHint: false } as const;
 const regionId = z.string().regex(/^(GR|AR|EL\d\d|\d\d)$/).describe("Region id: GR, AR, NUTS2 code like EL52, or IGN province code like 30");
-const day = z.string().regex(/^\d{4}-\d\d-\d\d$/).refine((s) => !Number.isNaN(Date.parse(`${s}T00:00:00Z`)), "invalid date");
+/** A real Gregorian day: Date.parse rolls 2026-02-30 over to 2 Mar, so the parsed day must round-trip (audit BC-005). */
+export const isCalendarDay = (s: string): boolean => {
+  const t = Date.parse(`${s}T00:00:00Z`);
+  return !Number.isNaN(t) && new Date(t).toISOString().slice(0, 10) === s;
+};
+const day = z.string().regex(/^\d{4}-\d\d-\d\d$/).refine(isCalendarDay, "invalid calendar date");
 const caveatMode = z.enum(["full", "codes"]).default("full")
   .describe("full: caveat texts (use on the first call); codes: only caveat codes, to save tokens on later calls");
 

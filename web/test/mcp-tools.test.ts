@@ -413,6 +413,16 @@ describe("aggregate", () => {
     expect(r.caveats.map((c) => c.code)).toContain("relative_mode");
   });
 
+  it("keeps anomaly months only for regions whose own series is the summed one (audit BC-002)", () => {
+    const el52 = read<RegionFile>("gr/regions/EL52.json");
+    const r = aggregate([el52, el62], { from: "2024-01", to: "2024-12", top: 3 }, grIndex.period);
+    expect(r.series).toBe("modis");
+    const h = r.regions.find((x) => x.id === "EL52")!;
+    expect(h.anomaly_months).toBeUndefined();
+    expect(h.anomaly_months_omitted).toMatch(/harm series/);
+    expect(r.regions.find((x) => x.id === "EL62")!.anomaly_months).toEqual(expect.any(Array));
+  });
+
   it("refuses to add a country to its own regions", () => {
     const ar = read<RegionFile>("ar/regions/AR.json");
     expect(() => aggregate([ar, er], { from: "2020-01", to: "2020-12", top: 3 }, period)).toThrow(/double/);

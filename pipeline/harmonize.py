@@ -143,6 +143,9 @@ def series(m: pd.DataFrame, F: pd.DataFrame, G: pd.DataFrame, band: pd.DataFrame
     rec["src"] = np.where(observed, "observed", np.where(mod["terra_only"], "backcast_terra", "backcast"))
     rec["fit_level"] = np.where(observed, None, mod["fit_level"])
     if mode == "relative":
+        # No modelled series: every value shown (raw MODIS, raw VIIRS) is observed (audit BC-003).
         rec[["harm", "harm_lo", "harm_hi"]] = np.nan
+        rec["src"] = "observed"
+        rec["fit_level"] = None
     rec["viirs"] = rec["viirs"].astype("Int64")
     return rec

@@ -83,6 +83,24 @@ def test_partial_january_2012_stays_out_of_the_fit_and_is_back_cast():
     assert rec.loc["2012-02", "src"] == "observed"
 
 
+def test_relative_mode_marks_every_month_observed():
+    """Audit BC-003: a relative region has no back-cast, so raw MODIS before 2012 is not 'backcast'."""
+    from harmonize import series
+
+    rows = []
+    for y in range(2005, 2020):
+        rows += [("modis", "Aqua", f"{y}-07", "D", 10)]
+        if y >= 2012:
+            rows += [("viirs", "N", f"{y}-07", "D", 30)]
+    m = monthly_counts(detections(rows))
+    F = fit_ratio(m, "viirs", "modis", range(2012, 2020))
+    rec = series(m, F, F.assign(f=1.0), None, "relative")
+    assert (rec["src"] == "observed").all()
+    assert rec["fit_level"].isna().all()
+    assert rec["harm"].isna().all()
+    assert rec.loc["2007-07", "modis"] == 10
+
+
 def test_loyo_compares_2012_from_february():
     from validate import loyo
 

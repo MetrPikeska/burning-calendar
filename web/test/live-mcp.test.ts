@@ -54,6 +54,17 @@ describe("live tools over MCP", () => {
     expect(unknown.isError).toBe(true);
     expect(fetchMock).not.toHaveBeenCalled();
   });
+
+  it("reject days that do not exist instead of calling the upstream (audit BC-005)", async () => {
+    for (const from of ["2026-02-30", "2025-02-29", "2026-04-31"]) {
+      const r = await rpc("tools/call", { name: "get_fire_weather", arguments: { region_id: "EL52", from, to: "2026-05-01" } });
+      expect(r.isError, from).toBe(true);
+    }
+    expect(fetchMock).not.toHaveBeenCalled();
+    const { isCalendarDay } = await import("../api/_lib/live/register.ts");
+    expect(isCalendarDay("2024-02-29")).toBe(true);
+    expect(isCalendarDay("2026-02-30")).toBe(false);
+  });
 });
 
 describe("live caveat codes", () => {

@@ -69,6 +69,17 @@ describe("show_calendar data", () => {
     expect(() => calendarData(el62, { series: "harm" }, period)).toThrow(/relative mode/);
   });
 
+  it("drops harm anomaly flags and switches the unit when a harmonized region is shown as MODIS (audit BC-001)", () => {
+    const el52 = read<RegionFile>("gr/regions/EL52.json");
+    const own = calendarData(el52, { from: "2024-01", to: "2024-12" }, period);
+    expect(own.anomaly_months).toContain("2024-05");
+    const d = calendarData(el52, { from: "2024-01", to: "2024-12", series: "modis" }, period);
+    expect(d.unit).toMatch(/raw MODIS/);
+    expect(d.months.some((m) => "anom" in m)).toBe(false);
+    expect(d.anomaly_months).toBeUndefined();
+    expect(d.anomaly_months_omitted).toMatch(/harm series/);
+  });
+
   it("strips control, bidi and zero-width characters from names", () => {
     expect(safeText("Ke\u0000ntr‮iki​ Ellada\u0085", 80)).toBe("Kentriki Ellada");
     expect(safeText("x".repeat(200))).toHaveLength(80);
