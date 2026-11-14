@@ -112,5 +112,5 @@ Same tests for three models: ours (region x month x day/night with fallbacks), o
 | 94 | relative | 60.1 | 27.7 | 49.7 | 62.1 | 31.6 | 40.9 | 6.11 | 93.1 |
 
 - Ours is best on the time split in 8 of 22 harmonized regions and on LOYO in 15 of 22. Median time split over those regions: ours 8.65 %, constant 10.05 %, per month 9.65 %.
-- Band coverage over harmonized regions: median 70.1 %, range 52.8-87.5 %; the band is narrower than its nominal 80 % in most regions, so it is a "likely range", not a calibrated interval.
+- Band coverage over harmonized regions: median 70.1 %, range 52.8-87.5 %; the band is narrower than its nominal 80 % in most regions. The web and MCP call it a likely range.
 - The validation season window now comes from MODIS 2001-2011 (`season_start_month_validation`); peak hit rates changed: 78 0.571 / 0.571 -> 0.714 / 0.714, 82 0.857 / 0.857 -> 1.0 / 1.0. No region changed mode.
