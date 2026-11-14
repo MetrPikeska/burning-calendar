@@ -60,17 +60,17 @@ Jury path in 1 minute: claude.ai connector with no auth. Keep a recorded fallbac
 
 | Tool | Inputs | Notes |
 |---|---|---|
-| `search_regions` | `country?`, `level?`, `query?`, `limit` | climatology, `annual_mean`, `loyo_mdape_pct`, `view_url` |
-| `get_region_series` | `region_id`, `from`, `to`, `aggregate` | max 120 monthly records, else an error that suggests `aggregate: "year"`; `view_url`, `data_url`, `csv_url` |
+| `search_regions` | `country?`, `level?`, `query?`, `limit` | climatology, `annual_mean` (null for relative regions, raw value in `annual_mean_modis`), `loyo_mdape_pct`, `view_url` |
+| `get_region_series` | `region_id`, `from`, `to`, `aggregate`, `fields?` | max 120 monthly records, else an error that suggests `aggregate: "year"`; nulls omitted; month mode adds calendar-year `totals` on harm (modis in relative mode) with `partial`; ranges outside coverage are clipped with an `out_of_coverage` caveat; `view_url`, `data_url`, `csv_url` |
 | `get_season_calendar` | `region_id`, `year?` | climatology and season years |
 | `get_anomalies` | `region_id`, `year` | percentile, `baseline_median`, `baseline_p90`, `baseline_years`, `ratio_to_median`, `flagged` |
-| `compare_regions` | `region_ids` (2-10), `metric`, `year?` | count metrics ranked only when all regions are harmonized (`ranking_allowed`) |
-| `find_region_at` | `lat`, `lon` | point in polygon over `regions.geojson`, shared `regionAt` from `web/src/lib/geo.ts` |
+| `compare_regions` | `region_ids` (2-10), `metric`, `year?` | count metrics ranked only when all regions are harmonized (`ranking_allowed`); relative regions get `value_modis` instead of `value` |
+| `find_region_at` | `lat`, `lon` | point in polygon (`regionAt` from `web/src/lib/geo.ts`); returns climatology, annual mean, last 3 season years, `view_url`, `data_url`; outside both countries the nearest region within 5 km |
 | `get_methodology` | `topic` | static text: overview, harmonization, validation, modes, anomalies, calendar, limits |
 
 - The country comes from the region id (`GR`, `EL..` vs `AR`, two digits), so no tool needs a country argument besides `search_regions`.
-- Every result has `caveats` with codes `relative_mode`, `backcast`, `backcast_terra`, `outage`, `detections_not_fires`. The text block lists them first, then the JSON; `structuredContent` carries the same object (no `outputSchema`).
-- `outage` is raised only for months whose value comes from MODIS, because `data/outages.csv` lists Aqua gaps only.
+- Every result has `coverage` (`start`, `end` from `index.json` `period`) and `caveats` with codes `coverage` (S-NPP end, no NOAA-20 splice), `out_of_coverage`, `relative_mode`, `backcast`, `backcast_terra`, `outage`, `detections_not_fires`. Series and anomaly results carry `anomaly_definition` (above `baseline_p90`). The text block lists them first, then the JSON; `structuredContent` carries the same object (no `outputSchema`).
+- `outage` (caveat and month field, with `outage_affects: "modis"`) only for months whose value comes from MODIS, because `data/outages.csv` lists Aqua gaps only. Changes from Petr's first claude.ai test (beads burncal-w7p, -nmk, -j03, -17x, -zgm).
 - MCP resources and an MCP Apps widget are not built.
 
 ## Proposed tools (13 Nov design)
