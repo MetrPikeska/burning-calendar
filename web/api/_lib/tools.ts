@@ -279,6 +279,7 @@ export function searchRegions(indexes: IndexFile[],
 export const MONTH_FIELDS = [
   "ym", "modis", "viirs", "harm", "harm_lo", "harm_hi", "src", "fit_level", "anom_pct", "anom",
   "outage", "outage_affects", "baseline_median", "baseline_p90", "baseline_years", "days_modis", "days_viirs",
+  "fwi", "fwi_pct", "fwi_level", "spei3", "spei6",
 ] as const;
 export type MonthField = (typeof MONTH_FIELDS)[number];
 
@@ -298,6 +299,8 @@ function monthOut(m: Month, mode: RegionFile["mode"], fields: readonly MonthFiel
     baseline_median: m.baseline_median ?? null, baseline_p90: m.baseline_p90 ?? null,
     baseline_years: m.baseline_years ?? null,
     days_modis: m.days_modis ?? null, days_viirs: m.days_viirs ?? null,
+    fwi: m.fwi ?? null, fwi_pct: m.fwi_pct ?? null, fwi_level: m.fwi_level ?? null,
+    spei3: m.spei3 ?? null, spei6: m.spei6 ?? null,
   };
   const keep = new Set<MonthField>(["ym", ...fields]);
   return dropNulls(Object.fromEntries(MONTH_FIELDS.filter((k) => keep.has(k)).map((k) => [k, full[k]])));

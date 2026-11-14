@@ -119,6 +119,33 @@
     "area_km2": {
       "type": "number",
       "exclusiveMinimum": 0
+    },
+    "context": {
+      "type": "object",
+      "description": "Optional context factors (weather, drought, land cover). Context for the calendar, not a prediction",
+      "required": ["available", "landcover", "sources"],
+      "properties": {
+        "available": { "type": "boolean" },
+        "landcover": {
+          "type": ["object", "null"],
+          "required": ["cropland_pct", "tree_pct", "shrub_grass_pct", "other_pct", "source"],
+          "properties": {
+            "cropland_pct": { "type": "number", "minimum": 0, "maximum": 100 },
+            "tree_pct": { "type": "number", "minimum": 0, "maximum": 100 },
+            "shrub_grass_pct": { "type": "number", "minimum": 0, "maximum": 100 },
+            "other_pct": { "type": "number", "minimum": 0, "maximum": 100 },
+            "source": { "type": "string" }
+          }
+        },
+        "sources": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["name", "url"],
+            "properties": { "name": { "type": "string" }, "url": { "type": "string" } }
+          }
+        }
+      }
     }
   },
   "$defs": {
@@ -256,6 +283,37 @@
           "minimum": 0,
           "maximum": 31,
           "description": "Days of the month with at least one VIIRS detection after filters; null before 2012"
+        },
+        "fwi": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "description": "Optional context. Mean over the month of the daily Fire Weather Index (CEMS, ERA5-based), averaged over the region's grid cells"
+        },
+        "fwi_pct": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Optional context. Percentile of fwi among the same calendar month over all years; null with fewer than 10 values"
+        },
+        "fwi_level": {
+          "enum": ["normal", "elevated", "critical", null],
+          "description": "Optional context. fwi_pct below 75 normal, 75 to under 90 elevated, 90 and above critical"
+        },
+        "spei3": {
+          "type": ["number", "null"],
+          "description": "Optional context. SPEI-3 (SPEIbase), averaged over the region's grid cells"
+        },
+        "spei6": {
+          "type": ["number", "null"],
+          "description": "Optional context. SPEI-6 (SPEIbase), averaged over the region's grid cells"
+        },
+        "spei3_level": {
+          "enum": ["dry", "normal", "wet", null],
+          "description": "Optional context. dry at or below -1, wet at or above 1"
+        },
+        "spei6_level": {
+          "enum": ["dry", "normal", "wet", null],
+          "description": "Optional context. dry at or below -1, wet at or above 1"
         }
       }
     },

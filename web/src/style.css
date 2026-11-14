@@ -281,6 +281,21 @@ h2 { margin: 0; font-size: var(--fs-xl); font-weight: 650; letter-spacing: -0.01
 .range-details[open] { padding-bottom: var(--s3); }
 .method { padding-bottom: var(--s2); }
 .method h3 { display: none; }
+.context { margin-top: var(--s4); padding-top: var(--s4); border-top: 1px solid var(--line); }
+.context h3 { margin: 0 0 var(--s1); font-size: var(--fs-lg); font-weight: 650; }
+.context p { margin: 0 0 var(--s3); font-size: var(--fs-base); max-width: 62ch; }
+.context .hint, .context .lc-key { font-size: var(--fs-xs); }
+.ctx-list { list-style: none; margin: 0 0 var(--s3); padding: 0; display: grid; gap: var(--s2); font-size: var(--fs-base); }
+.ctx-name { display: inline-block; min-width: 9.5em; color: var(--muted); }
+.ctx-badge { margin-left: var(--s2); padding: 1px 8px; border: 1px solid var(--line); border-radius: 999px; font-size: var(--fs-xs); white-space: nowrap; }
+.ctx-critical, .ctx-dry { border-color: var(--anomaly-strong); font-weight: 650; }
+.ctx-elevated { border-style: dashed; border-color: var(--anomaly-strong); }
+.lc { display: flex; height: 10px; margin: 0 0 var(--s1); border-radius: 3px; overflow: hidden; background: var(--line); max-width: 62ch; }
+.lc span { display: block; height: 100%; }
+.lc-crop { background: #c9a227; }
+.lc-tree { background: #4f7a4a; }
+.lc-shrub { background: #a9b585; }
+.lc-other { background: transparent; }
 .method p { margin: 0 0 var(--s3); font-size: var(--fs-base); max-width: 62ch; }
 .method strong { font-weight: 650; }
 .method-chart { margin: 0 0 var(--s2); }

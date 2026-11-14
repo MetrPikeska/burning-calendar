@@ -70,3 +70,11 @@ Per-season-year record (`years`): `season_year` (the calendar year holding most 
 `factors`: one row per calendar month × day/night × kind: `month`, `dn`, `f`, `level`, `den_total` (denominator count in the fit window), `kind` (`viirs_over_modis` on 2012-2019, `modis_over_terra` on 2003-2011), `window`.
 
 The web recomputes anomalies in JS only for a range the user picks. CSV export of a user-picked range is generated in JS from the monthly records; the full series is precomputed as `regions/{id}.csv`.
+
+## Context fields (optional, 14 Nov 2026)
+
+Written by `pipeline/factors.py` when the gridded inputs exist in `data/raw/factors/`; otherwise `null` and the web hides the Context panel. Context for the calendar, not an explanation or a forecast. Source licences are not yet verified (UNVERIFIED).
+
+- Per month: `fwi` (mean over the month of the daily Fire Weather Index, CEMS fire danger indices, ERA5-based, 0.25 degree, mean over the region's grid cells), `fwi_pct` (percentile among the same calendar month over all years, null with fewer than 10 values), `fwi_level` (`normal` below 75, `elevated` 75 to under 90, `critical` 90 and above), `spei3` and `spei6` (SPEIbase, 0.5 degree), `spei3_level` and `spei6_level` (`dry` at or below -1, `wet` at or above 1, else `normal`). The same keys are columns in `regions/{id}.csv`.
+- Per region: `context` = `{available, landcover, sources}`. `landcover` has `cropland_pct`, `tree_pct`, `shrub_grass_pct`, `other_pct` (shares of the region's area, CORINE 2018, EPSG:6933 overlay) and `source`; `sources` maps `fwi`, `spei`, `landcover` to name and URL.
+- A region with no grid cell centre inside its polygon takes the nearest cell, so very small regions are coarse.

@@ -14,6 +14,7 @@ import pandas as pd
 
 from calendar_metrics import anomalies, outage_days, season_metrics
 from export import ROOT, export_country, write_json
+from factors import load_context, region_context
 from filters import drop_static
 from harmonize import detection_days, fit, monthly_counts, series
 from load import COUNTRIES, load
@@ -26,7 +27,7 @@ LEVEL = {"GR": "nuts2", "AR": "province"}
 
 def build_region(rid: str, name: str, level: str, parent: str | None, m: pd.DataFrame,
                  national: pd.DataFrame | None, outages: pd.DataFrame, area_km2: float,
-                 days: pd.DataFrame) -> dict:
+                 days: pd.DataFrame, context: dict | None = None) -> dict:
     start = raw_start_month(m)
     val, band = validate(m, national, start)
     mode = val["mode"]
@@ -44,7 +45,10 @@ def build_region(rid: str, name: str, level: str, parent: str | None, m: pd.Data
     rec["days_viirs"] = days["days_viirs"]
     rec["outage_days"] = od.astype(int)
     rec["outage"] = od >= OUTAGE_MIN_DAYS
-    months = [{k: (None if pd.isna(v) else v) for k, v in r.items()}
+    ctx_cols, ctx_block = region_context(context or {}, rid, rec.index)
+    for col in ctx_cols.columns:
+        rec[col] = ctx_cols[col]
+    months =[{k: (None if pd.isna(v) else v) for k, v in r.items()}
               for r in rec.reset_index().to_dict("records")]
     annual_mean = round(sum(y["total"] for y in years) / max(len(years), 1), 1)
     density = round(1000 * annual_mean / area_km2, 2) if area_km2 > 0 else None
@@ -59,7 +63,7 @@ def build_region(rid: str, name: str, level: str, parent: str | None, m: pd.Data
     factors = pd.concat([F.assign(kind="viirs_over_modis", window="2012-2019"),
                          G.assign(kind="modis_over_terra", window="2003-2011")])
     detail = {"id": rid, "name": name, "level": level, "parent": parent, "mode": mode, "area_km2": area_km2,
-              "summary": summary, "months": months, "years": years,
+              "summary": summary, "months": months, "years": years, "context": ctx_block,
               "factors": factors.round(4).to_dict("records"), "band": band.to_dict("records"),
               "validation": val}
     return {"entry": entry, "detail": detail}
@@ -116,14 +120,16 @@ def main() -> None:
     print("assignment:", assign_stats)
     outages = pd.read_csv(ROOT / "data" / "outages.csv")
     areas = region_areas(polys)
+    context = load_context(c, polys)
+    print("context:", {k: ("yes" if v is not None else "no") for k, v in context.items() if k != "sources"})
 
     national = monthly_counts(kept)
     out = [build_region(c, COUNTRIES[c], "country", None, national, None, outages,
-                        round(sum(areas.values()), 1), detection_days(kept))]
+                        round(sum(areas.values()), 1), detection_days(kept), context)]
     for _, p in polys.sort_values("id").iterrows():
         sub = kept[kept["region"] == p["id"]]
         out.append(build_region(p["id"], p["name"], LEVEL[c], c, monthly_counts(sub), national, outages,
-                                areas[p["id"]], detection_days(sub)))
+                                areas[p["id"]], detection_days(sub), context))
 
     for r in out:
         e = r["entry"]
