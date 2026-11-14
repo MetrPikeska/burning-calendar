@@ -5,6 +5,8 @@ verified_by: uv run python pipeline/download_firms_api.py; uv run python pipelin
 sources: [../../pipeline/build.py, ../../pipeline/validate.py, ../../pipeline/harmonize.py]
 ---
 
+**15 Nov rebuild (burncal-dxk, burncal-wp4):** January 2012 is now back-cast and stays out of the fit and validation (FIRMS S-NPP starts 20 Jan 2012; the 12-day month had pulled January factors low, Argentina Jan 2012 VIIRS/MODIS 0.98 vs 2.8-3.9 in 2013-2019). Sensor gaps of 4+ days found in the detection files were added to `data/outages.csv`. Only January back-cast months changed (and December where the season-level fallback pools DJF). Tables below are from that rebuild.
+
 All numbers recomputed on 14 Nov 2026 from FIRMS SP country CSVs (MODIS C6.1 2000-2025, VIIRS S-NPP 2012-2025), `type == 0`, static filter. The pre-event numbers were not reused.
 
 ## Data
@@ -26,18 +28,18 @@ All numbers recomputed on 14 Nov 2026 from FIRMS SP country CSVs (MODIS C6.1 200
 
 | id | name | mode | LOYO MdAPE % | peak hit harm / raw | time split MdAPE % | fit gap % |
 |---|---|---|---|---|---|---|
-| EL30 | Attiki | harmonized | 16.0 | 0.857 / 0.857 | 18.1 | -3.4 |
+| EL30 | Attiki | harmonized | 16.1 | 0.857 / 0.857 | 18.1 | -3.4 |
 | EL41 | Voreio Aigaio | harmonized | 9.7 | 1.0 / 0.857 | 23.7 | 0.1 |
-| EL42 | Notio Aigaio | harmonized | 25.0 | 0.429 / 0.286 | 22.7 | -12.6 |
-| EL43 | Kriti | harmonized | 13.9 | 0.625 / 0.625 | 15.8 | 1.5 |
-| EL51 | Anatoliki Makedonia, Thraki | harmonized | 7.3 | 0.857 / 1.0 | 11.0 | 0.9 |
-| EL52 | Kentriki Makedonia | harmonized | 4.0 | 0.857 / 0.857 | 11.7 | 0.5 |
+| EL42 | Notio Aigaio | harmonized | 25.0 | 0.429 / 0.286 | 22.8 | -12.6 |
+| EL43 | Kriti | harmonized | 13.9 | 0.714 / 0.714 | 15.8 | 1.5 |
+| EL51 | Anatoliki Makedonia, Thraki | harmonized | 7.5 | 0.857 / 1.0 | 11.1 | 0.9 |
+| EL52 | Kentriki Makedonia | harmonized | 4.0 | 0.857 / 0.857 | 11.8 | 0.5 |
 | EL53 | Dytiki Makedonia | harmonized | 6.3 | 1.0 / 1.0 | 30.5 | -6.6 |
 | EL54 | Ipeiros | harmonized | 24.2 | 0.571 / 0.429 | 31.9 | -10.3 |
-| EL61 | Thessalia | harmonized | 4.1 | 0.714 / 0.857 | 19.2 | -6.2 |
+| EL61 | Thessalia | harmonized | 4.2 | 0.714 / 0.857 | 19.5 | -6.1 |
 | EL62 | Ionia Nisia | relative | 32.0 | 1.0 / 1.0 | 40.5 | 3.6 |
-| EL63 | Dytiki Elláda | harmonized | 19.6 | 0.857 / 0.429 | 22.5 | -19.0 |
-| EL64 | Sterea Elláda | harmonized | 16.9 | 0.714 / 0.857 | 12.8 | 18.5 |
+| EL63 | Dytiki Elláda | harmonized | 19.4 | 0.857 / 0.429 | 22.4 | -19.0 |
+| EL64 | Sterea Elláda | harmonized | 16.3 | 0.714 / 0.857 | 13.0 | 18.5 |
 | EL65 | Peloponnisos | harmonized | 17.5 | 1.0 / 0.857 | 16.1 | 9.8 |
 
 - 12 of 13 regions are `harmonized`; EL62 Ionia Nisia is `relative` on the 25 % error threshold.

@@ -138,7 +138,7 @@ const handler = createMcpHandler(
         title: "Monthly fire detection series",
         description:
           "Monthly (max 120 records) or calendar-year detection counts for one region: modis, viirs, harm (VIIRS-equivalent), " +
-          "harm_lo..harm_hi for modelled months before 2012, anomaly flags. Null fields are omitted; `fields` picks record keys. " +
+          "harm_lo..harm_hi for modelled months before Feb 2012, anomaly flags. Null fields are omitted; `fields` picks record keys. " +
           "Month mode also returns calendar-year totals on the same series (harm, or modis in relative mode), partial years marked. " +
           "Always pass on the caveats; quote back-cast months with their range. Returns view_url (map), data_url (JSON), csv_url (full monthly series) and, for Greece, " +
           "detections_csv_url: every individual hotspot (date, UTC time, sensor, lat/lon, FRP, confidence) of the region.",
@@ -168,7 +168,7 @@ const handler = createMcpHandler(
         description:
           "Fire season of one region: climatological peak month, onset, end, season length, season start month, bimodal flag, " +
           "and per season year the same metrics plus the total. Give a year to get one season year only (plus its season_window). " +
-          "Season years with months before 2012 carry backcast_months and total_lo..total_hi: quote that range, the total is modelled.",
+          "Season years with months before Feb 2012 carry backcast_months and total_lo..total_hi: quote that range, the total is modelled.",
         inputSchema: z.object({ caveats: caveatMode, region_id: regionId, year: year.optional() }),
         annotations: RO,
       },
@@ -239,7 +239,7 @@ const handler = createMcpHandler(
         description:
           "Sum detections over a period for 1 to 40 regions: total per region, overall total and the top months of the sum. " +
           "Uses harm (VIIRS-equivalent) when all regions are harmonized, otherwise raw MODIS for all with a caveat. " +
-          "Do not mix a country (GR, AR) with its own regions. Periods with months before 2012 add backcast_months and total_lo..total_hi (per region and overall).",
+          "Do not mix a country (GR, AR) with its own regions. Periods with months before Feb 2012 add backcast_months and total_lo..total_hi (per region and overall).",
         inputSchema: z.object({ caveats: caveatMode,
           region_ids: z.array(regionId).min(1).max(40),
           from: ym,

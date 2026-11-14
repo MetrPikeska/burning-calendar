@@ -130,7 +130,7 @@ export function registerCalendar(server: McpServer, d: CalendarDeps) {
       title: "Show burning calendar",
       description:
         "Show the burning calendar of one region as an interactive heat strip in the chat (years x months; MCP Apps widget). " +
-        "Harmonized regions show harm (VIIRS-equivalent), relative regions raw MODIS. Back-cast months (before 2012) are hatched, " +
+        "Harmonized regions show harm (VIIRS-equivalent), relative regions raw MODIS. Back-cast months (before Feb 2012) are hatched, " +
         "anomalies (above baseline_p90) outlined. Default range: all of 2000-11 to 2025-12. Hosts without widgets get calendar-year " +
         "totals, anomaly months, caveats and a view_url; for monthly numbers use get_region_series. Pass on the caveats.",
       inputSchema: z.object({

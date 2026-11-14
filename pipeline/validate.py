@@ -29,7 +29,7 @@ def loyo(m: pd.DataFrame, national: pd.DataFrame | None) -> pd.DataFrame:
     for y in FIT_YEARS:
         F, G = fit(m, national, years=[x for x in FIT_YEARS if x != y])
         mod = model(m, F, G)
-        sel = m["year"] == y
+        sel = (m["year"] == y) & (m.index >= VIIRS_START)  # 2012 compared Feb-Dec on both sides
         parts.append(pd.DataFrame({"pred": mod.loc[sel, "model"], "obs": _obs(m)[sel],
                                    "modis": (m["modis_D"] + m["modis_N"])[sel],
                                    "year": y, "month": m.loc[sel, "month"]}))
@@ -107,7 +107,7 @@ def _mdiff(a: int, b: int) -> int:
 
 def trend(m: pd.DataFrame) -> dict:
     out = {}
-    w = m[(m["year"] >= FULL_YEARS[0]) & (m["year"] <= FULL_YEARS[-1])]
+    w = m[(m["year"] >= FULL_YEARS[0]) & (m["year"] <= FULL_YEARS[-1]) & (m.index >= VIIRS_START)]
     for dn in "DN":
         a = w.groupby("year")[[f"viirs_{dn}", f"modis_{dn}"]].sum()
         a = a[a[f"modis_{dn}"] > 0]

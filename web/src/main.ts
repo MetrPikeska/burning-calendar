@@ -220,7 +220,7 @@ function renderPanel(): void {
     <div id="chart" tabindex="0" role="group" aria-label="Burning calendar, years by months. Arrow keys change the compared month."></div>
     ${marksKey(hasRange)}
     <p class="foot">${matchMedia("(pointer: coarse)").matches ? "Tap" : "Click"} a cell or use the arrows to compare another month.${series === "harm"
-      ? ` 2000-2011 back-cast from MODIS (range in the tooltip), 2012-${endYear} VIIRS observed${provisionalNote}.`
+      ? ` Nov 2000 to Jan 2012 back-cast from MODIS (range in the tooltip), Feb 2012 to ${endYear} VIIRS observed${provisionalNote}.`
       : ""}</p>
     <details class="method-details" ${methodOpen ? "open" : ""}>
       <summary>How well the harmonization holds here</summary>

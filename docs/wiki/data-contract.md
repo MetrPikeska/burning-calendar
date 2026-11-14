@@ -52,8 +52,8 @@ Monthly record (`months`, 312 entries, Nov 2000 to Oct 2026):
  "baseline_years":"2002-2011 without 2007"}
 ```
 
-- `modis`: Terra + Aqua count after filters. `viirs`: S-NPP count, null before 2012.
-- `src`: `observed` (VIIRS, 2012 on), `backcast` (MODIS Terra+Aqua times factor), `backcast_terra` (Nov 2000 to Jun 2002, chained factor).
+- `modis`: Terra + Aqua count after filters. `viirs`: S-NPP count, null before 2012; Jan 2012 holds the raw partial count (record starts 20 Jan 2012, `outage_viirs` true).
+- `src`: `observed` (VIIRS, Feb 2012 on), `backcast` (Jan 2012 included) (MODIS Terra+Aqua times factor), `backcast_terra` (Nov 2000 to Jun 2002, chained factor).
 - For `observed`, `harm` equals `viirs` and `harm_lo` / `harm_hi` are null.
 - `harm_lo` / `harm_hi`: modelled value times the 10th / 90th percentile of LOYO obs/pred ratios of the region, pooled by meteorological season (`band`: `month`, `q_lo`, `q_hi`).
 - `fit_level`: the coarsest fallback level among the day and night strata of that month: `region_month_dn`, `region_season_dn`, `region_dn` (later `national_dn`). Null for `observed`.

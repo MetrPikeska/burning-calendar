@@ -3,10 +3,10 @@
 Factor F[month, dn] = sum(VIIRS) / sum(MODIS Terra+Aqua) over the fit window, with the
 fallback chain region_month_dn -> region_season_dn -> region_dn -> national_dn. A stratum
 is accepted when its MODIS total over the window is >= MIN_TOTAL and >= MIN_PER_YEAR per year.
-Back-cast: 2002-07..2011-12 = sum_dn F * MODIS.
+Back-cast: 2002-07..2012-01 = sum_dn F * MODIS.
 Terra-only months (2000-11..2002-06): chained G[month, dn] = (Terra+Aqua)/Terra fitted on
 2003-2011 with the same chain, then F * G * Terra.
-From 2012 the series is observed VIIRS (to END; 2026 from the area API, NRT months provisional). Uncertainty bands come from validate.loyo_band.
+From Feb 2012 the series is observed VIIRS (to END; 2026 from the area API, NRT months provisional). Uncertainty bands come from validate.loyo_band.
 """
 
 import numpy as np
@@ -18,7 +18,8 @@ CHAIN_YEARS = tuple(range(2003, 2012))
 START, END = "2000-11", "2026-10"  # 2026 from the FIRMS area API, S-NPP ended 2 Nov 2026
 AQUA_START = "2002-07"
 CLIM_END = "2025-12"  # climatology (calendar, season start) uses complete calendar years only
-VIIRS_START = "2012-01"
+VIIRS_DATA_START = "2012-01"  # first month with S-NPP detections in FIRMS (record starts 20 Jan 2012)
+VIIRS_START = "2012-02"  # first complete VIIRS month: Jan 2012 keeps its raw viirs count but is back-cast and kept out of fit and validation
 MIN_PER_YEAR = 5
 MIN_TOTAL = 30
 SEASON = {12: "DJF", 1: "DJF", 2: "DJF", 3: "MAM", 4: "MAM", 5: "MAM",
@@ -52,14 +53,14 @@ def _accept(den_total: float, n_years: int) -> bool:
 
 def detection_days(df: pd.DataFrame) -> pd.DataFrame:
     """Days with at least one detection per month and sensor (distinct acq_date, UTC), indexed by ym.
-    days_viirs is null before VIIRS_START."""
+    days_viirs is null before VIIRS_DATA_START."""
     yms = pd.period_range(START, END, freq="M").strftime("%Y-%m")
     out = pd.DataFrame(index=yms)
     out.index.name = "ym"
     for sensor in ("modis", "viirs"):
         n = df[df["sensor"] == sensor].groupby("ym")["acq_date"].nunique()
         out[f"days_{sensor}"] = n.reindex(yms, fill_value=0).astype("Int64")
-    out.loc[out.index < VIIRS_START, "days_viirs"] = pd.NA
+    out.loc[out.index < VIIRS_DATA_START, "days_viirs"] = pd.NA
     return out
 
 
@@ -68,6 +69,8 @@ def fit_ratio(m: pd.DataFrame, num: str, den: str, years, national: pd.DataFrame
     years = tuple(years)
     w = m[m["year"].isin(years)]
     nat = national[national["year"].isin(years)] if national is not None else w
+    if num.startswith("viirs") or den.startswith("viirs"):  # only complete VIIRS months enter a VIIRS ratio
+        w, nat = w[w.index >= VIIRS_START], nat[nat.index >= VIIRS_START]
     rows = []
     for dn in "DN":
         nu, de = f"{num}_{dn}", f"{den}_{dn}"
@@ -126,7 +129,7 @@ def series(m: pd.DataFrame, F: pd.DataFrame, G: pd.DataFrame, band: pd.DataFrame
     rec["modis"] = (m["modis_D"] + m["modis_N"]).astype(int)
     observed = m.index >= VIIRS_START
     viirs = (m["viirs_D"] + m["viirs_N"]).astype(float)
-    rec["viirs"] = viirs.where(observed)
+    rec["viirs"] = viirs.where(m.index >= VIIRS_DATA_START)  # raw count, partial in Jan 2012
     rec["harm"] = np.where(observed, viirs, mod["model"].round(1))
     if band is not None:
         b = band.set_index("month")

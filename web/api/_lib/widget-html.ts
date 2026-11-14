@@ -231,7 +231,7 @@ a { color: var(--bc-link); }
       var hd = sv("defs"); hd.appendChild(hatchDef("bc-hatch-key")); hs.appendChild(hd);
       hs.appendChild(sv("rect", { x: 1, y: 1, width: 12, height: 12, fill: "#f6d746" }));
       hs.appendChild(sv("rect", { x: 1, y: 1, width: 12, height: 12, fill: "url(#bc-hatch-key)" }));
-      item(hs, "Back-cast from MODIS (before 2012), modelled");
+      item(hs, "Back-cast from MODIS (before Feb 2012), modelled");
     }
     if (cells.some(function (c) { return c.outage; })) item(swatch([sv("rect", { x: 1, y: 1, width: 12, height: 12, fill: "#fbe7a6" }), sv("text", { x: 7, y: 11, "text-anchor": "middle", style: "fill:#1d1b19;font-size:12px;font-weight:600" }, "×")]), "Known MODIS outage");
     if (cells.some(function (c) { return c.v == null; })) item(swatch([sv("rect", { x: 1, y: 1, width: 12, height: 12, style: "fill:var(--bc-none)" })]), "No value");

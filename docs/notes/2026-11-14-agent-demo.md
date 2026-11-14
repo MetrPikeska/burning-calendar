@@ -40,7 +40,7 @@ Když Claude vynechá caveat nebo odkaz, nic nedoplňovat a nepsat druhý dotaz:
 1. **Harmonizace před 2012:** "Was August 2007 abnormal in Peloponnisos (EL65)? Give the range, not only the number."
    `get_anomalies` / `get_region_series`: 3,674.9 detekcí, `src: backcast`, interval `harm_lo`..`harm_hi` **2,649.6 až 10,021.5**, medián 51.4 (baseline „2002-2011 without 2007“), 71.5×. Ukazuje, že back-cast nese nejistotu. `view_url` `/?country=gr&region=EL65&from=2007-01&to=2007-12`.
 2. **Argentina, hustota:** "Which Argentine province has the most fire detections per 1000 km² a year? Show the top 5."
-   `rank_regions {metric: density_per_1000km2, country: AR}`: Formosa 394.21, Tucumán 263.77, Misiones 261.03, Corrientes 252.78, Chaco 243.32 (průměr za season year na 1000 km²). Tři relativní provincie (Ciudad de Buenos Aires, Neuquén, Tierra del Fuego) jsou mimo pořadí v `excluded_relative`, caveat `relative_mode`.
+   `rank_regions {metric: density_per_1000km2, country: AR}`: Formosa 390.24, Misiones 264.23, Tucumán 259.56, Corrientes 253.34, Chaco 239.04 (průměr za season year na 1000 km², přepočet 15. 11.). Dvě relativní provincie (Ciudad de Buenos Aires, Tierra del Fuego) jsou mimo pořadí v `excluded_relative`, caveat `relative_mode`.
 3. **Paraná 2020 (navazuje na webové demo):** "Show the 2020 fire season in Entre Ríos (Paraná Delta) month by month against the median."
    `get_anomalies {region_id: "30", year: 2020}`: srpen 16,492 proti mediánu 634.4 (2010-2019), 26×; nad p90 je každý měsíc únor až prosinec (11 z 12); červenec 6,772 (20.9×). `get_season_calendar`: season year 2020 celkem 39,311, onset červen, konec říjen, peak srpen.
 

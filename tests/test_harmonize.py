@@ -57,6 +57,39 @@ def test_detection_days_counts_distinct_dates_per_sensor():
     assert d.loc["2015-08", "days_viirs"] == 2
     assert d.loc["2015-08", "days_modis"] == 1
     assert d.loc["2005-07", "days_modis"] == 1
-    assert pd.isna(d.loc["2005-07", "days_viirs"])  # no VIIRS before 2012
+    assert pd.isna(d.loc["2005-07", "days_viirs"])  # no VIIRS before Feb 2012
     assert d.loc["2016-01", "days_viirs"] == 0
     assert len(d) == 312  # 2000-11 .. 2026-10
+
+
+def test_partial_january_2012_stays_out_of_the_fit_and_is_back_cast():
+    """FIRMS S-NPP starts 20 Jan 2012: Jan 2012 VIIRS covers 12 days and must not enter the ratio."""
+    from harmonize import series
+
+    rows = []
+    for y in range(2012, 2020):
+        viirs_jan = 5 if y == 2012 else 30  # 2012: partial month, far below the true ratio
+        rows += [("modis", "Aqua", f"{y}-01", "D", 10), ("viirs", "N", f"{y}-01", "D", viirs_jan)]
+    m = monthly_counts(detections(rows))
+    F = fit_ratio(m, "viirs", "modis", range(2012, 2020))
+    jan = F[(F.month == 1) & (F.dn == "D")].iloc[0]
+    assert jan["f"] == 3.0
+    assert jan["den_total"] == 70  # 2013-2019 only
+    G = F.assign(f=1.0)
+    rec = series(m, F, G)
+    assert rec.loc["2012-01", "src"] == "backcast"
+    assert rec.loc["2012-01", "harm"] == 30.0
+    assert rec.loc["2012-01", "viirs"] == 5  # raw partial count stays visible
+    assert rec.loc["2012-02", "src"] == "observed"
+
+
+def test_loyo_compares_2012_from_february():
+    from validate import loyo
+
+    rows = []
+    for y in range(2012, 2020):
+        for mo in (1, 2):
+            rows += [("modis", "Aqua", f"{y}-{mo:02d}", "D", 10), ("viirs", "N", f"{y}-{mo:02d}", "D", 30)]
+    lo = loyo(monthly_counts(detections(rows)), None)
+    assert not ((lo["year"] == 2012) & (lo["month"] == 1)).any()
+    assert ((lo["year"] == 2012) & (lo["month"] == 2)).any()

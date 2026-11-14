@@ -22,7 +22,7 @@ MODIS has flown since 2000 and is near its end. VIIRS S-NPP has flown since 2012
 
 ## Method
 
-The reference scale is VIIRS S-NPP. From 2012 the series is VIIRS as observed; before 2012 it is back-cast from MODIS.
+The reference scale is VIIRS S-NPP. From February 2012 the series is VIIRS as observed; before that it is back-cast from MODIS (FIRMS S-NPP starts on 20 Jan 2012, so January 2012 is a partial month and is back-cast too).
 
 1. FIRMS standard-processing country CSVs, `type == 0` (vegetation fire), plus our own static-source filter: 0.01° cells with detections on 16 or more days a year are dropped.
 2. Detections assigned to GISCO NUTS 2024 regions (Greece) and IGN provinces (Argentina).
@@ -44,7 +44,7 @@ Leave-one-year-out (LOYO) over 2012-2019: fit on seven years, predict the eighth
 | Peak month hit, harmonized vs raw MODIS | 86 % vs 57 % | 100 % vs 86 % |
 | Time split, fit 2012-2019, test 2020-2025 | 7.1 % | 7.0 % |
 
-- Regions: 12 of 13 Greek regions and 21 of 24 Argentine provinces are `harmonized`. Ionia Nisia, Ciudad de Buenos Aires, Neuquén and Tierra del Fuego are `relative`.
+- Regions: 12 of 13 Greek regions and 22 of 24 Argentine provinces are `harmonized`. Ionia Nisia, Ciudad de Buenos Aires and Tierra del Fuego are `relative`.
 - Mode rule: `relative` when the LOYO error of annual totals exceeds 25 %, or when the harmonized series misses the VIIRS peak month in more season years than raw MODIS, with one year of tolerance. We added that tolerance on 14 Nov after seeing the results: with 7-8 held-out years, one year moves the hit rate by 13-14 points.
 - Per-region numbers: [findings-greece.md](docs/wiki/findings-greece.md), [findings-argentina.md](docs/wiki/findings-argentina.md), and `validation.json` per country.
 

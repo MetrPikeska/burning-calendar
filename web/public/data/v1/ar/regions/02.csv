@@ -6,8 +6,8 @@ region_id,mode,ym,modis,viirs,harm,harm_lo,harm_hi,src,fit_level,anom_pct,anom,o
 02,relative,2001-03,0,,,,,backcast_terra,national_dn,50.0,false,0,false,0.0,0.0,2002-2011,0,,0,false,false
 02,relative,2001-04,0,,,,,backcast_terra,national_dn,45.0,false,0,false,0.0,0.2,2002-2011,0,,0,false,false
 02,relative,2001-05,0,,,,,backcast_terra,national_dn,50.0,false,0,false,0.0,0.0,2002-2011,0,,0,false,false
-02,relative,2001-06,0,,,,,backcast_terra,national_dn,50.0,false,0,false,0.0,0.0,2002-2011,0,,0,false,false
-02,relative,2001-07,0,,,,,backcast_terra,national_dn,45.0,false,0,false,0.0,0.1,2002-2011,0,,0,false,false
+02,relative,2001-06,0,,,,,backcast_terra,national_dn,50.0,false,15,true,0.0,0.0,2002-2011,0,,0,false,false
+02,relative,2001-07,0,,,,,backcast_terra,national_dn,45.0,false,3,true,0.0,0.1,2002-2011,0,,0,false,false
 02,relative,2001-08,0,,,,,backcast_terra,national_dn,50.0,false,0,false,0.0,0.0,2002-2011,0,,0,false,false
 02,relative,2001-09,0,,,,,backcast_terra,national_dn,45.0,false,0,false,0.0,0.1,2002-2011,0,,0,false,false
 02,relative,2001-10,0,,,,,backcast_terra,national_dn,40.0,false,0,false,0.0,1.0,2002-2011,0,,0,false,false
@@ -15,12 +15,12 @@ region_id,mode,ym,modis,viirs,harm,harm_lo,harm_hi,src,fit_level,anom_pct,anom,o
 02,relative,2001-12,0,,,,,backcast_terra,national_dn,10.0,false,0,false,1.0,3.1,2002-2011,0,,0,false,false
 02,relative,2002-01,0,,,,,backcast_terra,national_dn,22.2,false,0,false,1.0,1.2,2002-2011 without 2002,0,,0,false,false
 02,relative,2002-02,0,,,,,backcast_terra,national_dn,50.0,false,0,false,0.0,0.0,2002-2011 without 2002,0,,0,false,false
-02,relative,2002-03,0,,,,,backcast_terra,national_dn,50.0,false,0,false,0.0,0.0,2002-2011 without 2002,0,,0,false,false
+02,relative,2002-03,0,,,,,backcast_terra,national_dn,50.0,false,9,true,0.0,0.0,2002-2011 without 2002,0,,0,false,false
 02,relative,2002-04,0,,,,,backcast_terra,national_dn,44.4,false,0,false,0.0,0.4,2002-2011 without 2002,0,,0,false,false
 02,relative,2002-05,0,,,,,backcast_terra,national_dn,50.0,false,0,false,0.0,0.0,2002-2011 without 2002,0,,0,false,false
 02,relative,2002-06,0,,,,,backcast_terra,national_dn,50.0,false,0,false,0.0,0.0,2002-2011 without 2002,0,,0,false,false
-02,relative,2002-07,0,,,,,backcast,national_dn,44.4,false,0,false,0.0,0.2,2002-2011 without 2002,0,,0,false,false
-02,relative,2002-08,0,,,,,backcast,national_dn,50.0,false,0,false,0.0,0.0,2002-2011 without 2002,0,,0,false,false
+02,relative,2002-07,0,,,,,backcast,national_dn,44.4,false,2,false,0.0,0.2,2002-2011 without 2002,0,,0,false,false
+02,relative,2002-08,0,,,,,backcast,national_dn,50.0,false,7,true,0.0,0.0,2002-2011 without 2002,0,,0,false,false
 02,relative,2002-09,0,,,,,backcast,national_dn,44.4,false,0,false,0.0,0.2,2002-2011 without 2002,0,,0,false,false
 02,relative,2002-10,0,,,,,backcast,national_dn,38.9,false,0,false,0.0,1.0,2002-2011 without 2002,0,,0,false,false
 02,relative,2002-11,1,,,,,backcast,national_dn,61.1,false,0,false,1.0,2.2,2002-2011 without 2002,1,,0,false,false
@@ -36,7 +36,7 @@ region_id,mode,ym,modis,viirs,harm,harm_lo,harm_hi,src,fit_level,anom_pct,anom,o
 02,relative,2003-09,0,,,,,backcast,national_dn,44.4,false,0,false,0.0,0.2,2002-2011 without 2003,0,,0,false,false
 02,relative,2003-10,0,,,,,backcast,national_dn,38.9,false,0,false,0.0,1.0,2002-2011 without 2003,0,,0,false,false
 02,relative,2003-11,0,,,,,backcast,national_dn,16.7,false,0,false,1.0,2.2,2002-2011 without 2003,0,,0,false,false
-02,relative,2003-12,1,,,,,backcast,national_dn,50.0,false,0,false,1.0,3.2,2002-2011 without 2003,1,,0,false,false
+02,relative,2003-12,1,,,,,backcast,national_dn,50.0,false,8,true,1.0,3.2,2002-2011 without 2003,1,,0,false,false
 02,relative,2004-01,0,,,,,backcast,national_dn,22.2,false,0,false,1.0,1.2,2002-2011 without 2004,0,,0,false,false
 02,relative,2004-02,0,,,,,backcast,national_dn,50.0,false,0,false,0.0,0.0,2002-2011 without 2004,0,,0,false,false
 02,relative,2004-03,0,,,,,backcast,national_dn,50.0,false,0,false,0.0,0.0,2002-2011 without 2004,0,,0,false,false
@@ -133,7 +133,7 @@ region_id,mode,ym,modis,viirs,harm,harm_lo,harm_hi,src,fit_level,anom_pct,anom,o
 02,relative,2011-10,1,,,,,backcast,national_dn,94.4,true,0,false,0.0,0.2,2002-2011 without 2011,1,,0,false,false
 02,relative,2011-11,1,,,,,backcast,national_dn,61.1,false,0,false,1.0,2.2,2002-2011 without 2011,1,,0,false,false
 02,relative,2011-12,3,,,,,backcast,national_dn,88.9,true,0,false,1.0,1.6,2002-2011 without 2011,3,,0,false,false
-02,relative,2012-01,1,0,,,,observed,,70.0,false,0,false,0.5,1.1,2002-2011,1,0,0,false,false
+02,relative,2012-01,1,0,,,,backcast,national_dn,70.0,false,0,false,0.5,1.1,2002-2011,1,0,19,true,false
 02,relative,2012-02,2,0,,,,observed,,100.0,true,0,false,0.0,0.0,2002-2011,2,0,0,false,false
 02,relative,2012-03,0,1,,,,observed,,50.0,false,0,false,0.0,0.0,2002-2011,0,1,0,false,false
 02,relative,2012-04,0,0,,,,observed,,45.0,false,0,false,0.0,0.2,2002-2011,0,0,0,false,false
@@ -182,10 +182,10 @@ region_id,mode,ym,modis,viirs,harm,harm_lo,harm_hi,src,fit_level,anom_pct,anom,o
 02,relative,2015-11,0,1,,,,observed,,15.0,false,0,false,1.0,2.1,2005-2014,0,1,0,false,false
 02,relative,2015-12,2,0,,,,observed,,70.0,false,0,false,1.0,4.0,2005-2014,2,0,0,false,false
 02,relative,2016-01,1,0,,,,observed,,70.0,false,0,false,0.5,1.1,2006-2015,1,0,0,false,false
-02,relative,2016-02,0,0,,,,observed,,40.0,false,0,false,0.0,1.1,2006-2015,0,0,0,false,false
+02,relative,2016-02,0,0,,,,observed,,40.0,false,9,true,0.0,1.1,2006-2015,0,0,0,false,false
 02,relative,2016-03,0,3,,,,observed,,50.0,false,0,false,0.0,0.0,2006-2015,0,2,0,false,false
 02,relative,2016-04,0,0,,,,observed,,45.0,false,0,false,0.0,0.2,2006-2015,0,0,0,false,false
-02,relative,2016-05,0,0,,,,observed,,50.0,false,0,false,0.0,0.0,2006-2015,0,0,0,false,false
+02,relative,2016-05,0,0,,,,observed,,50.0,false,5,true,0.0,0.0,2006-2015,0,0,0,false,false
 02,relative,2016-06,0,0,,,,observed,,50.0,false,0,false,0.0,0.0,2006-2015,0,0,0,false,false
 02,relative,2016-07,0,0,,,,observed,,45.0,false,0,false,0.0,0.1,2006-2015,0,0,0,false,false
 02,relative,2016-08,0,0,,,,observed,,50.0,false,0,false,0.0,0.0,2006-2015,0,0,0,false,false
@@ -221,7 +221,7 @@ region_id,mode,ym,modis,viirs,harm,harm_lo,harm_hi,src,fit_level,anom_pct,anom,o
 02,relative,2019-02,0,0,,,,observed,,40.0,false,0,false,0.0,1.1,2009-2018,0,0,0,false,false
 02,relative,2019-03,0,5,,,,observed,,50.0,false,0,false,0.0,0.0,2009-2018,0,2,0,false,false
 02,relative,2019-04,0,0,,,,observed,,45.0,false,0,false,0.0,0.2,2009-2018,0,0,0,false,false
-02,relative,2019-05,0,0,,,,observed,,50.0,false,0,false,0.0,0.0,2009-2018,0,0,0,false,false
+02,relative,2019-05,0,0,,,,observed,,50.0,false,4,true,0.0,0.0,2009-2018,0,0,0,false,false
 02,relative,2019-06,0,0,,,,observed,,50.0,false,0,false,0.0,0.0,2009-2018,0,0,0,false,false
 02,relative,2019-07,0,0,,,,observed,,45.0,false,0,false,0.0,0.1,2009-2018,0,0,0,false,false
 02,relative,2019-08,0,0,,,,observed,,50.0,false,0,false,0.0,0.0,2009-2018,0,0,0,false,false
@@ -255,14 +255,14 @@ region_id,mode,ym,modis,viirs,harm,harm_lo,harm_hi,src,fit_level,anom_pct,anom,o
 02,relative,2021-12,0,1,,,,observed,,15.0,false,0,false,1.5,4.0,2011-2020,0,1,0,false,false
 02,relative,2022-01,0,1,,,,observed,,35.0,false,0,false,0.0,1.0,2012-2021,0,1,0,false,false
 02,relative,2022-02,0,0,,,,observed,,40.0,false,0,false,0.0,1.1,2012-2021,0,0,0,false,false
-02,relative,2022-03,0,0,,,,observed,,50.0,false,0,false,0.0,0.0,2012-2021,0,0,0,false,false
-02,relative,2022-04,0,0,,,,observed,,50.0,false,0,false,0.0,0.0,2012-2021,0,0,0,false,false
+02,relative,2022-03,0,0,,,,observed,,50.0,false,1,false,0.0,0.0,2012-2021,0,0,0,false,false
+02,relative,2022-04,0,0,,,,observed,,50.0,false,16,true,0.0,0.0,2012-2021,0,0,0,false,false
 02,relative,2022-05,0,0,,,,observed,,50.0,false,0,false,0.0,0.0,2012-2021,0,0,0,false,false
 02,relative,2022-06,0,0,,,,observed,,50.0,false,0,false,0.0,0.0,2012-2021,0,0,0,false,false
-02,relative,2022-07,0,0,,,,observed,,50.0,false,0,false,0.0,0.0,2012-2021,0,0,0,false,false
-02,relative,2022-08,0,1,,,,observed,,50.0,false,0,false,0.0,0.0,2012-2021,0,1,0,false,false
+02,relative,2022-07,0,0,,,,observed,,50.0,false,0,false,0.0,0.0,2012-2021,0,0,5,true,false
+02,relative,2022-08,0,1,,,,observed,,50.0,false,0,false,0.0,0.0,2012-2021,0,1,10,true,false
 02,relative,2022-09,0,0,,,,observed,,50.0,false,0,false,0.0,0.0,2012-2021,0,0,0,false,false
-02,relative,2022-10,0,0,,,,observed,,45.0,false,0,false,0.0,0.1,2012-2021,0,0,0,false,false
+02,relative,2022-10,0,0,,,,observed,,45.0,false,13,true,0.0,0.1,2012-2021,0,0,0,false,false
 02,relative,2022-11,0,0,,,,observed,,35.0,false,0,false,0.0,1.1,2012-2021,0,0,0,false,false
 02,relative,2022-12,0,2,,,,observed,,20.0,false,0,false,1.0,4.0,2012-2021,0,2,0,false,false
 02,relative,2023-01,0,6,,,,observed,,40.0,false,0,false,0.0,1.0,2013-2022,0,4,0,false,false
@@ -281,9 +281,9 @@ region_id,mode,ym,modis,viirs,harm,harm_lo,harm_hi,src,fit_level,anom_pct,anom,o
 02,relative,2024-02,0,0,,,,observed,,45.0,false,0,false,0.0,0.1,2014-2023,0,0,0,false,false
 02,relative,2024-03,0,0,,,,observed,,50.0,false,0,false,0.0,0.0,2014-2023,0,0,0,false,false
 02,relative,2024-04,0,0,,,,observed,,50.0,false,0,false,0.0,0.0,2014-2023,0,0,0,false,false
-02,relative,2024-05,0,0,,,,observed,,50.0,false,0,false,0.0,0.0,2014-2023,0,0,0,false,false
-02,relative,2024-06,0,0,,,,observed,,50.0,false,0,false,0.0,0.0,2014-2023,0,0,0,false,false
-02,relative,2024-07,0,0,,,,observed,,50.0,false,0,false,0.0,0.0,2014-2023,0,0,0,false,false
+02,relative,2024-05,0,0,,,,observed,,50.0,false,0,false,0.0,0.0,2014-2023,0,0,2,false,false
+02,relative,2024-06,0,0,,,,observed,,50.0,false,0,false,0.0,0.0,2014-2023,0,0,3,true,false
+02,relative,2024-07,0,0,,,,observed,,50.0,false,0,false,0.0,0.0,2014-2023,0,0,10,true,false
 02,relative,2024-08,0,0,,,,observed,,50.0,false,0,false,0.0,0.0,2014-2023,0,0,0,false,false
 02,relative,2024-09,0,0,,,,observed,,50.0,false,0,false,0.0,0.0,2014-2023,0,0,0,false,false
 02,relative,2024-10,0,0,,,,observed,,45.0,false,0,false,0.0,0.1,2014-2023,0,0,0,false,false

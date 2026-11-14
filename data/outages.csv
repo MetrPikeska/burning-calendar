@@ -4,3 +4,17 @@ S-NPP,2026-03-10,2026-03-12,VIIRS S-NPP: no detections worldwide in FIRMS SP (ch
 S-NPP,2026-04-28,2026-04-30,VIIRS S-NPP: no detections in Greece or Argentina in FIRMS SP,docs/wiki/data-firms.md
 S-NPP,2026-06-01,2026-06-02,VIIRS S-NPP: no detections in Greece or Argentina in FIRMS SP,docs/wiki/data-firms.md
 S-NPP,2026-07-11,2026-07-16,VIIRS S-NPP: no detections worldwide in FIRMS SP (checked 2026-07-13),docs/wiki/data-firms.md
+Terra,2001-06-16,2001-07-03,Terra MODIS: no detections in Greece or Argentina for 4+ days in FIRMS SP (gap check 2026-11-14),burncal-wp4
+Terra,2002-03-20,2002-03-28,Terra MODIS: no detections in Greece or Argentina for 4+ days in FIRMS SP (gap check 2026-11-14),burncal-wp4
+Terra,2003-12-17,2003-12-24,Terra MODIS: no detections in Greece or Argentina for 4+ days in FIRMS SP (gap check 2026-11-14),burncal-wp4
+Terra,2016-02-19,2016-02-27,Terra MODIS: no detections in Greece or Argentina for 4+ days in FIRMS SP (gap check 2026-11-14) (inside the 2012-2019 fit window),burncal-wp4
+Terra,2016-05-08,2016-05-12,Terra MODIS: no detections in Greece or Argentina for 4+ days in FIRMS SP (gap check 2026-11-14) (inside the 2012-2019 fit window),burncal-wp4
+Terra,2019-05-19,2019-05-22,Terra MODIS: no detections in Greece or Argentina for 4+ days in FIRMS SP (gap check 2026-11-14) (inside the 2012-2019 fit window),burncal-wp4
+Terra,2022-10-11,2022-10-23,Terra MODIS: no detections in Greece or Argentina for 4+ days in FIRMS SP (gap check 2026-11-14),burncal-wp4
+Aqua,2002-07-30,2002-08-07,Aqua MODIS: no detections in Greece or Argentina for 4+ days in FIRMS SP (gap check 2026-11-14),burncal-wp4
+Aqua,2022-03-31,2022-04-16,Aqua MODIS: no detections in Greece or Argentina for 4+ days in FIRMS SP (gap check 2026-11-14),burncal-wp4
+S-NPP,2022-07-27,2022-08-10,VIIRS S-NPP: no detections in Greece or Argentina for 4+ days in FIRMS SP (gap check 2026-11-14),burncal-wp4
+S-NPP,2024-05-30,2024-06-03,VIIRS S-NPP: no detections in Greece or Argentina for 4+ days in FIRMS SP (gap check 2026-11-14),burncal-wp4
+S-NPP,2024-07-10,2024-07-15,VIIRS S-NPP: no detections in Greece or Argentina for 4+ days in FIRMS SP (gap check 2026-11-14),burncal-wp4
+S-NPP,2024-07-25,2024-07-28,VIIRS S-NPP: no detections in Greece or Argentina for 4+ days in FIRMS SP (gap check 2026-11-14),burncal-wp4
+S-NPP,2012-01-01,2012-01-19,VIIRS S-NPP record in FIRMS starts 20 Jan 2012: Jan 2012 is a partial month (back-cast in harm),docs/wiki/sensors.md

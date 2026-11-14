@@ -93,7 +93,7 @@ export function renderValidation(region: RegionFile, country: CountryCode, width
   const links = document.createElement("p");
   links.className = "foot";
   links.innerHTML = `${region.mode === "harmonized"
-    ? "Back-cast months (before 2012) carry a likely range, shown in the tooltip and in the month card. "
+    ? "Back-cast months (before Feb 2012) carry a likely range, shown in the tooltip and in the month card. "
     : ""}Full numbers: <a href="${dataUrl(country, "validation.json")}">validation.json</a>,
     <a href="${dataUrl(country, `regions/${encodeURIComponent(region.id)}.json`)}">region JSON</a>.`;
   el.append(links);

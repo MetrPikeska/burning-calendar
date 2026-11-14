@@ -356,7 +356,7 @@ describe("rankRegions", () => {
     expect(r.ranked).toHaveLength(5);
     expect(r.ranked[0]).toMatchObject({ rank: 1, id: "34" }); // Formosa
     expect(r.ranked.every((x) => x.mode === "harmonized")).toBe(true);
-    expect(r.excluded_relative.map((x) => x.id).sort()).toEqual(["02", "58", "94", "EL62"]);
+    expect(r.excluded_relative.map((x) => x.id).sort()).toEqual(["02", "94", "EL62"]);
     expect(r.caveats.map((c) => c.code)).toContain("relative_mode");
   });
 
@@ -441,8 +441,8 @@ describe("validationFor", () => {
     const cv = read<{ static_filter: object; assignment: object; regions: Record<string, unknown> }>("ar/validation.json");
     const v = validationFor(ar, { validation: cv, index: arIndex });
     expect(v.regions).toHaveLength(24);
-    const row = v.regions!.find((r) => r.id === "58")!;
-    expect(row).toMatchObject({ name: "Neuquén", mode: "relative" });
+    const row = v.regions!.find((r) => r.id === "94")!;
+    expect(row).toMatchObject({ name: "Tierra del Fuego, Antártida e Islas del Atlántico Sur", mode: "relative" });
     expect(row.loyo_mdape_pct).toBeGreaterThan(25);
     expect(v.static_filter).toBeDefined();
   });

@@ -5,6 +5,8 @@ verified_by: uv run python pipeline/download_firms_api.py; uv run python pipelin
 sources: [../../pipeline/build.py, ../../pipeline/validate.py, ../../pipeline/regions.py]
 ---
 
+**15 Nov rebuild (burncal-dxk, burncal-wp4):** January 2012 is now back-cast and stays out of the fit and validation (FIRMS S-NPP starts 20 Jan 2012; the 12-day month had pulled January factors low, Argentina Jan 2012 VIIRS/MODIS 0.98 vs 2.8-3.9 in 2013-2019). Sensor gaps of 4+ days found in the detection files were added to `data/outages.csv`. Only January back-cast months changed (and December where the season-level fallback pools DJF). Tables below are from that rebuild.
+
 All numbers computed on 14 Nov 2026 from FIRMS SP country CSVs (MODIS 2000-2025, VIIRS S-NPP 2012-2025), `type == 0`, static filter, IGN provinces ([boundaries.md](boundaries.md)).
 
 ## Data
@@ -18,40 +20,40 @@ All numbers computed on 14 Nov 2026 from FIRMS SP country CSVs (MODIS 2000-2025,
 
 - LOYO over 2012-2019: annual totals median absolute error 1.5 % (worst 2012, +13.9 %); monthly r 0.986, bias 0.0 %, RMSE log1p 0.164.
 - Peak-month hit rate over 7 held-out season years: harmonized 1.0, raw MODIS vs VIIRS 0.857. Onset exact in 100 % of years (raw MODIS 86 %).
-- Time split (fit 2012-2019, test 2020-2025): annual median absolute error 7.0 %, monthly bias -6.7 %. Worst year 2022, -16.7 %.
-- Ratio trend 2012-2025: day +0.87 % per year (2.66-3.51), night +0.10 % per year (5.10-6.65). No night decline as in Greece ([findings-greece.md](findings-greece.md)).
-- Fit window gap: +3.2 %, above the LOYO error of 1.5 %. By the decided rule the back-cast uses the 2012-2019 fit.
+- Time split (fit 2012-2019, test 2020-2025): annual median absolute error 6.7 %, monthly bias -5.9 %. Worst year 2022, -14.8 %.
+- Ratio trend 2012-2025: day +0.71 % per year, night -0.27 % per year (values per year in validation.json). No night decline as in Greece ([findings-greece.md](findings-greece.md)).
+- Fit window gap: +3.1 %, above the LOYO error of 1.5 %. By the decided rule the back-cast uses the 2012-2019 fit.
 
 ## Provinces
 
 | in1 | name | mode | LOYO MdAPE % | peak hit harm / raw | time split MdAPE % | fit gap % |
 |---|---|---|---|---|---|---|
-| 02 | Ciudad Autónoma de Buenos Aires | relative | 114.5 | 0.0 / 0.0 | 100.0 | 4.0 |
-| 06 | Buenos Aires | harmonized | 8.7 | 0.857 / 0.857 | 22.8 | 12.2 |
-| 10 | Catamarca | harmonized | 13.2 | 1.0 / 0.857 | 13.1 | -7.7 |
-| 14 | Córdoba | harmonized | 11.1 | 1.0 / 1.0 | 5.1 | 1.2 |
-| 18 | Corrientes | harmonized | 7.3 | 0.857 / 1.0 | 4.6 | 3.4 |
-| 22 | Chaco | harmonized | 2.8 | 1.0 / 1.0 | 7.7 | -2.8 |
-| 26 | Chubut | harmonized | 11.8 | 0.857 / 0.714 | 19.2 | -7.2 |
-| 30 | Entre Ríos | harmonized | 7.6 | 1.0 / 1.0 | 11.2 | -1.4 |
-| 34 | Formosa | harmonized | 1.7 | 1.0 / 1.0 | 6.8 | 2.7 |
-| 38 | Jujuy | harmonized | 5.2 | 0.714 / 0.429 | 18.1 | 9.5 |
-| 42 | La Pampa | harmonized | 12.5 | 0.714 / 0.714 | 3.9 | -0.7 |
-| 46 | La Rioja | harmonized | 10.5 | 0.714 / 0.714 | 9.1 | -4.5 |
-| 50 | Mendoza | harmonized | 9.9 | 0.857 / 0.714 | 20.2 | 8.0 |
-| 54 | Misiones | harmonized | 2.9 | 1.0 / 1.0 | 10.9 | -3.3 |
-| 58 | Neuquén | relative | 26.5 | 0.571 / 0.857 | 21.6 | 4.2 |
-| 62 | Río Negro | harmonized | 6.2 | 0.571 / 0.571 | 7.6 | 0.7 |
-| 66 | Salta | harmonized | 7.1 | 0.857 / 1.0 | 7.8 | 11.6 |
-| 70 | San Juan | harmonized | 7.6 | 1.0 / 0.714 | 6.5 | 2.6 |
-| 74 | San Luis | harmonized | 6.1 | 0.714 / 0.714 | 6.2 | -2.7 |
-| 78 | Santa Cruz | harmonized | 15.8 | 0.571 / 0.571 | 14.0 | -6.2 |
-| 82 | Santa Fe | harmonized | 5.0 | 0.857 / 0.857 | 8.4 | 3.0 |
-| 86 | Santiago del Estero | harmonized | 3.1 | 0.857 / 0.857 | 8.5 | -2.7 |
-| 90 | Tucumán | harmonized | 7.4 | 1.0 / 1.0 | 2.8 | -0.5 |
-| 94 | Tierra del Fuego, Antártida e Islas del Atlántico Sur | relative | 45.4 | 0.143 / 0.143 | 54.6 | 93.4 |
+| 02 | Ciudad Autónoma de Buenos Aires | relative | 115.6 | 0.0 / 0.0 | 100.0 | 3.4 |
+| 06 | Buenos Aires | harmonized | 8.1 | 0.714 / 0.857 | 22.4 | 12.3 |
+| 10 | Catamarca | harmonized | 12.8 | 1.0 / 0.857 | 15.0 | -8.3 |
+| 14 | Córdoba | harmonized | 10.4 | 1.0 / 1.0 | 5.7 | 1.1 |
+| 18 | Corrientes | harmonized | 7.2 | 0.857 / 1.0 | 4.7 | 3.6 |
+| 22 | Chaco | harmonized | 2.3 | 1.0 / 1.0 | 8.3 | -2.8 |
+| 26 | Chubut | harmonized | 12.8 | 0.857 / 0.714 | 33.6 | -13.8 |
+| 30 | Entre Ríos | harmonized | 6.5 | 1.0 / 1.0 | 11.5 | -1.7 |
+| 34 | Formosa | harmonized | 2.3 | 1.0 / 1.0 | 4.2 | 1.6 |
+| 38 | Jujuy | harmonized | 5.6 | 0.714 / 0.429 | 18.1 | 9.5 |
+| 42 | La Pampa | harmonized | 6.4 | 0.714 / 0.714 | 4.0 | -0.7 |
+| 46 | La Rioja | harmonized | 13.0 | 0.714 / 0.714 | 9.0 | -4.5 |
+| 50 | Mendoza | harmonized | 9.3 | 0.857 / 0.714 | 20.0 | 8.0 |
+| 54 | Misiones | harmonized | 2.3 | 1.0 / 1.0 | 11.6 | -4.7 |
+| 58 | Neuquén | harmonized | 20.5 | 0.714 / 0.857 | 25.8 | 1.7 |
+| 62 | Río Negro | harmonized | 6.3 | 0.571 / 0.571 | 7.6 | 0.7 |
+| 66 | Salta | harmonized | 7.2 | 0.857 / 1.0 | 7.5 | 11.4 |
+| 70 | San Juan | harmonized | 7.6 | 1.0 / 0.714 | 6.5 | 2.7 |
+| 74 | San Luis | harmonized | 3.9 | 0.857 / 0.714 | 7.0 | -2.8 |
+| 78 | Santa Cruz | harmonized | 15.1 | 0.571 / 0.571 | 13.1 | -7.2 |
+| 82 | Santa Fe | harmonized | 4.6 | 0.857 / 0.857 | 7.9 | 3.2 |
+| 86 | Santiago del Estero | harmonized | 3.8 | 0.857 / 0.857 | 9.0 | -2.7 |
+| 90 | Tucumán | harmonized | 7.5 | 1.0 / 1.0 | 2.8 | -0.5 |
+| 94 | Tierra del Fuego, Antártida e Islas del Atlántico Sur | relative | 62.1 | 0.143 / 0.143 | 60.1 | 140.2 |
 
-- 21 of 24 provinces are `harmonized`. CABA (02) and Tierra del Fuego (94) are `relative` on the error threshold (very few detections); Neuquén (58) on both the error threshold and the peak-hit rule (4 of 7 vs raw MODIS 6 of 7). Under the original rule Corrientes (18) and Salta (66) were also `relative`, on one season year.
+- 22 of 24 provinces are `harmonized`. CABA (02) and Tierra del Fuego (94) are `relative` on the error threshold (very few detections). Neuquén (58) was `relative` until the 15 Nov rebuild (LOYO 26.5 %); without the partial January 2012 its LOYO error is 20.5 % and its peak-hit rate 5 of 7 vs raw MODIS 6 of 7, so it is `harmonized` now. Its time split error is 25.8 %. Under the original rule Corrientes (18) and Salta (66) were also `relative`, on one season year.
 
 ## Stress years
 

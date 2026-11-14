@@ -5,7 +5,7 @@
 Read before using the numbers:
 
 - A region with `mode: "relative"` failed validation (leave-one-year-out annual error above 25 %, or the harmonized series missed the VIIRS peak month in at least two more held-out season years than raw MODIS). Its `harm` is null and its calendar and anomalies come from MODIS counts alone. Do not compare its counts with harmonized regions.
-- Months with `src` `backcast` or `backcast_terra` (before 2012) are modelled, not observed. Quote them with the `harm_lo` to `harm_hi` range (10th to 90th percentile of out-of-sample errors).
+- Months with `src` `backcast` or `backcast_terra` (Nov 2000 to Jan 2012; FIRMS S-NPP starts 20 Jan 2012) are modelled, not observed. Quote them with the `harm_lo` to `harm_hi` range (10th to 90th percentile of out-of-sample errors).
 - Counts are detections, not fires and not burned area. One fire can produce many detections.
 - `outage: true` marks months with at least 3 days of known MODIS data gaps (Aqua Aug-Sep 2020); `outage_viirs: true` the same for VIIRS S-NPP (Mar, Apr and Jul 2026). Observed months (2012 on) depend on VIIRS, back-cast months on MODIS.
 - Jan-Oct 2026 come from the FIRMS area API, not the yearly country files. Months with `provisional: true` (from `period.provisional_from` in the index, Aug 2026) use near real-time data and may change. Near real-time rows have no `type` field, so static sources are removed with a cell mask from the 2023-2026 standard record.
