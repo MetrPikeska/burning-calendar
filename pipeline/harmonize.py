@@ -1,21 +1,20 @@
-"""Harmonization v0: VIIRS-equivalent monthly counts for one region.
+"""Harmonization: VIIRS-equivalent monthly counts for one region.
 
-Factor F[month, dn] = sum(VIIRS) / sum(MODIS Terra+Aqua) over the fit window,
-with a fallback chain month -> season -> all months when the MODIS stratum is thin.
+Factor F[month, dn] = sum(VIIRS) / sum(MODIS Terra+Aqua) over the fit window, with the
+fallback chain region_month_dn -> region_season_dn -> region_dn -> national_dn. A stratum
+is accepted when its MODIS total over the window is >= MIN_TOTAL and >= MIN_PER_YEAR per year.
 Back-cast: 2002-07..2011-12 = sum_dn F * MODIS.
-Terra-only months (2000-11..2002-06): chained G[month, dn] = (Terra+Aqua)/Terra fitted
-on 2003-2011, then F * G * Terra.
-From 2012 the series is observed VIIRS.
-
-Uncertainty v0: 10th/90th percentile of the yearly ratios in the stratum over the fit
-window (stand-in until the LOYO residuals of step 2).
+Terra-only months (2000-11..2002-06): chained G[month, dn] = (Terra+Aqua)/Terra fitted on
+2003-2011 with the same chain, then F * G * Terra.
+From 2012 the series is observed VIIRS. Uncertainty bands come from validate.loyo_band.
 """
 
 import numpy as np
 import pandas as pd
 
-FIT_YEARS = range(2012, 2020)
-CHAIN_YEARS = range(2003, 2012)
+FIT_YEARS = tuple(range(2012, 2020))
+FULL_YEARS = tuple(range(2012, 2026))
+CHAIN_YEARS = tuple(range(2003, 2012))
 START, END = "2000-11", "2025-12"
 AQUA_START = "2002-07"
 VIIRS_START = "2012-01"
@@ -23,13 +22,13 @@ MIN_PER_YEAR = 5
 MIN_TOTAL = 30
 SEASON = {12: "DJF", 1: "DJF", 2: "DJF", 3: "MAM", 4: "MAM", 5: "MAM",
           6: "JJA", 7: "JJA", 8: "JJA", 9: "SON", 10: "SON", 11: "SON"}
-LEVELS = ["region_month_dn", "region_season_dn", "region_dn"]
+LEVELS = ["region_month_dn", "region_season_dn", "region_dn", "national_dn"]
+RANK = {lvl: i for i, lvl in enumerate(LEVELS)}
 
 
 def monthly_counts(df: pd.DataFrame) -> pd.DataFrame:
-    """Wide monthly table indexed by ym: columns {modis,terra,aqua,viirs}_{D,N}."""
-    d = df.copy()
-    d["src"] = np.where(d["sensor"] == "viirs", "viirs", d["satellite"].str.lower())
+    """Wide monthly table indexed by ym: columns {modis,terra,aqua,viirs}_{D,N}, year, month."""
+    d = df.assign(src=np.where(df["sensor"] == "viirs", "viirs", df["satellite"].str.lower()))
     wide = d.groupby(["ym", "src", "daynight"]).size().unstack(["src", "daynight"], fill_value=0)
     wide.columns = [f"{s}_{dn}" for s, dn in wide.columns]
     yms = pd.period_range(START, END, freq="M").strftime("%Y-%m")
@@ -46,68 +45,87 @@ def monthly_counts(df: pd.DataFrame) -> pd.DataFrame:
     return wide
 
 
-def _ratio_table(m: pd.DataFrame, num: str, den: str, years: range) -> pd.DataFrame:
-    """Fit num/den per (month, dn) with fallback. Returns rows month, dn, f, f_lo, f_hi, level."""
+def _accept(den_total: float, n_years: int) -> bool:
+    return den_total >= MIN_TOTAL and den_total / n_years >= MIN_PER_YEAR
+
+
+def fit_ratio(m: pd.DataFrame, num: str, den: str, years, national: pd.DataFrame | None = None) -> pd.DataFrame:
+    """num/den per (month, dn) with the fallback chain. Rows: month, dn, f, level, den_total."""
+    years = tuple(years)
     w = m[m["year"].isin(years)]
-    n_years = len(years)
+    nat = national[national["year"].isin(years)] if national is not None else w
     rows = []
     for dn in "DN":
         nu, de = f"{num}_{dn}", f"{den}_{dn}"
-        yearly = w.groupby(["year", "month"])[[nu, de]].sum().reset_index()
-        yearly["season"] = yearly["month"].map(SEASON)
-        groupings = [("month", lambda mo: yearly["month"] == mo),
-                     ("season", lambda mo: yearly["season"] == SEASON[mo]),
-                     ("all", lambda mo: np.ones(len(yearly), bool))]
+        by_month = w.groupby("month")[[nu, de]].sum()
+        by_season = w.groupby(w["month"].map(SEASON))[[nu, de]].sum()
+        total = w[[nu, de]].sum()
+        nat_total = nat[[nu, de]].sum()
         for mo in range(1, 13):
-            for level, (_, sel) in zip(LEVELS, groupings):
-                g = yearly[sel(mo)].groupby("year")[[nu, de]].sum()
-                tot_de = g[de].sum()
-                if tot_de >= MIN_TOTAL and tot_de / n_years >= MIN_PER_YEAR or level == LEVELS[-1]:
+            cands = [("region_month_dn", by_month.loc[mo] if mo in by_month.index else None),
+                     ("region_season_dn", by_season.loc[SEASON[mo]] if SEASON[mo] in by_season.index else None),
+                     ("region_dn", total)]
+            level, s = "national_dn", nat_total
+            for lvl, c in cands:
+                if c is not None and _accept(c[de], len(years)):
+                    level, s = lvl, c
                     break
-            f = g[nu].sum() / tot_de if tot_de else np.nan
-            r = (g[nu] / g[de]).replace([np.inf], np.nan).dropna()
-            lo, hi = (np.percentile(r, [10, 90]) if len(r) >= 3 else (np.nan, np.nan))
-            rows.append({"month": mo, "dn": dn, "f": f, "f_lo": lo, "f_hi": hi,
-                         "level": level, "den_total": int(tot_de)})
+            f = s[nu] / s[de] if s[de] > 0 else np.nan
+            rows.append({"month": mo, "dn": dn, "f": float(f), "level": level, "den_total": int(s[de])})
     return pd.DataFrame(rows)
 
 
-def fit(m: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """F = VIIRS/MODIS on FIT_YEARS, G = MODIS/Terra on CHAIN_YEARS."""
-    return _ratio_table(m, "viirs", "modis", FIT_YEARS), _ratio_table(m, "modis", "terra", CHAIN_YEARS)
+def fit(m: pd.DataFrame, national: pd.DataFrame | None = None, years=FIT_YEARS) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """F = VIIRS/MODIS on `years`, G = MODIS/Terra on CHAIN_YEARS."""
+    return (fit_ratio(m, "viirs", "modis", years, national),
+            fit_ratio(m, "modis", "terra", CHAIN_YEARS, national))
 
 
-def series(m: pd.DataFrame, F: pd.DataFrame, G: pd.DataFrame) -> pd.DataFrame:
-    """Monthly records: ym, modis, viirs, harm, harm_lo, harm_hi, src, fit_level."""
-    Fi = F.set_index(["month", "dn"])
-    Gi = G.set_index(["month", "dn"])
-    rank = {lvl: i for i, lvl in enumerate(LEVELS)}
-    out = []
-    for ym, r in m.iterrows():
-        mo = r["month"]
-        modis = int(r["modis_D"] + r["modis_N"])
-        viirs = int(r["viirs_D"] + r["viirs_N"]) if ym >= VIIRS_START else None
-        rec = {"ym": ym, "modis": modis, "viirs": viirs}
-        if ym >= VIIRS_START:
-            rec.update(harm=float(viirs), harm_lo=None, harm_hi=None, src="observed", fit_level=None)
-        else:
-            terra_only = ym < AQUA_START
-            h = lo = hi = 0.0
-            levels = []
-            for dn in "DN":
-                f = Fi.loc[(mo, dn)]
-                if terra_only:
-                    g = Gi.loc[(mo, dn)]
-                    base = r[f"terra_{dn}"] * g["f"]
-                    levels.append(max(f["level"], g["level"], key=rank.get))
-                else:
-                    base = r[f"modis_{dn}"]
-                    levels.append(f["level"])
-                h += base * f["f"]
-                lo += base * f["f_lo"]
-                hi += base * f["f_hi"]
-            rec.update(harm=round(h, 1), harm_lo=round(lo, 1), harm_hi=round(hi, 1),
-                       src="backcast_terra" if terra_only else "backcast",
-                       fit_level=max(levels, key=rank.get))
-        out.append(rec)
-    return pd.DataFrame(out)
+def model(m: pd.DataFrame, F: pd.DataFrame, G: pd.DataFrame) -> pd.DataFrame:
+    """Modelled VIIRS-equivalent count for every month (ignores observed VIIRS).
+    Columns: model, fit_level, terra_only."""
+    out = pd.DataFrame(index=m.index)
+    out["terra_only"] = m.index < AQUA_START
+    total = np.zeros(len(m))
+    lvl = np.zeros(len(m), dtype=int)
+    for dn in "DN":
+        f = F[F["dn"] == dn].set_index("month")
+        g = G[G["dn"] == dn].set_index("month")
+        fm = m["month"].map(f["f"]).to_numpy()
+        gm = m["month"].map(g["f"]).to_numpy()
+        base = np.where(out["terra_only"], m[f"terra_{dn}"] * gm, m[f"modis_{dn}"])
+        total += np.nan_to_num(base * fm)
+        lf = m["month"].map(f["level"].map(RANK)).to_numpy()
+        lg = m["month"].map(g["level"].map(RANK)).to_numpy()
+        lvl = np.maximum(lvl, np.where(out["terra_only"], np.maximum(lf, lg), lf))
+    out["model"] = total
+    out["fit_level"] = [LEVELS[i] for i in lvl]
+    return out
+
+
+def series(m: pd.DataFrame, F: pd.DataFrame, G: pd.DataFrame, band: pd.DataFrame | None = None,
+           mode: str = "harmonized") -> pd.DataFrame:
+    """Monthly records indexed by ym: modis, viirs, harm, harm_lo, harm_hi, src, fit_level.
+    band: rows month, q_lo, q_hi (multipliers of the modelled value)."""
+    mod = model(m, F, G)
+    rec = pd.DataFrame(index=m.index)
+    rec["modis"] = (m["modis_D"] + m["modis_N"]).astype(int)
+    observed = m.index >= VIIRS_START
+    viirs = (m["viirs_D"] + m["viirs_N"]).astype(float)
+    rec["viirs"] = viirs.where(observed)
+    rec["harm"] = np.where(observed, viirs, mod["model"].round(1))
+    if band is not None:
+        b = band.set_index("month")
+        lo = m["month"].map(b["q_lo"]).to_numpy() * mod["model"]
+        hi = m["month"].map(b["q_hi"]).to_numpy() * mod["model"]
+        rec["harm_lo"] = np.where(observed, np.nan, lo.round(1))
+        rec["harm_hi"] = np.where(observed, np.nan, hi.round(1))
+    else:
+        rec["harm_lo"] = np.nan
+        rec["harm_hi"] = np.nan
+    rec["src"] = np.where(observed, "observed", np.where(mod["terra_only"], "backcast_terra", "backcast"))
+    rec["fit_level"] = np.where(observed, None, mod["fit_level"])
+    if mode == "relative":
+        rec[["harm", "harm_lo", "harm_hi"]] = np.nan
+    rec["viirs"] = rec["viirs"].astype("Int64")
+    return rec

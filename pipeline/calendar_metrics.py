@@ -3,7 +3,9 @@
 Onset/end: first month where the cumulative within-season count reaches 10% / 90%
 (Freeborn et al. 2014). Peak month: highest mean count (Giglio et al. 2006).
 Season year starts at the climatological minimum month and is labelled by the
-calendar year in which it starts. Months are 1-12.
+calendar year that holds most of its months: the start year when the season starts
+in Jan-Jul, the next year when it starts in Aug-Dec (a Dec 2019 - Nov 2020 season is
+2020). Months are 1-12.
 """
 
 import numpy as np
@@ -49,10 +51,11 @@ def is_bimodal(clim: np.ndarray) -> bool:
     return False
 
 
-def season_metrics(s: pd.Series) -> tuple[dict, list[dict]]:
-    """Climatology summary and per-season-year metrics for a monthly series."""
+def season_metrics(s: pd.Series, start_month: int | None = None) -> tuple[dict, list[dict]]:
+    """Climatology summary and per-season-year metrics for a monthly series.
+    start_month defaults to the climatological minimum of `s`."""
     clim = climatology(s)
-    start = int(np.nanargmin(clim)) + 1
+    start = start_month or int(np.nanargmin(clim)) + 1
     order = [(start - 1 + i) % 12 + 1 for i in range(12)]
     on, end, length = onset_end(clim[[m - 1 for m in order]], start)
     summary = {"peak_month": int(np.nanargmax(clim)) + 1, "onset": on, "end": end,
@@ -67,7 +70,7 @@ def season_metrics(s: pd.Series) -> tuple[dict, list[dict]]:
         if np.isnan(v).any():
             continue
         o, e, l = onset_end(v, start)
-        years.append({"season_year": y, "onset": o, "end": e, "season_length": l,
+        years.append({"season_year": y + (1 if start >= 8 else 0), "onset": o, "end": e, "season_length": l,
                       "peak_month": order[int(np.argmax(v))] if v.sum() > 0 else None,
                       "total": round(float(v.sum()), 1)})
     return summary, years

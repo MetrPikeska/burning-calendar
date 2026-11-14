@@ -1,6 +1,6 @@
 ---
 title: Decisions
-updated: 2026-11-13
+updated: 2026-11-14
 verified_by: team discussion 11-13 Nov 2026, grilling session 13 Nov 2026; numbers in findings-greece.md
 sources: [sources/2026-11-13-research-harmonization-validation.md, findings-greece.md, harmonization.md, sources/2026-11-11-research-modis-viirs.md]
 ---
@@ -37,8 +37,18 @@ sources: [sources/2026-11-13-research-harmonization-validation.md, findings-gree
 | 13 Nov | Owners: Petr builds MCP, JSON Schema and the static agent layer; Vita builds URL-state deep links in the web | MCP sits on the contract Petr's pipeline writes; deep links are UI |
 | 13 Nov | Countries: Greece and Argentina, both must-have. Development starts on Greece; Argentina is equal in the pitch, demo opens on Paraná 2020. Argentina minimum: provinces and one validation year; departments only if time allows | Greek data and numbers exist; CONAE wrote the challenge; two continents show the method is not tuned to one country |
 | 13 Nov | Start from scratch on Sat 14 Nov after 09:00: new repo, FIRMS data downloaded again, all scripts and numbers recomputed; this repo stays a private archive | Space Apps FAQ forbids work on the project before the event ([space-apps-rules.md](space-apps-rules.md), Eligibility) |
+| 14 Nov | Vertical slice first: whole country as one region `GR`, then NUTS2 | A heatmap with real data on Vercel by 13:00 |
+| 14 Nov | Web stack Vite + TypeScript, no framework, MapLibre; data in `web/public/data/v1/{gr,ar}/`; generated JSON committed | Vercel runs no Python; demo works offline |
+| 14 Nov | Map geometry as GeoJSON (`regions.geojson`), not TopoJSON | MapLibre reads GeoJSON directly; Greece NUTS2 1:20M is 15 kB |
+| 14 Nov | Detections assigned with GISCO 1:1M; outside any polygon, nearest region within 5 km, else national only | 1,510 coastal detections fall just outside the 1:1M coastline |
+| 14 Nov | Season year starts at the climatological minimum of the region's MODIS series | Scale-free, independent of the fit, same in both modes and in validation |
+| 14 Nov | Season-year label = calendar year holding most of its months (start month 8-12 gives the next year) | With a December start, the Paraná Delta 2020 fires were labelled 2019 |
+| 14 Nov | Argentina provinces from the IGN WFS layer `ign:provincia` (SHAPE-ZIP), id `in1`, clipped at 56° S; web geometry simplified at 0.02° (141 kB) | Same ids as CONAE; direct file links do not exist on the IGN page |
+| 14 Nov | Country itself is a region (`GR`) fitted on national counts, shown next to NUTS2 | National LOYO error 5.4 %, a clear number for the pitch |
 
 ## Open
+
+- **Peak-hit rule is decided by one season year.** With 7-8 held-out season years, three of four Greek `relative` regions (EL51, EL61 Thessalia, EL64) flip on a single year, while their annual errors are 4-17 % ([findings-greece.md](findings-greece.md)). The rule was fixed before results; changing it now needs a team decision.
 
 - **Agent access, round 2.** Tool surface, `caveats` codes, response size caps, MCP Apps calendar widget (in or out), demo script. Draft in [agent-access.md](agent-access.md).
 - **2026 and NOAA-20 splice.** Deferred (see Made, 13 Nov). Needs a FIRMS MAP_KEY.

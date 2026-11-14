@@ -1,6 +1,6 @@
 ---
 title: Open questions
-updated: 2026-11-13
+updated: 2026-11-14
 verified_by: n/a, a list of unknowns
 sources: [sources/2026-11-13-research-harmonization-validation.md, sources/2026-11-13-research-conae-argentina.md, sources/2026-11-13-research-anomalies-rules.md]
 ---
@@ -12,7 +12,7 @@ sources: [sources/2026-11-13-research-harmonization-validation.md, sources/2026-
 - **S-NPP vs NOAA-20 count factor.** No published multi-year value exists, confirmed again 13 Nov. The only number is 0.988 from 12 days in Mar 2023. Compute it from the 2018-2026 overlap (needs a MAP_KEY).
 - **Licence texts.** Neither the GISCO NUTS nor the IGN Argentina licence text has been read.
 - **MODIS end date.** LAADS gives Aqua ~Aug 2026, CAMS gives ~Sep 2027. Has Aqua already stopped?
-- **Orbit drift effect on MODIS counts.** Not published. Measure it ourselves: compare the 2012-2019 and 2012-2025 ratios and run a trend test ([harmonization.md](harmonization.md)).
+- **Orbit drift effect on MODIS counts.** Not published. First measurement for Greece (14 Nov): national night ratio falls 3.3 % per year over 2012-2025, day ratio flat; time-split errors grow to +18-23 % in 2023 and 2025 ([findings-greece.md](findings-greece.md)). Fire-year effects not separated yet.
 - **Aqua today.** Is Aqua still collecting, and what is its crossing time in Nov 2026? No 2026 primary source was found.
 - **Ratio vs fire size.** No paper publishes the count ratio as a function of FRP or fire size.
 - **NOAA-21 start date.** The FIRMS FAQ gives 17 Jan 2024; the Download tool gives 1 Mar 2023.

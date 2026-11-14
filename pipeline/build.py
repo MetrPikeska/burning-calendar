@@ -1,45 +1,58 @@
 """Build the static JSON for one country.
 
 Usage: uv run python pipeline/build.py --country GR [--refresh]
-Step 1 (vertical slice): the whole country is one region with id = country code.
+Writes web/public/data/v1/{country}/: index.json, regions/{id}.json, regions.geojson, validation.json.
+Regions: the whole country (id = country code, level `country`) plus the fitting level
+(NUTS2 for Greece), each fitted with the national factor as the last fallback.
 """
 
 import argparse
+import json
 
 import pandas as pd
 
 from calendar_metrics import anomalies, outage_days, season_metrics
-from export import ROOT, export_country
+from export import ROOT, export_country, write_json
 from filters import drop_static
 from harmonize import fit, monthly_counts, series
 from load import COUNTRIES, load
+from regions import assign, region_table
+from validate import raw_start_month, validate
 
 OUTAGE_MIN_DAYS = 3
+LEVEL = {"GR": "nuts2", "AR": "province"}
 
 
-def build_region(rid: str, name: str, level: str, det: pd.DataFrame, outages: pd.DataFrame) -> dict:
-    m = monthly_counts(det)
-    F, G = fit(m)
-    rec = series(m, F, G).set_index("ym")
-    mode = "harmonized"
-    metric_series = rec["harm"] if mode == "harmonized" else rec["modis"].astype(float)
-    summary, years = season_metrics(metric_series)
-    an = anomalies(metric_series)
+def build_region(rid: str, name: str, level: str, parent: str | None, m: pd.DataFrame,
+                 national: pd.DataFrame | None, outages: pd.DataFrame) -> dict:
+    start = raw_start_month(m)
+    val, band = validate(m, national, start)
+    mode = val["mode"]
+    F, G = fit(m, national)
+    rec = series(m, F, G, band, mode)
+    metric = rec["harm"] if mode == "harmonized" else rec["modis"].astype(float)
+    summary, years = season_metrics(metric, start_month=start)
+    an = anomalies(metric)
     od = outage_days(rec.index, outages)
     rec["anom_pct"] = an["anom_pct"]
     rec["anom"] = an["anom"]
     rec["outage_days"] = od.astype(int)
     rec["outage"] = od >= OUTAGE_MIN_DAYS
-    months = rec.reset_index().to_dict("records")
-    full_years = [y for y in years]
-    entry = {"id": rid, "name": name, "level": level, "parent": None, "mode": mode, **summary,
-             "harm_annual_mean": round(sum(y["total"] for y in full_years) / max(len(full_years), 1), 1)}
-    factors = F.assign(kind="viirs_over_modis", window="2012-2019")
-    chain = G.assign(kind="modis_over_terra", window="2003-2011")
-    detail = {"id": rid, "name": name, "level": level, "mode": mode, "summary": summary,
-              "months": months, "years": years,
-              "factors": pd.concat([factors, chain]).round(4).to_dict("records")}
-    return {"entry": entry, "detail": detail, "F": F, "G": G}
+    months = [{k: (None if pd.isna(v) else v) for k, v in r.items()}
+              for r in rec.reset_index().to_dict("records")]
+    entry = {"id": rid, "name": name, "level": level, "parent": parent, "mode": mode, **summary,
+             "annual_mean": round(sum(y["total"] for y in years) / max(len(years), 1), 1),
+             "annual_mean_of": "harm" if mode == "harmonized" else "modis",
+             "loyo_mdape_pct": val["loyo"]["annual_mdape_pct"],
+             "peak_hit_rate": val["loyo"]["season"]["harm"]["peak_hit_rate"],
+             "peak_hit_rate_raw": val["loyo"]["season"]["modis_raw"]["peak_hit_rate"]}
+    factors = pd.concat([F.assign(kind="viirs_over_modis", window="2012-2019"),
+                         G.assign(kind="modis_over_terra", window="2003-2011")])
+    detail = {"id": rid, "name": name, "level": level, "parent": parent, "mode": mode,
+              "summary": summary, "months": months, "years": years,
+              "factors": factors.round(4).to_dict("records"), "band": band.to_dict("records"),
+              "validation": val}
+    return {"entry": entry, "detail": detail}
 
 
 def main() -> None:
@@ -47,20 +60,41 @@ def main() -> None:
     ap.add_argument("--country", default="GR", choices=list(COUNTRIES))
     ap.add_argument("--refresh", action="store_true", help="re-read raw CSVs")
     a = ap.parse_args()
+    c = a.country
 
-    det = load(a.country, refresh=a.refresh)
+    det = load(c, refresh=a.refresh)
     kept, flagged = drop_static(det)
     print(f"static filter: {len(det)} -> {len(kept)} rows, {len(flagged)} sensor-year-cells dropped")
+    polys, web_polys = region_table(c)
+    kept["region"], assign_stats = assign(kept, polys)
+    print("assignment:", assign_stats)
     outages = pd.read_csv(ROOT / "data" / "outages.csv")
 
-    r = build_region(a.country, COUNTRIES[a.country], "country", kept, outages)
-    print(r["F"].to_string(index=False))
-    print(r["G"].to_string(index=False))
-    print(r["entry"])
-    meta = {"fixture": False, "method_version": "v0-national-month-dn",
-            "notes": "v0: one national region; harm_lo/harm_hi from 10th/90th percentile of yearly ratios, not LOYO yet"}
-    out = export_country(a.country, COUNTRIES[a.country], [r], meta)
-    print("wrote", out)
+    national = monthly_counts(kept)
+    out = [build_region(c, COUNTRIES[c], "country", None, national, None, outages)]
+    for _, p in polys.sort_values("id").iterrows():
+        m = monthly_counts(kept[kept["region"] == p["id"]])
+        out.append(build_region(p["id"], p["name"], LEVEL[c], c, m, national, outages))
+
+    for r in out:
+        e = r["entry"]
+        print(f"{e['id']:5} {e['mode']:10} mdape={e['loyo_mdape_pct']} peak_hit={e['peak_hit_rate']} "
+              f"raw={e['peak_hit_rate_raw']} gap={r['detail']['validation']['fit_window_gap_pct']} "
+              f"reasons={r['detail']['validation']['mode_reasons']}")
+
+    meta = {"fixture": False, "method_version": "v1-region-month-dn-loyo",
+            "notes": "Factors per region x month x day/night on 2012-2019 with fallback to season, "
+                     "region and national; harm_lo/harm_hi from LOYO obs/pred 10th-90th percentile by season."}
+    dest = export_country(c, COUNTRIES[c], out, meta)
+    gj = web_polys[["id", "name", "geometry"]].copy()
+    gj["geometry"] = gj.geometry.set_precision(0.001)
+    (dest / "regions.geojson").write_text(gj.to_json(drop_id=True))
+    write_json(dest / "validation.json", {
+        "country": c, "static_filter": {"rows_in": len(det), "rows_out": len(kept),
+                                        "cells_dropped": len(flagged)},
+        "assignment": assign_stats,
+        "regions": {r["entry"]["id"]: r["detail"]["validation"] for r in out}})
+    print("wrote", dest)
 
 
 if __name__ == "__main__":

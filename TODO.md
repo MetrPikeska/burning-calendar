@@ -5,6 +5,8 @@ Feature freeze Sun 15 Nov 12:00. Local submission Sun 15:00, pitch 16:00 (7 min 
 
 ## Must-have
 
+- [ ] P+V Team decision: keep the peak-hit part of the mode rule? (3 of 4 Greek `relative` regions flip on one season year, see decisions.md Open)
+
 - [x] P Scaffold: pyproject (uv), TODO.md, docs/si-use.md
 - [x] P FIRMS download script, Greece CSVs in data/raw/firms/
 - [x] P Argentina CSVs (40/40, 362 MB total in data/raw/firms/)
@@ -14,11 +16,11 @@ Feature freeze Sun 15 Nov 12:00. Local submission Sun 15:00, pitch 16:00 (7 min 
 - [ ] P Ask Local Lead / Discord: where to send the project at 15:00 (FAQ has "[email]" placeholder), demo setup (HDMI/USB-C, own laptop, Wi-Fi)
 - [x] P Greece vertical slice, whole country as region `GR` (`uv run python pipeline/build.py --country GR`, tests in tests/)
 - [ ] V Year x month heatmap reading the JSON, deployed on Vercel at a public URL (milestone Sat 13:00)
-- [ ] P Full harmonization: region x month x d/n factors, fallback chain, Terra-only chaining, LOYO validation, `relative` mode
+- [x] P Full harmonization GR: region x month x d/n factors, fallback chain, Terra-only chaining, LOYO, time split, `relative` mode (findings-greece.md)
 - [ ] V Toggle MODIS / VIIRS / harmonized, region picker on the map
-- [ ] P Region geometry: GISCO NUTS 2024 1:20M (GR), IGN provinces (AR), TopoJSON
-- [ ] P Argentina through the same pipeline (provinces + Paraná 2020 minimum)
-- [ ] P Anomalies (percentile vs preceding 10 years), outages from data/outages.csv
+- [x] P Region geometry: GISCO NUTS 2024 1:20M (GR), IGN provinces (AR), as regions.geojson
+- [x] P Argentina through the same pipeline (24 provinces, Paraná 2020 in findings-argentina.md)
+- [x] P Anomalies (percentile vs preceding 10 years), outages from data/outages.csv (in the JSON; outage list has only Aqua 2020 so far)
 - [ ] V CSV export per region (JS from monthly records)
 - [ ] P Static agent layer: /data/v1/ with CORS, JSON Schema, /llms.txt, deep links
 - [ ] P api/mcp.ts (mcp-handler 2.4.0 exact): smoke test, then tools with `caveats` and `view_url`

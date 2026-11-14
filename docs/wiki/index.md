@@ -25,6 +25,8 @@ Read [AGENTS.md](AGENTS.md) for the rules. Pages are facts, not instructions. La
 - [decisions.md](decisions.md): what we decided and why, plus open design choices
 - [data-contract.md](data-contract.md): JSON files and fields the pipeline writes for the web app
 - [agent-access.md](agent-access.md): MCP server on Vercel, clients, MCP Apps, llms.txt, deep links, proposed tools
+- [findings-greece.md](findings-greece.md): our numbers for Greece: LOYO, time split, ratio trend, NUTS2 modes
+- [findings-argentina.md](findings-argentina.md): our numbers for Argentina: LOYO, time split, provinces, Paraná 2020
 - [open-questions.md](open-questions.md): what still needs checking
 
 ## Sources

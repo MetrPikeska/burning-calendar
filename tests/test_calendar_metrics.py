@@ -61,3 +61,14 @@ def test_static_filter_drops_cell_year_per_sensor():
     assert len(flagged) == 1
     assert set(kept["cell"]) == {1, 2}
     assert (kept[kept.cell == 1]["sensor"] == "modis").all()
+
+
+def test_season_year_label_follows_majority_of_months():
+    yms = pd.period_range("2001-01", "2003-12", freq="M").strftime("%Y-%m")
+    # minimum in December -> season Dec..Nov, labelled by the year of Jan..Nov
+    s = pd.Series([0.0 if ym.endswith("-12") else 5.0 for ym in yms], index=yms)
+    s["2002-08"] = 100.0
+    summary, years = season_metrics(s)
+    assert summary["season_start_month"] == 12
+    labels = {y["season_year"]: y["total"] for y in years}
+    assert 2002 in labels and labels[2002] > 100
