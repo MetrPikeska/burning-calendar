@@ -79,11 +79,14 @@ async function ok(raw: object, mode: "full" | "codes" = "full") {
     const text = `CAVEATS (codes; get_methodology topic 'caveats' explains them): ${result.caveat_codes.join(", ")}\n${JSON.stringify(result)}`;
     return { content: [{ type: "text" as const, text }], structuredContent: result };
   }
-  const result = full;
-  const lines = result.caveats.map((c: Caveat) => `CAVEAT ${c.code}: ${c.message}`);
+  // Caveat texts go once into the header lines; the JSON in the text block lists only their codes.
+  // structuredContent keeps the full caveats.
+  const lines = full.caveats.map((c: Caveat) => `CAVEAT ${c.code}: ${c.message}`);
+  const { caveats, ...rest } = full;
+  const body = { ...rest, caveat_codes: caveats.map((c: Caveat) => c.code) };
   return {
-    content: [{ type: "text" as const, text: [...lines, JSON.stringify(result)].join("\n") }],
-    structuredContent: result,
+    content: [{ type: "text" as const, text: [...lines, JSON.stringify(body)].join("\n") }],
+    structuredContent: full,
   };
 }
 

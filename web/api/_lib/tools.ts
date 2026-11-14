@@ -41,7 +41,8 @@ export interface Caveat {
     | "detections_not_fires"
     | "coverage"
     | "out_of_coverage"
-    | "size_bias";
+    | "size_bias"
+    | "season_window";
   message: string;
 }
 
@@ -128,6 +129,25 @@ export function withCoverage<T extends object>(result: T, period: Period): T & {
 
 function outOfCoverage(what: string, period: Period): Caveat {
   return { code: "out_of_coverage", message: `${what} is outside the data coverage ${period.start} to ${period.end}.` };
+}
+
+// ---------- season windows ----------
+
+/** The 12 months of a season year: it starts at season_start_month and is labelled with the calendar year
+ *  holding most of its months (start month 8-12 belongs to the next year's label). */
+export function seasonWindow(startMonth: number, seasonYear: number): { from: string; to: string } {
+  const y0 = startMonth >= 8 ? seasonYear - 1 : seasonYear;
+  const endMonth = ((startMonth + 10) % 12) + 1;
+  const y1 = endMonth < startMonth ? y0 + 1 : y0;
+  const mm = (m: number) => String(m).padStart(2, "0");
+  return { from: `${y0}-${mm(startMonth)}`, to: `${y1}-${mm(endMonth)}` };
+}
+
+function windowsCaveat(rows: { season_window?: { from: string; to: string } }[]): Caveat[] {
+  const w = new Set(rows.map((r) => r.season_window && `${r.season_window.from}..${r.season_window.to}`).filter(Boolean));
+  return w.size > 1
+    ? [{ code: "season_window", message: "season_total covers each region's own season year (season_window per row), so the 12-month windows differ between regions. For one common window use aggregate with from/to." }]
+    : [];
 }
 
 // ---------- search_regions ----------
@@ -340,8 +360,10 @@ export function compareRegions(items: { country: CountryCode; entry: Entry; regi
     return dropNulls({
       id: entry.id, name: clean(entry.name), country: country.toUpperCase(), mode: entry.mode,
       value: relCount ? null : raw, value_modis: relCount ? raw : null,
+      season_window: metric === "season_total" && year !== undefined ? seasonWindow(entry.season_start_month, year) : null,
       view_url: viewUrl(country, entry.id),
-    }) as { id: string; mode: string; value?: number; value_modis?: number; view_url: string };
+    }) as { id: string; mode: string; value?: number; value_modis?: number;
+            season_window?: { from: string; to: string }; view_url: string };
   });
   const relative = rows.filter((r) => r.mode === "relative").map((r) => r.id);
   const ranking_allowed = !(isCount && relative.length);
@@ -356,6 +378,7 @@ export function compareRegions(items: { country: CountryCode; entry: Entry; regi
     caveats.push(DETECTIONS);
     if (ranking_allowed) rows.sort((a, b) => (b.value ?? -1) - (a.value ?? -1));
   }
+  caveats.push(...windowsCaveat(rows));
   return { metric, year: year ?? null, ranking_allowed, rows, caveats };
 }
 
@@ -418,7 +441,9 @@ export function rankRegions(items: { country: CountryCode; entry: Entry; region?
       : ((entry[metric] as number | null | undefined) ?? null);
   const row = (it: (typeof items)[number]) => ({
     id: it.entry.id, name: clean(it.entry.name), country: it.country.toUpperCase(), level: it.entry.level,
-    mode: it.entry.mode, view_url: viewUrl(it.country, it.entry.id),
+    mode: it.entry.mode,
+    ...(metric === "season_total" ? { season_window: seasonWindow(it.entry.season_start_month, p.year!) } : {}),
+    view_url: viewUrl(it.country, it.entry.id),
   });
   const rankable = items.filter((it) => !(isCount && it.entry.mode === "relative"));
   const sign = p.order === "desc" ? -1 : 1;
@@ -438,6 +463,7 @@ export function rankRegions(items: { country: CountryCode; entry: Entry; region?
     });
   }
   if (isCount) caveats.push(DETECTIONS);
+  caveats.push(...windowsCaveat(ranked));
   if (metric === "annual_mean" || metric === "season_total") {
     caveats.push({ code: "size_bias", message: "Absolute counts favour large regions; use density_per_1000km2 to compare regions of different size." });
   }

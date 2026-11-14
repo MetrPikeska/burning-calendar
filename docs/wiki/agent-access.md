@@ -73,6 +73,8 @@ Jury path in 1 minute: claude.ai connector with no auth. Keep a recorded fallbac
 
 - The country comes from the region id (`GR`, `EL..` vs `AR`, two digits), so no tool needs a country argument besides `search_regions`.
 - Every result has `source` (method version, FIRMS download dates, links to the full `source` block in each `index.json`) and `coverage` (`start`, `end` from `index.json` `period`) and `caveats` with codes `coverage` (S-NPP end, no NOAA-20 splice), `out_of_coverage`, `relative_mode`, `backcast`, `backcast_terra`, `outage`, `detections_not_fires`. Series and anomaly results carry `anomaly_definition` (above `baseline_p90`). The text block lists them first, then the JSON; `structuredContent` carries the same object (no `outputSchema`).
+- `season_total` rows (in `rank_regions` and `compare_regions`) carry `season_window` (`from`, `to`): each region's own season year, so windows differ between regions; a `season_window` caveat says so and points to `aggregate` for a common window.
+- In full mode the caveat texts appear once, as header lines of the text block; the JSON there lists only `caveat_codes`, while `structuredContent` keeps the full caveats.
 - Every tool except `get_methodology` takes `caveats: "full" | "codes"`. `codes` replaces the caveat texts with `caveat_codes`; `get_methodology` topic `caveats` explains them.
 - `outage` (caveat and month field, with `outage_affects: "modis"`) only for months whose value comes from MODIS, because `data/outages.csv` lists Aqua gaps only. Changes from Petr's first claude.ai test (beads burncal-w7p, -nmk, -j03, -17x, -zgm).
 - MCP resources and an MCP Apps widget are not built.

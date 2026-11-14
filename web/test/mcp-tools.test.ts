@@ -13,6 +13,7 @@ import {
   regionSummary,
   regionSeries,
   searchRegions,
+  seasonWindow,
   seasonCalendar,
   validationFor,
   viewUrl,
@@ -408,5 +409,32 @@ describe("compactCaveats", () => {
     expect(c).not.toHaveProperty("caveats");
     expect(c.caveat_codes).toEqual(["backcast", "detections_not_fires", "coverage"]);
     expect(c.records).toEqual(full.records);
+  });
+});
+
+// burncal-a0t: season windows in season_total rankings
+describe("season windows", () => {
+  it("maps a season year to its 12 months", () => {
+    expect(seasonWindow(12, 2020)).toEqual({ from: "2019-12", to: "2020-11" });
+    expect(seasonWindow(1, 2020)).toEqual({ from: "2020-01", to: "2020-12" });
+    expect(seasonWindow(4, 2020)).toEqual({ from: "2020-04", to: "2021-03" });
+    expect(seasonWindow(8, 2020)).toEqual({ from: "2019-08", to: "2020-07" });
+  });
+
+  it("matches the season total of Santa Fe 2020", () => {
+    const sf = read<RegionFile>("ar/regions/82.json");
+    const w = seasonWindow(sf.summary.season_start_month, 2020);
+    const sum = sf.months.filter((m) => m.ym >= w.from && m.ym <= w.to).reduce((a, m) => a + (m.harm ?? 0), 0);
+    expect(sum).toBeCloseTo(sf.years.find((y) => y.season_year === 2020)!.total, 0);
+  });
+
+  it("puts season_window on each ranked row and warns when windows differ", () => {
+    const items = ["82", "30", "22"].map((id) => ({
+      country: "ar" as const, entry: arIndex.regions.find((x) => x.id === id)!, region: read<RegionFile>(`ar/regions/${id}.json`),
+    }));
+    const r = rankRegions(items, "season_total", { year: 2020, top: 10, order: "desc" });
+    expect(r.ranked[0]).toHaveProperty("season_window");
+    const windows = new Set(r.ranked.map((x) => JSON.stringify((x as { season_window?: unknown }).season_window)));
+    if (windows.size > 1) expect(r.caveats.map((c) => c.code)).toContain("season_window");
   });
 });
