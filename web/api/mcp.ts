@@ -45,7 +45,8 @@ function loadJson<T>(rel: string): Promise<T> {
   return cache.get(rel) as Promise<T>;
 }
 const loadIndex = (c: CountryCode) => loadJson<IndexFile>(`${c}/index.json`);
-const loadGeo = (c: CountryCode) => loadJson<RegionCollection>(`${c}/regions.geojson`);
+// find_region_at uses the assignment polygons (pipeline/mcp_geometry.py), not the generalized map polygons.
+const loadGeo = (c: CountryCode) => loadJson<RegionCollection>(`${c}/regions_mcp.geojson`);
 
 async function loadRegion(id: string): Promise<RegionFile> {
   const country = countryOf(id);
@@ -163,7 +164,8 @@ const handler = createMcpHandler(
         title: "Fire season calendar",
         description:
           "Fire season of one region: climatological peak month, onset, end, season length, season start month, bimodal flag, " +
-          "and per season year the same metrics plus the total. Give a year to get one season year only.",
+          "and per season year the same metrics plus the total. Give a year to get one season year only (plus its season_window). " +
+          "Season years with months before 2012 carry backcast_months and total_lo..total_hi: quote that range, the total is modelled.",
         inputSchema: z.object({ caveats: caveatMode, region_id: regionId, year: year.optional() }),
         annotations: RO,
       },
@@ -201,7 +203,8 @@ const handler = createMcpHandler(
         title: "Compare regions",
         description:
           "Compare 2 to 10 regions on one metric. Count metrics (annual_mean, density_per_1000km2, season_total) are ranked only when all regions are harmonized; " +
-          "otherwise ranking_allowed is false and you must not rank them. season_total needs a year.",
+          "otherwise ranking_allowed is false and you must not rank them. season_total needs a year; rows with back-cast months carry value_lo..value_hi, " +
+          "and a region without a complete season year gets incomplete_season instead of a value (ranking_allowed false).",
         inputSchema: z.object({ caveats: caveatMode,
           region_ids: z.array(regionId).min(2).max(10),
           metric: z.enum(COMPARE_METRICS),
@@ -233,7 +236,7 @@ const handler = createMcpHandler(
         description:
           "Sum detections over a period for 1 to 40 regions: total per region, overall total and the top months of the sum. " +
           "Uses harm (VIIRS-equivalent) when all regions are harmonized, otherwise raw MODIS for all with a caveat. " +
-          "Do not mix a country (GR, AR) with its own regions.",
+          "Do not mix a country (GR, AR) with its own regions. Periods with months before 2012 add backcast_months and total_lo..total_hi (per region and overall).",
         inputSchema: z.object({ caveats: caveatMode,
           region_ids: z.array(regionId).min(1).max(40),
           from: ym,
@@ -259,7 +262,8 @@ const handler = createMcpHandler(
         description:
           "Rank all regions (or one country / level) by a metric, e.g. 'where were the most fires'. Prefer density_per_1000km2 " +
           "(detections per 1000 km2 per year) over annual_mean, which favours large regions. Count metrics rank harmonized regions only; " +
-          "relative-mode regions are returned apart in excluded_relative. season_total needs a year. Country-level rows are left out unless level is 'country'.",
+          "relative-mode regions are returned apart in excluded_relative. season_total needs a year; regions without a complete season year are listed in incomplete_season, " +
+          "rows with back-cast months carry value_lo..value_hi. Country-level rows are left out unless level is 'country'.",
         inputSchema: z.object({ caveats: caveatMode,
           metric: z.enum(RANK_METRICS),
           country: z.enum(["GR", "AR"]).optional(),
@@ -293,7 +297,9 @@ const handler = createMcpHandler(
         title: "Find region at a point",
         description:
           "Region (Greek NUTS2 or Argentine province) containing a latitude/longitude, with its season climatology, annual mean, " +
-          "last 3 season years, view_url, data_url and (Greece) detections_csv_url with the individual hotspots. Outside both countries: found false, plus the nearest region within 5 km if any.",
+          "last 3 season years, view_url, data_url and (Greece) detections_csv_url with the individual hotspots. Uses the same boundaries as the detection counts " +
+          "(NUTS 1:1M, IGN provinces), simplified to about 100 m. Not inside any region: found false, plus the nearest region within 5 km if any; " +
+          "the counts include detections up to 5 km off the coast in that nearest region.",
         inputSchema: z.object({ caveats: caveatMode, lat: z.number().min(-90).max(90), lon: z.number().min(-180).max(180) }),
         annotations: RO,
       },

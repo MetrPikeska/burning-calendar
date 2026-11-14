@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import type { IndexFile, RegionFile } from "../src/lib/contract.ts";
 import type { RegionCollection } from "../src/lib/geo.ts";
@@ -33,7 +33,7 @@ type Monthly = {
 };
 /** regionSeries in month mode (the return type is a union of month and year shapes). */
 const monthly = (r: unknown) => r as Monthly;
-const NEAR_COAST = { lat: 40.58, lon: 22.93, id: "EL52" }; // Thermaikos Gulf, 1.8 km off the 1:20M coastline
+const NEAR_COAST = { lat: 40.58, lon: 22.93, id: "EL52" }; // Thermaikos Gulf, 0.5 km off the 1:1M coastline
 
 describe("countryOf", () => {
   it("infers the country from the region id", () => {
@@ -263,8 +263,8 @@ describe("annual_mean by mode", () => {
 // burncal-zgm: find_region_at returns the region summary
 describe("find_region_at", () => {
   const geo = {
-    gr: read<RegionCollection>("gr/regions.geojson"),
-    ar: read<RegionCollection>("ar/regions.geojson"),
+    gr: read<RegionCollection>("gr/regions_mcp.geojson"),
+    ar: read<RegionCollection>("ar/regions_mcp.geojson"),
   };
 
   it("finds Thessaloniki and Paraná", () => {
@@ -461,5 +461,103 @@ describe("season windows", () => {
     expect(r.ranked[0]).toHaveProperty("season_window");
     const windows = new Set(r.ranked.map((x) => JSON.stringify((x as { season_window?: unknown }).season_window)));
     if (windows.size > 1) expect(r.caveats.map((c) => c.code)).toContain("season_window");
+  });
+});
+
+// burncal-x9p: find_region_at agrees with the pipeline's assignment of detections
+describe("find_region_at vs detection assignment", () => {
+  const geo = {
+    gr: read<RegionCollection>("gr/regions_mcp.geojson"),
+    ar: read<RegionCollection>("ar/regions_mcp.geojson"),
+  };
+
+  it("puts at least 99.9 % of a sample of Greek hotspots into the region that counts them", () => {
+    let n = 0;
+    let same = 0;
+    for (const f of readdirSync("public/data/v1/gr/detections").filter((x) => /^EL\d\d\.csv$/.test(x))) {
+      const lines = readFileSync(`public/data/v1/gr/detections/${f}`, "utf8").trim().split("\n").slice(1);
+      for (let i = 0; i < lines.length; i += 15) {
+        const c = lines[i].split(",");
+        const m = locate(geo, Number(c[6]), Number(c[7]));
+        n++;
+        // Off the coastline the pipeline takes the nearest region within 5 km; locate returns it as nearest.
+        if ((m.found ? m.id : m.nearest?.id) === c[0]) same++;
+      }
+    }
+    expect(n).toBeGreaterThan(7000);
+    expect(same / n).toBeGreaterThanOrEqual(0.999);
+  });
+});
+
+// burncal-kxs, burncal-774, burncal-5gj: back-cast season years, incomplete season years, Terra-only ranges
+describe("back-cast and incomplete season years", () => {
+  const grItems = grIndex.regions.filter((r) => r.level !== "country").map((entry) => ({
+    country: "gr" as const, entry, region: read<RegionFile>(`gr/regions/${entry.id}.json`),
+  }));
+  const el65 = read<RegionFile>("gr/regions/EL65.json");
+  const codes = (r: { caveats: { code: string }[] }) => r.caveats.map((c) => c.code);
+
+  it("gives season_total 2007 (back-cast) with backcast caveat and a value range", () => {
+    const r = rankRegions(grItems, "season_total", { year: 2007, top: 20, order: "desc" });
+    expect(codes(r)).toContain("backcast");
+    const pelo = r.ranked.find((x) => x.id === "EL65")!;
+    expect(pelo.value).toBeCloseTo(el65.years.find((y) => y.season_year === 2007)!.total, 1);
+    expect(pelo.backcast_months).toBe(12);
+    expect(pelo.value_lo!).toBeLessThan(pelo.value);
+    expect(pelo.value_hi!).toBeGreaterThan(pelo.value);
+    const w = seasonWindow(el65.summary.season_start_month, 2007);
+    const lo = el65.months.filter((m) => m.ym >= w.from && m.ym <= w.to).reduce((a, m) => a + (m.harm_lo ?? 0), 0);
+    expect(pelo.value_lo!).toBeCloseTo(lo, 0);
+    expect(r.incomplete_season).toEqual([]);
+  });
+
+  it("marks season year 2007 as back-cast in the season calendar and in compare_regions", () => {
+    const s = seasonCalendar(el65, 2007, period);
+    expect(codes(s)).toContain("backcast");
+    expect(s.years[0]).toMatchObject({ season_year: 2007, backcast_months: 12 });
+    expect(s.years[0]).toHaveProperty("total_lo");
+    const c = compareRegions(grItems.filter((x) => ["EL65", "EL63"].includes(x.entry.id)), "season_total", 2007);
+    expect(c.ranking_allowed).toBe(true);
+    expect(codes(c)).toContain("backcast");
+    expect(c.rows.every((x) => x.value_lo !== undefined && x.value_hi !== undefined)).toBe(true);
+  });
+
+  it("observed season years carry no range", () => {
+    const s = seasonCalendar(el65, 2020, period);
+    expect(s.years[0]).toMatchObject({ backcast_months: 0 });
+    expect(s.years[0]).not.toHaveProperty("total_lo");
+  });
+
+  it("lists regions without a complete season year 2025 instead of dropping them", () => {
+    const r = rankRegions(grItems, "season_total", { year: 2025, top: 20, order: "desc" });
+    const ranked = r.ranked.map((x) => x.id);
+    const missing = r.incomplete_season!.map((x) => x.id);
+    expect(missing).toEqual(expect.arrayContaining(["EL41", "EL42", "EL51", "EL52", "EL53", "EL54"]));
+    expect(ranked.filter((id) => missing.includes(id))).toEqual([]);
+    expect(ranked.length + r.excluded_relative.filter((x) => !missing.includes(x.id)).length + missing.length).toBe(13);
+    expect(r.incomplete_season!.find((x) => x.id === "EL52")!.season_window).toEqual({ from: "2025-04", to: "2026-03" });
+    const oc = r.caveats.find((c) => c.code === "out_of_coverage")!;
+    expect(oc.message).toMatch(/EL52/);
+  });
+
+  it("does not allow a ranking in compare_regions when a season_total is missing", () => {
+    const c = compareRegions(grItems.filter((x) => ["EL30", "EL52"].includes(x.entry.id)), "season_total", 2025);
+    expect(c.ranking_allowed).toBe(false);
+    expect(codes(c)).toContain("out_of_coverage");
+    const el52row = c.rows.find((x) => x.id === "EL52")!;
+    expect(el52row.value).toBeUndefined();
+    expect(el52row.incomplete_season).toMatch(/2026-03/);
+  });
+
+  it("keeps backcast and backcast_terra for a Terra-only aggregate and gives a total range", () => {
+    const r = aggregate([el65], { from: "2000-11", to: "2002-06", top: 3 }, period);
+    expect(codes(r)).toEqual(expect.arrayContaining(["backcast", "backcast_terra"]));
+    expect(r.regions[0]).toMatchObject({ n_months: 20, backcast_months: 20 });
+    expect(r.total_lo!).toBeLessThan(r.total);
+    expect(r.total_hi!).toBeGreaterThan(r.total);
+    expect(r.total_lo).toBe(r.regions[0].total_lo);
+    const post = aggregate([el65], { from: "2020-01", to: "2020-12", top: 3 }, period);
+    expect(codes(post)).not.toContain("backcast");
+    expect(post).not.toHaveProperty("total_lo");
   });
 });

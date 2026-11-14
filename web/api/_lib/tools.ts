@@ -180,6 +180,60 @@ function windowsCaveat(rows: { season_window?: { from: string; to: string } }[])
     : [];
 }
 
+const monthsIn = (region: RegionFile, w: { from: string; to: string }) =>
+  (region.months as Month[]).filter((m) => m.ym >= w.from && m.ym <= w.to);
+
+/** Back-cast months in a sum over months and its range: harm_lo / harm_hi of the back-cast months plus the
+ *  observed harm values. lo / hi are null when no month is back-cast. Harmonized mode only. */
+function backcastRange(months: Month[]): { backcast_months: number; lo: number | null; hi: number | null } {
+  const n = months.filter((m) => m.src !== "observed").length;
+  if (!n) return { backcast_months: 0, lo: null, hi: null };
+  const sum = (k: "harm_lo" | "harm_hi") =>
+    r1(months.reduce((a, m) => a + ((m.src === "observed" ? m.harm : (m[k] ?? m.harm)) ?? 0), 0));
+  return { backcast_months: n, lo: sum("harm_lo"), hi: sum("harm_hi") };
+}
+
+/** backcast / backcast_terra caveats for results built from sums or means over many months (season totals,
+ *  climatology, aggregate). `what` names the numbers, `range` the fields that carry the range (or null). */
+function backcastCaveats(mode: RegionFile["mode"], months: Month[], what: string, range: string | null,
+                         note = ""): Caveat[] {
+  if (mode !== "harmonized") return [];
+  const n = months.filter((m) => m.src === "backcast" || m.src === "backcast_terra").length;
+  const nTerra = months.filter((m) => m.src === "backcast_terra").length;
+  const out: Caveat[] = [];
+  if (n) {
+    out.push({
+      code: "backcast",
+      message: `${n} monthly value(s) behind ${what} are from before 2012 and modelled from MODIS, not observed.` +
+        (range ? ` Quote ${range} (harm_lo / harm_hi of those months plus the observed values; summing 10th / 90th percentile bounds overstates the range).` : "") +
+        (note ? ` ${note}` : ""),
+    });
+  }
+  if (nTerra) {
+    out.push({
+      code: "backcast_terra",
+      message: `${nTerra} of them (Nov 2000 to Jun 2002) use Terra only with a chained factor; uncertainty is higher.`,
+    });
+  }
+  return out;
+}
+
+/** Why a region has no season_total for a season year: the window runs past the data. */
+function incompleteReason(region: RegionFile, w: { from: string; to: string }): string {
+  const first = region.months[0]?.ym;
+  const last = region.months[region.months.length - 1]?.ym;
+  if (last && w.to > last) return `season year not complete in coverage: it ends ${w.to}, data end ${last}`;
+  if (first && w.from < first) return `season year not complete in coverage: it starts ${w.from}, data start ${first}`;
+  return "season year not complete in coverage";
+}
+
+function incompleteCaveat(rows: { id: string; season_window: { from: string; to: string } }[], year: number): Caveat[] {
+  return rows.length
+    ? [{ code: "out_of_coverage",
+         message: `No complete season year ${year} (season_total missing) for ${rows.map((r) => `${r.id} (${r.season_window.from} to ${r.season_window.to})`).join(", ")}. They are not ranked; do not read them as zero or lowest.` }]
+    : [];
+}
+
 // ---------- search_regions ----------
 
 /** annual_mean and density are only comparable across harmonized regions; relative regions get them as *_modis. */
@@ -319,15 +373,31 @@ function yearly(months: Month[], mode: RegionFile["mode"]) {
 export function seasonCalendar(region: RegionFile, year: number | undefined, period: Period) {
   const country = countryOf(region.id)!;
   const loyo = (region.validation as { loyo?: { annual_mdape_pct?: number | null } }).loyo;
-  const caveats = caveatsFor(region.mode, []);
-  const years = year === undefined ? region.years : region.years.filter((y) => y.season_year === year);
-  if (year !== undefined && !years.length) {
-    caveats.push(outOfCoverage(`Season year ${year} (complete season years only)`, period));
+  const harm = region.mode === "harmonized";
+  const start = region.summary.season_start_month;
+  const years = (year === undefined ? region.years : region.years.filter((y) => y.season_year === year)).map((y) => {
+    if (!harm) return y;
+    const b = backcastRange(monthsIn(region, seasonWindow(start, y.season_year)));
+    return { ...y, ...dropNulls({ backcast_months: b.backcast_months, total_lo: b.lo, total_hi: b.hi }) };
+  });
+  const window = year === undefined ? null : seasonWindow(start, year);
+  // The climatology (and so every season metric's reference) is computed over the whole series.
+  const all = region.months as Month[];
+  const yearsBackcast = years.some((y) => ((y as { backcast_months?: number }).backcast_months ?? 0) > 0);
+  const caveats = [
+    ...caveatsFor(region.mode, []),
+    ...backcastCaveats(region.mode, all,
+      `the climatology (all months ${all[0]?.ym} to ${all[all.length - 1]?.ym})${yearsBackcast ? " and season years with backcast_months > 0" : ""}`,
+      yearsBackcast ? "total_lo to total_hi for those season years" : null),
+  ];
+  if (window && !years.length) {
+    caveats.push(outOfCoverage(`Season year ${year} (${window.from} to ${window.to}; complete season years only)`, period));
   }
   return {
     region_id: region.id, name: clean(region.name), mode: region.mode,
     metrics_on: seriesOf(region.mode),
     climatology: region.summary,
+    ...(window ? { season_window: window } : {}),
     years,
     loyo_mdape_pct: loyo?.annual_mdape_pct ?? null,
     notes: "Months are 1-12. onset/end: months where the cumulative season count passes 10 % and 90 %. A season year starts at season_start_month and is labelled with the calendar year holding most of its months.",
@@ -378,11 +448,25 @@ export const COUNT_METRICS: readonly CompareMetric[] = ["annual_mean", "density_
 export function compareRegions(items: { country: CountryCode; entry: Entry; region?: RegionFile }[],
                                metric: CompareMetric, year?: number) {
   const isCount = COUNT_METRICS.includes(metric);
+  const usedMonths: Month[] = [];
+  const incomplete: { id: string; season_window: { from: string; to: string } }[] = [];
   const rows = items.map(({ country, entry, region }) => {
     let raw: number | null;
+    let window: { from: string; to: string } | null = null;
+    let range: ReturnType<typeof backcastRange> | null = null;
+    let reason: string | null = null;
     if (metric === "season_total") {
       if (!region || year === undefined) throw new Error("season_total needs a year");
+      window = seasonWindow(entry.season_start_month, year);
       raw = region.years.find((y) => y.season_year === year)?.total ?? null;
+      if (raw === null) {
+        reason = incompleteReason(region, window);
+        incomplete.push({ id: entry.id, season_window: window });
+      } else if (entry.mode === "harmonized") {
+        const ms = monthsIn(region, window);
+        usedMonths.push(...ms);
+        range = backcastRange(ms);
+      }
     } else {
       raw = entry[metric] ?? null;
     }
@@ -391,24 +475,30 @@ export function compareRegions(items: { country: CountryCode; entry: Entry; regi
     return dropNulls({
       id: entry.id, name: clean(entry.name), country: country.toUpperCase(), mode: entry.mode,
       value: relCount ? null : raw, value_modis: relCount ? raw : null,
-      season_window: metric === "season_total" && year !== undefined ? seasonWindow(entry.season_start_month, year) : null,
+      value_lo: range?.lo ?? null, value_hi: range?.hi ?? null, backcast_months: range?.backcast_months ?? null,
+      season_window: window, incomplete_season: reason,
       view_url: viewUrl(country, entry.id),
-    }) as { id: string; mode: string; value?: number; value_modis?: number;
-            season_window?: { from: string; to: string }; view_url: string };
+    }) as { id: string; mode: string; value?: number; value_modis?: number; value_lo?: number; value_hi?: number;
+            backcast_months?: number; season_window?: { from: string; to: string }; incomplete_season?: string;
+            view_url: string };
   });
   const relative = rows.filter((r) => r.mode === "relative").map((r) => r.id);
-  const ranking_allowed = !(isCount && relative.length);
+  // A region without a season_total for the year cannot be placed in a ranking.
+  const ranking_allowed = !(isCount && relative.length) && !incomplete.length;
   const caveats: Caveat[] = [];
-  if (!ranking_allowed) {
+  if (isCount && relative.length) {
     caveats.push({
       code: "relative_mode",
       message: `Regions ${relative.join(", ")} are in relative mode: value is null and value_modis is a raw MODIS count on a different scale. No absolute ranking is given.`,
     });
   }
+  if (year !== undefined) caveats.push(...incompleteCaveat(incomplete, year));
   if (isCount) {
     caveats.push(DETECTIONS);
     if (ranking_allowed) rows.sort((a, b) => (b.value ?? -1) - (a.value ?? -1));
   }
+  caveats.push(...backcastCaveats("harmonized", usedMonths, "these season totals",
+                                  "value_lo to value_hi on rows with backcast_months > 0"));
   caveats.push(...windowsCaveat(rows));
   return { metric, year: year ?? null, ranking_allowed, rows, caveats };
 }
@@ -437,23 +527,34 @@ export function aggregate(regions: RegionFile[], p: { from: string; to: string; 
     });
   }
   const byMonth = new Map<string, number>();
+  const used: Month[] = [];
   const rows = regions.map((r) => {
     const ms = (r.months as Month[]).filter((m) => m.ym >= from && m.ym <= to);
+    used.push(...ms);
     let total = 0;
     for (const m of ms) {
       const v = (series === "harm" ? m.harm : m.modis) ?? 0;
       total += v;
       byMonth.set(m.ym, (byMonth.get(m.ym) ?? 0) + v);
     }
-    caveats.push(...caveatsFor(series === "harm" ? "harmonized" : "relative", ms).filter((c) => c.code === "backcast" || c.code === "outage"));
+    caveats.push(...caveatsFor(series === "harm" ? "harmonized" : "relative", ms).filter((c) => c.code === "outage"));
+    const b = series === "harm" ? backcastRange(ms) : null;
     return { id: r.id, name: clean(r.name), mode: r.mode, total: r1(total) as number, n_months: ms.length,
+             ...dropNulls({ backcast_months: b?.backcast_months ?? null, total_lo: b?.lo ?? null, total_hi: b?.hi ?? null }),
              anomaly_months: ms.filter((m) => m.anom).map((m) => m.ym) };
   });
+  // Back-cast months of all regions together; the overall range sums the per-region ranges.
+  caveats.push(...backcastCaveats(series === "harm" ? "harmonized" : "relative", used, "the totals",
+                                  "total_lo to total_hi overall and per region"));
+  const withRange = rows.some((r) => r.total_lo !== undefined);
+  const sumOf = (k: "total_lo" | "total_hi") => r1(rows.reduce((a, r) => a + (r[k] ?? r.total), 0)) as number;
   const top_months = [...byMonth.entries()].sort((a, b) => b[1] - a[1]).slice(0, p.top)
     .map(([ym, total]) => ({ ym, total: r1(total) as number }));
   const seen = new Set<string>();
   const uniq = [...caveats, DETECTIONS].filter((c) => (seen.has(c.message) ? false : (seen.add(c.message), true)));
-  return { series, from, to, total: r1(rows.reduce((a, r) => a + r.total, 0)) as number, regions: rows, top_months, caveats: uniq };
+  return { series, from, to, total: r1(rows.reduce((a, r) => a + r.total, 0)) as number,
+           ...(withRange ? { total_lo: sumOf("total_lo"), total_hi: sumOf("total_hi") } : {}),
+           regions: rows, top_months, caveats: uniq };
 }
 
 // ---------- rank_regions ----------
@@ -470,22 +571,36 @@ export function rankRegions(items: { country: CountryCode; entry: Entry; region?
     metric === "season_total"
       ? (region?.years.find((y) => y.season_year === p.year)?.total ?? null)
       : ((entry[metric] as number | null | undefined) ?? null);
+  const windowOf = (it: (typeof items)[number]) => seasonWindow(it.entry.season_start_month, p.year!);
   const row = (it: (typeof items)[number]) => ({
     id: it.entry.id, name: clean(it.entry.name), country: it.country.toUpperCase(), level: it.entry.level,
     mode: it.entry.mode,
-    ...(metric === "season_total" ? { season_window: seasonWindow(it.entry.season_start_month, p.year!) } : {}),
+    ...(metric === "season_total" ? { season_window: windowOf(it) } : {}),
     view_url: viewUrl(it.country, it.entry.id),
   });
+  /** season_total of a harmonized region: back-cast months of its window and the value range. */
+  const range = (it: (typeof items)[number]) => {
+    const b = metric === "season_total" && it.entry.mode === "harmonized" && it.region
+      ? backcastRange(monthsIn(it.region, windowOf(it))) : null;
+    return dropNulls({ backcast_months: b?.backcast_months ?? null, value_lo: b?.lo ?? null, value_hi: b?.hi ?? null });
+  };
   const rankable = items.filter((it) => !(isCount && it.entry.mode === "relative"));
   const sign = p.order === "desc" ? -1 : 1;
   const ranked = rankable
-    .map((it) => ({ ...row(it), value: value(it) }))
-    .filter((r) => r.value !== null)
-    .sort((a, b) => sign * ((a.value as number) - (b.value as number)))
+    .filter((it) => value(it) !== null)
+    .map((it) => ({ ...row(it), value: value(it) as number, ...range(it) }))
+    .sort((a, b) => sign * (a.value - b.value))
     .slice(0, p.top)
     .map((r, i) => ({ rank: i + 1, ...r }));
   const excluded = items.filter((it) => isCount && it.entry.mode === "relative")
     .map((it) => ({ ...row(it), value_modis: value(it) }));
+  // season_total: regions whose season year is not complete in the data are listed, not silently dropped.
+  const incomplete_season = metric === "season_total"
+    ? items.filter((it) => value(it) === null).map((it) => ({
+        id: it.entry.id, name: clean(it.entry.name), mode: it.entry.mode, season_window: windowOf(it),
+        reason: it.region ? incompleteReason(it.region, windowOf(it)) : "season year not complete in coverage",
+      }))
+    : [];
   const caveats: Caveat[] = [];
   if (excluded.length) {
     caveats.push({
@@ -493,12 +608,24 @@ export function rankRegions(items: { country: CountryCode; entry: Entry; region?
       message: `Not ranked: ${excluded.map((r) => r.id).join(", ")} (relative mode, raw MODIS counts on a different scale). They are listed in excluded_relative.`,
     });
   }
+  if (p.year !== undefined) caveats.push(...incompleteCaveat(incomplete_season, p.year));
   if (isCount) caveats.push(DETECTIONS);
+  if (metric === "season_total") {
+    const used = ranked.flatMap((r) => {
+      const it = rankable.find((x) => x.entry.id === r.id);
+      return it?.region && it.entry.mode === "harmonized" ? monthsIn(it.region, windowOf(it)) : [];
+    });
+    caveats.push(...backcastCaveats("harmonized", used, "the ranked season totals",
+      "value_lo to value_hi on rows with backcast_months > 0",
+      "Ranks use the central value, so overlapping ranges leave the order uncertain."));
+  }
   caveats.push(...windowsCaveat(ranked));
   if (metric === "annual_mean" || metric === "season_total") {
     caveats.push({ code: "size_bias", message: "Absolute counts favour large regions; use density_per_1000km2 to compare regions of different size." });
   }
-  return { metric, year: p.year ?? null, order: p.order, ranked, excluded_relative: excluded, caveats };
+  return { metric, year: p.year ?? null, order: p.order, ranked,
+           ...(metric === "season_total" ? { incomplete_season } : {}),
+           excluded_relative: excluded, caveats };
 }
 
 // ---------- find_region_at ----------
@@ -555,7 +682,8 @@ export function regionSummary(country: CountryCode, entry: Entry, region: Region
     ...annualMeanFields(entry),
     last_season_years: region.years.slice(-3).map((y) => ({ season_year: y.season_year, total: y.total, peak_month: y.peak_month })),
     season_totals_of: seriesOf(entry.mode),
-    caveats: caveatsFor(entry.mode, []),
+    caveats: [...caveatsFor(entry.mode, []),
+              ...backcastCaveats(entry.mode, region.months as Month[], "the climatology and annual_mean (over all season years)", null)],
     view_url: viewUrl(country, entry.id),
     data_url: dataUrl(country, entry.id, "json"),
     ...hotspotLinks(country, entry.id),
@@ -658,7 +786,7 @@ export const METHODOLOGY: Record<string, string> = {
   calendar:
     "Season year starts at the climatological minimum month of the region's MODIS series and is labelled with the calendar year holding most of its months. Onset and end: months where the cumulative season count passes 10 % and 90 % (Freeborn 2014). Peak month: highest mean count (Giglio 2006). bimodal: two peaks at least 2 months apart with a trough below 50 % of the smaller one.",
   caveats:
-    "Caveat codes: coverage = data cover 2000-11 to 2025-12, S-NPP stopped 2 Nov 2026, no NOAA-20 splice, so nothing after Dec 2025. out_of_coverage = part of the request was outside that range and was clipped. relative_mode = the region failed validation; harm is null and counts are raw MODIS, not comparable with harmonized regions. backcast = months before 2012 are modelled from MODIS; quote harm_lo..harm_hi. backcast_terra = Nov 2000 to Jun 2002 use Terra only with a chained factor; wider uncertainty. outage = a known MODIS (Aqua) data gap of 3 or more days affects a MODIS-based value. detections_not_fires = counts are satellite detections, not fires or burned area. size_bias = absolute counts favour large regions; use density_per_1000km2.",
+    "Caveat codes: coverage = data cover 2000-11 to 2025-12, S-NPP stopped 2 Nov 2026, no NOAA-20 splice, so nothing after Dec 2025. out_of_coverage = part of the request was outside that range and was clipped. relative_mode = the region failed validation; harm is null and counts are raw MODIS, not comparable with harmonized regions. backcast = months before 2012 are modelled from MODIS; quote harm_lo..harm_hi, or for sums total_lo..total_hi / value_lo..value_hi (season totals and climatology before 2012 are modelled too). backcast_terra = Nov 2000 to Jun 2002 use Terra only with a chained factor; wider uncertainty. outage = a known MODIS (Aqua) data gap of 3 or more days affects a MODIS-based value. detections_not_fires = counts are satellite detections, not fires or burned area. size_bias = absolute counts favour large regions; use density_per_1000km2.",
   limits:
     "Detections are not fires or burned area. Back-cast months (before 2012) are modelled. Factors are constant per region-month and do not follow land-cover change. acq_date is UTC, so some Argentine night detections fall on the next day. Known satellite outages are listed manually (Aqua Aug-Sep 2020). Series ends Dec 2025; S-NPP ended 2 Nov 2026 and the NOAA-20 splice is not done.",
 };
