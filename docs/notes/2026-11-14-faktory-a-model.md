@@ -31,7 +31,7 @@ Přesné licence a podmínky použití nejsou ověřené (UNVERIFIED), pro výsl
 4. **Zemědělské pálení a zapálení člověkem.** Nejsou řízené počasím stejně jako přírodní požáry. Bez typu krajiny se signál rozmaže (viz Zervaki a kol. v greece.md).
 5. **Souvislost není příčina.** Reportovat asociaci s kontrolou sezónnosti a trendu, ne "sucho způsobuje".
 6. **Cílová veličina nese chybu.** Harmonizovaný počet má nejistotu a drift senzorů (harmonization.md). Raději binární cíl (například nad 90. percentilem) a výstup s intervalem než surové počty.
-7. **Únik informace při validaci.** Blokově po letech (leave-one-year-out), stejně jako náš `pipeline/harmonize.py`, ne náhodné dělení.
+7. **Únik informace při validaci.** Blokově po letech (leave-one-year-out), stejně jako naše `loyo()` v `pipeline/validate.py`, ne náhodné dělení.
 
 ## Návrh po vrstvách
 
