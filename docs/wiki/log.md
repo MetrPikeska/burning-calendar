@@ -32,3 +32,4 @@ Append-only. Format: `YYYY-MM-DD op: what changed`.
 - 2026-11-14 build: 7 MCP tools implemented (agent-access.md, new section Implemented tools). llms.txt lists them.
 - 2026-11-14 build: MCP tools after the first claude.ai test: coverage in every result, outage scoped to MODIS months, no mixing of MODIS and harmonized counts, `fields` and yearly totals, richer `find_region_at` (agent-access.md).
 - 2026-11-14 build: `area_km2` and `density_per_1000km2` in index.json (EPSG:6933; Greece 131,696 km2, Argentina 2,792,459 km2), new MCP tool `rank_regions` (data-contract.md, agent-access.md). Country densities: Greece 50.3, Argentina 84.4 detections per 1000 km2 per year; top province Formosa 394.
+- 2026-11-14 build: from Petr's persona feedback (docs/notes/2026-11-14-feedback-early-warning-research.md): `days_modis`/`days_viirs` per month, `source` provenance block in index.json, MCP tool `aggregate`, `source` in every MCP result (data-contract.md, agent-access.md).

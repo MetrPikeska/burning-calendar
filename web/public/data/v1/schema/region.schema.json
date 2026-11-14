@@ -154,7 +154,9 @@
         "outage",
         "baseline_median",
         "baseline_p90",
-        "baseline_years"
+        "baseline_years",
+        "days_modis",
+        "days_viirs"
       ],
       "properties": {
         "ym": {
@@ -239,6 +241,21 @@
           ],
           "pattern": "^[0-9]{4}-[0-9]{4}( without [0-9]{4})?$",
           "description": "Baseline window: the preceding 10 years, or 2002-2011 without the target year for years before 2012"
+        },
+        "days_modis": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 31,
+          "description": "Days of the month with at least one MODIS detection after filters (acq_date, UTC)"
+        },
+        "days_viirs": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 31,
+          "description": "Days of the month with at least one VIIRS detection after filters; null before 2012"
         }
       }
     },

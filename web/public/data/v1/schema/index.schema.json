@@ -12,7 +12,8 @@
     "units",
     "fixture",
     "method_version",
-    "regions"
+    "regions",
+    "source"
   ],
   "properties": {
     "schema_version": {
@@ -63,6 +64,40 @@
       "minItems": 1,
       "items": {
         "$ref": "#/$defs/entry"
+      }
+    },
+    "source": {
+      "type": "object",
+      "description": "Provenance: FIRMS product, versions, download dates, filters, boundaries, area CRS",
+      "required": [
+        "firms",
+        "filters",
+        "boundaries"
+      ],
+      "properties": {
+        "firms": {
+          "type": "object",
+          "required": [
+            "product",
+            "url_pattern",
+            "modis",
+            "viirs",
+            "downloaded"
+          ]
+        },
+        "filters": {
+          "type": "object"
+        },
+        "boundaries": {
+          "type": "object",
+          "required": [
+            "name",
+            "url"
+          ]
+        },
+        "area_crs": {
+          "type": "string"
+        }
       }
     }
   },

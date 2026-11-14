@@ -23,7 +23,9 @@ Shared files: `data/v1/schema/index.schema.json` and `data/v1/schema/region.sche
 
 ## `index.json`
 
-Header: `schema_version` (`"1"`), `generated_at` (UTC ISO), `country`, `country_name`, `period` (`{"start":"2000-11","end":"2025-12"}`), `units`, `fixture` (bool), `method_version` (e.g. `v1-region-month-dn-loyo`), `notes`, `regions`.
+Header: `schema_version` (`"1"`), `generated_at` (UTC ISO), `country`, `country_name`, `period` (`{"start":"2000-11","end":"2025-12"}`), `units`, `fixture` (bool), `method_version` (e.g. `v1-region-month-dn-loyo`), `source`, `notes`, `regions`.
+
+`source` (provenance): `firms` (product, URL pattern, MODIS and VIIRS instrument, years and `version` values found in the files, number of files, download dates from the file times, terms URL), `filters` (type 0, static-source rule), `boundaries` (name, URL, terms URL), `area_crs`. Licence texts are linked, not yet verified.
 
 One region entry:
 
@@ -56,6 +58,7 @@ Monthly record (`months`, 302 entries, Nov 2000 to Dec 2025):
 - Day and night are fitted separately; only their sum is stored.
 - `anom_pct`: percentile rank (0-100) of the month among the same month of the preceding 10 years; years before 2012 use 2002-2011 minus the target year. `anom`: above the baseline 90th percentile. Computed on `harm` in `harmonized` mode, on `modis` in `relative` mode.
 - `baseline_median`, `baseline_p90`: median and 90th percentile of the same calendar month over the baseline years, on the same series as `anom_pct`. `baseline_years`: the window as text, `YYYY-YYYY` or `2002-2011 without YYYY`. All three null when fewer than 5 baseline values exist. The web's month-vs-median panel and the MCP `get_anomalies` tool read these instead of recomputing.
+- `days_modis`, `days_viirs`: days of the month with at least one detection after filters (distinct `acq_date`, UTC), per sensor; `days_viirs` null before 2012. A count that one large fire cannot inflate the way it inflates detections.
 - `outage_days`: days of the month covered by `data/outages.csv`. `outage`: `outage_days >= 3`.
 - In `relative` mode, `harm`, `harm_lo` and `harm_hi` are null; season metrics, `years.total`, anomalies and baseline fields are computed on `modis`.
 - No FRP fields yet. They come as optional fields with the FRP layer.

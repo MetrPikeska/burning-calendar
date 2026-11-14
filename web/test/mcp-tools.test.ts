@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { IndexFile, RegionFile } from "../src/lib/contract.ts";
 import type { RegionCollection } from "../src/lib/geo.ts";
 import {
+  aggregate,
   anomaliesFor,
   compareRegions,
   countryOf,
@@ -324,5 +325,50 @@ describe("rankRegions", () => {
     const r = rankRegions(all, "loyo_mdape_pct", { top: 50, order: "asc" });
     expect(r.excluded_relative).toEqual([]);
     expect(r.ranked[0].value).toBeLessThanOrEqual(r.ranked[1].value as number);
+  });
+});
+
+// burncal-x34: days with a detection
+describe("days with a detection", () => {
+  it("returns days_viirs / days_modis via fields and in anomalies", () => {
+    const r = regionSeries(er, { from: "2020-08", to: "2020-08", aggregate: "month", fields: ["days_viirs", "days_modis"] }, period);
+    expect(r.records[0]).toEqual({ ym: "2020-08", days_modis: 30, days_viirs: 30 });
+    const a = anomaliesFor(er, 2020, period).months.find((m) => m.ym === "2020-08")!;
+    expect(a.days_viirs).toBe(30);
+    const old = regionSeries(er, { from: "2005-08", to: "2005-08", aggregate: "month", fields: ["days_viirs", "days_modis"] }, period);
+    expect(old.records[0]).not.toHaveProperty("days_viirs"); // null before 2012, dropped
+  });
+});
+
+// burncal-cis: aggregation over a period and regions
+describe("aggregate", () => {
+  const ar18 = read<RegionFile>("ar/regions/18.json");
+  const sum = (r: RegionFile, k: "harm" | "modis", from: string, to: string) =>
+    r.months.filter((m) => m.ym >= from && m.ym <= to).reduce((a, m) => a + ((m[k] as number | null) ?? 0), 0);
+
+  it("sums harm over a period per region and overall, with top months", () => {
+    const r = aggregate([er, ar18], { from: "2020-01", to: "2022-12", top: 3 }, period);
+    expect(r.series).toBe("harm");
+    expect(r.regions.find((x) => x.id === "30")!.total).toBeCloseTo(sum(er, "harm", "2020-01", "2022-12"), 0);
+    expect(r.total).toBeCloseTo(sum(er, "harm", "2020-01", "2022-12") + sum(ar18, "harm", "2020-01", "2022-12"), 0);
+    expect(r.top_months).toHaveLength(3);
+    expect(r.top_months[0].total).toBeGreaterThanOrEqual(r.top_months[1].total);
+  });
+
+  it("falls back to MODIS when a region is relative", () => {
+    const r = aggregate([er, el62], { from: "2020-01", to: "2020-12", top: 3 }, period);
+    expect(r.series).toBe("modis");
+    expect(r.caveats.map((c) => c.code)).toContain("relative_mode");
+  });
+
+  it("refuses to add a country to its own regions", () => {
+    const ar = read<RegionFile>("ar/regions/AR.json");
+    expect(() => aggregate([ar, er], { from: "2020-01", to: "2020-12", top: 3 }, period)).toThrow(/double/);
+  });
+
+  it("clips to coverage", () => {
+    const r = aggregate([er], { from: "2025-06", to: "2026-06", top: 3 }, period);
+    expect(r.regions[0].n_months).toBe(7);
+    expect(r.caveats.map((c) => c.code)).toContain("out_of_coverage");
   });
 });

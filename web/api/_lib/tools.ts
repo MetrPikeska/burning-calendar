@@ -28,6 +28,8 @@ type Month = MonthRecord & {
   baseline_median?: number | null;
   baseline_p90?: number | null;
   baseline_years?: string | null;
+  days_modis?: number;
+  days_viirs?: number | null;
 };
 
 export interface Caveat {
@@ -172,7 +174,7 @@ export function searchRegions(indexes: IndexFile[],
 
 export const MONTH_FIELDS = [
   "ym", "modis", "viirs", "harm", "harm_lo", "harm_hi", "src", "fit_level", "anom_pct", "anom",
-  "outage", "outage_affects", "baseline_median", "baseline_p90", "baseline_years",
+  "outage", "outage_affects", "baseline_median", "baseline_p90", "baseline_years", "days_modis", "days_viirs",
 ] as const;
 export type MonthField = (typeof MONTH_FIELDS)[number];
 
@@ -191,6 +193,7 @@ function monthOut(m: Month, mode: RegionFile["mode"], fields: readonly MonthFiel
     outage: outage ? true : null, outage_affects: outage ? "modis" : null,
     baseline_median: m.baseline_median ?? null, baseline_p90: m.baseline_p90 ?? null,
     baseline_years: m.baseline_years ?? null,
+    days_modis: m.days_modis ?? null, days_viirs: m.days_viirs ?? null,
   };
   const keep = new Set<MonthField>(["ym", ...fields]);
   return dropNulls(Object.fromEntries(MONTH_FIELDS.filter((k) => keep.has(k)).map((k) => [k, full[k]])));
@@ -297,6 +300,7 @@ export function anomaliesFor(region: RegionFile, year: number, period: Period) {
       baseline_median: med, baseline_p90: m.baseline_p90 ?? null, baseline_years: m.baseline_years ?? null,
       ratio_to_median: value !== null && med ? Math.round((value / med) * 10) / 10 : null,
       outage: outage ? true : null, outage_affects: outage ? "modis" : null,
+      days_viirs: m.days_viirs ?? null, days_modis: m.days_modis ?? null,
     });
   });
   const caveats = caveatsFor(region.mode, months);
@@ -353,6 +357,49 @@ export function compareRegions(items: { country: CountryCode; entry: Entry; regi
     if (ranking_allowed) rows.sort((a, b) => (b.value ?? -1) - (a.value ?? -1));
   }
   return { metric, year: year ?? null, ranking_allowed, rows, caveats };
+}
+
+// ---------- aggregate ----------
+
+/** Totals over a period for one or more regions, plus the top months of their sum. */
+export function aggregate(regions: RegionFile[], p: { from: string; to: string; top: number }, period: Period) {
+  if (p.from > p.to) throw new Error("from must not be after to");
+  const ids = regions.map((r) => r.id);
+  for (const [country, child] of [["GR", /^EL\d\d$/], ["AR", /^\d\d$/]] as const) {
+    if (ids.includes(country) && ids.some((i) => child.test(i))) {
+      throw new Error(`${country} already contains its regions; adding both would double count. Use either the country or its regions.`);
+    }
+  }
+  const caveats: Caveat[] = [];
+  const from = p.from < period.start ? period.start : p.from;
+  const to = p.to > period.end ? period.end : p.to;
+  if (from !== p.from || to !== p.to) caveats.push(outOfCoverage(`Part of the requested range ${p.from} to ${p.to}`, period));
+  const allHarm = regions.every((r) => r.mode === "harmonized");
+  const series: Series = allHarm ? "harm" : "modis";
+  if (!allHarm) {
+    caveats.push({
+      code: "relative_mode",
+      message: `${regions.filter((r) => r.mode === "relative").map((r) => r.id).join(", ")} in relative mode, so all totals use raw MODIS counts (not VIIRS-equivalent).`,
+    });
+  }
+  const byMonth = new Map<string, number>();
+  const rows = regions.map((r) => {
+    const ms = (r.months as Month[]).filter((m) => m.ym >= from && m.ym <= to);
+    let total = 0;
+    for (const m of ms) {
+      const v = (series === "harm" ? m.harm : m.modis) ?? 0;
+      total += v;
+      byMonth.set(m.ym, (byMonth.get(m.ym) ?? 0) + v);
+    }
+    caveats.push(...caveatsFor(series === "harm" ? "harmonized" : "relative", ms).filter((c) => c.code === "backcast" || c.code === "outage"));
+    return { id: r.id, name: clean(r.name), mode: r.mode, total: r1(total) as number, n_months: ms.length,
+             anomaly_months: ms.filter((m) => m.anom).map((m) => m.ym) };
+  });
+  const top_months = [...byMonth.entries()].sort((a, b) => b[1] - a[1]).slice(0, p.top)
+    .map(([ym, total]) => ({ ym, total: r1(total) as number }));
+  const seen = new Set<string>();
+  const uniq = [...caveats, DETECTIONS].filter((c) => (seen.has(c.message) ? false : (seen.add(c.message), true)));
+  return { series, from, to, total: r1(rows.reduce((a, r) => a + r.total, 0)) as number, regions: rows, top_months, caveats: uniq };
 }
 
 // ---------- rank_regions ----------

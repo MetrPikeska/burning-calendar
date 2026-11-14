@@ -8,6 +8,7 @@ import { z } from "zod";
 import type { CountryCode, IndexFile, RegionFile } from "../src/lib/contract.ts";
 import type { RegionCollection } from "../src/lib/geo.ts";
 import {
+  aggregate,
   anomaliesFor,
   type Caveat,
   COMPARE_METRICS,
@@ -19,6 +20,7 @@ import {
   RANK_METRICS,
   rankRegions,
   type Period,
+  PUBLIC_URL,
   regionSeries,
   regionSummary,
   searchRegions,
@@ -52,9 +54,23 @@ async function loadRegion(id: string): Promise<RegionFile> {
 /** Coverage from index.json `period` (both countries share it). */
 const period = async (): Promise<Period> => (await loadIndex("gr")).period;
 
-/** Adds coverage, then caveats first in the text block and the full JSON (TextContent mirrors structuredContent). */
+type Provenance = { firms?: { downloaded?: string[] } };
+
+/** Short provenance for every result; the full block is `source` in each country's index.json. */
+async function source() {
+  const ix = await Promise.all((["gr", "ar"] as const).map((c) => loadIndex(c)));
+  const dl = ix.flatMap((i) => (i as IndexFile & { source?: Provenance }).source?.firms?.downloaded ?? []);
+  return {
+    method_version: ix[0].method_version,
+    firms: "NASA FIRMS standard processing, MODIS C6.1 + VIIRS S-NPP 375 m",
+    firms_downloaded: [...new Set(dl)].sort(),
+    details: (["gr", "ar"] as const).map((c) => `${PUBLIC_URL}data/v1/${c}/index.json#source`),
+  };
+}
+
+/** Adds coverage and source, then caveats first in the text block and the full JSON (TextContent mirrors structuredContent). */
 async function ok(raw: object) {
-  const result = withCoverage(raw, await period());
+  const result = { ...withCoverage(raw, await period()), source: await source() };
   const lines = result.caveats.map((c: Caveat) => `CAVEAT ${c.code}: ${c.message}`);
   return {
     content: [{ type: "text" as const, text: [...lines, JSON.stringify(result)].join("\n") }],
@@ -112,7 +128,7 @@ const handler = createMcpHandler(
           to: ym,
           aggregate: z.enum(["month", "year"]).default("month"),
           fields: z.array(z.enum(MONTH_FIELDS)).max(MONTH_FIELDS.length).optional()
-            .describe("Month record keys to return (ym is always included). Default: the series of the region's mode, src, anom, outage."),
+            .describe("Month record keys to return (ym is always included). Default: the series of the region's mode, src, anom, outage. days_viirs / days_modis: days of the month with at least one detection."),
         }),
         annotations: RO,
       },
@@ -188,6 +204,32 @@ const handler = createMcpHandler(
             }),
           );
           return await ok(compareRegions(items, metric, y));
+        } catch (e) {
+          return fail(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      "aggregate",
+      {
+        title: "Totals over a period",
+        description:
+          "Sum detections over a period for 1 to 40 regions: total per region, overall total and the top months of the sum. " +
+          "Uses harm (VIIRS-equivalent) when all regions are harmonized, otherwise raw MODIS for all with a caveat. " +
+          "Do not mix a country (GR, AR) with its own regions.",
+        inputSchema: z.object({
+          region_ids: z.array(regionId).min(1).max(40),
+          from: ym,
+          to: ym,
+          top: z.number().int().min(1).max(24).default(5),
+        }),
+        annotations: RO,
+      },
+      async ({ region_ids, from, to, top }) => {
+        try {
+          const regions = await Promise.all([...new Set(region_ids)].map((id) => loadRegion(id)));
+          return await ok(aggregate(regions, { from, to, top }, await period()));
         } catch (e) {
           return fail(e);
         }

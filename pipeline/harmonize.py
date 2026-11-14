@@ -49,6 +49,19 @@ def _accept(den_total: float, n_years: int) -> bool:
     return den_total >= MIN_TOTAL and den_total / n_years >= MIN_PER_YEAR
 
 
+def detection_days(df: pd.DataFrame) -> pd.DataFrame:
+    """Days with at least one detection per month and sensor (distinct acq_date, UTC), indexed by ym.
+    days_viirs is null before VIIRS_START."""
+    yms = pd.period_range(START, END, freq="M").strftime("%Y-%m")
+    out = pd.DataFrame(index=yms)
+    out.index.name = "ym"
+    for sensor in ("modis", "viirs"):
+        n = df[df["sensor"] == sensor].groupby("ym")["acq_date"].nunique()
+        out[f"days_{sensor}"] = n.reindex(yms, fill_value=0).astype("Int64")
+    out.loc[out.index < VIIRS_START, "days_viirs"] = pd.NA
+    return out
+
+
 def fit_ratio(m: pd.DataFrame, num: str, den: str, years, national: pd.DataFrame | None = None) -> pd.DataFrame:
     """num/den per (month, dn) with the fallback chain. Rows: month, dn, f, level, den_total."""
     years = tuple(years)

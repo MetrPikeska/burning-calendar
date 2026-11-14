@@ -7,6 +7,7 @@ Regions: the whole country (id = country code, level `country`) plus the fitting
 """
 
 import argparse
+from datetime import datetime, timezone
 import json
 
 import pandas as pd
@@ -14,7 +15,7 @@ import pandas as pd
 from calendar_metrics import anomalies, outage_days, season_metrics
 from export import ROOT, export_country, write_json
 from filters import drop_static
-from harmonize import fit, monthly_counts, series
+from harmonize import detection_days, fit, monthly_counts, series
 from load import COUNTRIES, load
 from regions import assign, region_areas, region_table
 from validate import raw_start_month, validate
@@ -24,7 +25,8 @@ LEVEL = {"GR": "nuts2", "AR": "province"}
 
 
 def build_region(rid: str, name: str, level: str, parent: str | None, m: pd.DataFrame,
-                 national: pd.DataFrame | None, outages: pd.DataFrame, area_km2: float) -> dict:
+                 national: pd.DataFrame | None, outages: pd.DataFrame, area_km2: float,
+                 days: pd.DataFrame) -> dict:
     start = raw_start_month(m)
     val, band = validate(m, national, start)
     mode = val["mode"]
@@ -38,6 +40,8 @@ def build_region(rid: str, name: str, level: str, parent: str | None, m: pd.Data
     rec["anom"] = an["anom"]
     for k in ("baseline_median", "baseline_p90", "baseline_years"):
         rec[k] = an[k]
+    rec["days_modis"] = days["days_modis"]
+    rec["days_viirs"] = days["days_viirs"]
     rec["outage_days"] = od.astype(int)
     rec["outage"] = od >= OUTAGE_MIN_DAYS
     months = [{k: (None if pd.isna(v) else v) for k, v in r.items()}
@@ -61,6 +65,42 @@ def build_region(rid: str, name: str, level: str, parent: str | None, m: pd.Data
     return {"entry": entry, "detail": detail}
 
 
+BOUNDARY_SOURCE = {
+    "GR": {"name": "GISCO NUTS 2024 (Eurostat), level 2; 1:1M for assignment, 1:20M for the map",
+           "url": "https://gisco-services.ec.europa.eu/distribution/v2/nuts/",
+           "terms_url": "https://ec.europa.eu/eurostat/web/gisco/geodata/administrative-units"},
+    "AR": {"name": "IGN Argentina, layer ign:provincia (WFS), clipped at 56 S",
+           "url": "https://wms.ign.gob.ar/geoserver/ign/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=ign%3Aprovincia",
+           "terms_url": "https://www.ign.gob.ar/NuestrasActividades/InformacionGeoespacial/CapasSIG"},
+}
+
+
+def source_block(country: str, det: pd.DataFrame) -> dict:
+    """Machine-readable provenance for index.json: FIRMS files, versions, download dates, filters, boundaries."""
+    files = sorted((ROOT / "data" / "raw" / "firms").glob(f"*_{COUNTRIES[country]}.csv"))
+    dates = sorted({datetime.fromtimestamp(f.stat().st_mtime, timezone.utc).strftime("%Y-%m-%d") for f in files})
+    versions = {s: sorted(det.loc[det["sensor"] == s, "version"].astype(str).unique().tolist()) for s in ("modis", "viirs")}
+    return {
+        "firms": {
+            "product": "NASA FIRMS country yearly archive, standard processing (SP)",
+            "url_pattern": "https://firms.modaps.eosdis.nasa.gov/data/country/{modis|viirs-snpp}/{year}/{sensor}_{year}_"
+                           + COUNTRIES[country] + ".csv",
+            "modis": {"instrument": "MODIS Collection 6.1, Terra and Aqua, 1 km", "years": "2000-2025",
+                      "versions": versions["modis"]},
+            "viirs": {"instrument": "VIIRS S-NPP 375 m", "years": "2012-2025", "versions": versions["viirs"]},
+            "files": len(files),
+            "downloaded": dates,
+            "terms_url": "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance",
+        },
+        "filters": {
+            "type": "type == 0 (presumed vegetation fire) only",
+            "static_sources": "0.01 deg cells with detections on 16 or more distinct days in a year removed, per sensor and year",
+        },
+        "boundaries": BOUNDARY_SOURCE[country],
+        "area_crs": "EPSG:6933",
+    }
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--country", default="GR", choices=list(COUNTRIES))
@@ -79,10 +119,11 @@ def main() -> None:
 
     national = monthly_counts(kept)
     out = [build_region(c, COUNTRIES[c], "country", None, national, None, outages,
-                        round(sum(areas.values()), 1))]
+                        round(sum(areas.values()), 1), detection_days(kept))]
     for _, p in polys.sort_values("id").iterrows():
-        m = monthly_counts(kept[kept["region"] == p["id"]])
-        out.append(build_region(p["id"], p["name"], LEVEL[c], c, m, national, outages, areas[p["id"]]))
+        sub = kept[kept["region"] == p["id"]]
+        out.append(build_region(p["id"], p["name"], LEVEL[c], c, monthly_counts(sub), national, outages,
+                                areas[p["id"]], detection_days(sub)))
 
     for r in out:
         e = r["entry"]
@@ -90,7 +131,7 @@ def main() -> None:
               f"raw={e['peak_hit_rate_raw']} gap={r['detail']['validation']['fit_window_gap_pct']} "
               f"reasons={r['detail']['validation']['mode_reasons']}")
 
-    meta = {"fixture": False, "method_version": "v1-region-month-dn-loyo",
+    meta = {"fixture": False, "method_version": "v1-region-month-dn-loyo", "source": source_block(c, kept),
             "notes": "Factors per region x month x day/night on 2012-2019 with fallback to season, "
                      "region and national; harm_lo/harm_hi from LOYO obs/pred 10th-90th percentile by season."}
     dest = export_country(c, COUNTRIES[c], out, meta)

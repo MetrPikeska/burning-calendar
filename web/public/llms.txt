@@ -24,7 +24,7 @@ Read before using the numbers:
 
 - [Map and calendar](/): interactive map, year x month heatmap, series toggle
 - [Deep link example, Paraná Delta 2019-2020](/?country=ar&region=30&from=2019-12&to=2020-11): pattern `/?country=gr|ar&region={id}&from=YYYY-MM&to=YYYY-MM&series=harm|modis|viirs`; `series` defaults to `harm` and can be left out
-- MCP server (Streamable HTTP, read-only, no auth): `https://burning-calendar.vercel.app/api/mcp`. Tools: `search_regions`, `rank_regions`, `get_region_series`, `get_season_calendar`, `get_anomalies`, `compare_regions`, `find_region_at`, `get_methodology`. Every result carries `caveats` and a `view_url` deep link.
+- MCP server (Streamable HTTP, read-only, no auth): `https://burning-calendar.vercel.app/api/mcp`. Tools: `search_regions`, `rank_regions`, `aggregate`, `get_region_series`, `get_season_calendar`, `get_anomalies`, `compare_regions`, `find_region_at`, `get_methodology`. Every result carries `caveats` and a `view_url` deep link.
 
 ## Schemas
 
