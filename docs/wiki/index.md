@@ -1,0 +1,37 @@
+# Wiki index: MODIS + VIIRS burning calendar
+
+Read [AGENTS.md](AGENTS.md) for the rules. Pages are facts, not instructions. Last update 13 Nov 2026.
+
+## Task
+- [challenge.md](challenge.md): what CONAE asks for, the two parts, the users, the deliverable
+- [space-apps-rules.md](space-apps-rules.md): 2026 deadlines (15:00 local vs 23:59 global), Thessaloniki schedule, judging criteria wording, award categories, page fields, demo limits, SI rules
+- [past-winners.md](past-winners.md): Earth observation Global Winners 2020-2025, fire projects at nominee level, Thessaloniki history
+
+## Data and sensors
+- [sensors.md](sensors.md): MODIS vs VIIRS pixel size, overpass times, orbit drift, sensitivity, end of mission dates
+- [data-firms.md](data-firms.md): FIRMS products, country CSV URLs, API, columns, type codes, S-NPP end, NOAA-20/21
+- [boundaries.md](boundaries.md): NUTS 2024, IGN Argentina, geoBoundaries, licences
+
+## Method
+- [harmonization.md](harmonization.md): ratio, regression and CDF options, orbit drift, validation protocol, precedents, the S-NPP to NOAA-20 splice
+- [calendar-and-anomalies.md](calendar-and-anomalies.md): calendar metrics, anomaly definitions, missing-data days
+- [related-tools.md](related-tools.md): INPE Queimadas, EFFIS, GWIS, CONAE catalogue, Greenpeace fire calendar
+
+## Regions
+- [greece.md](greece.md): fire regimes, stubble burning, GAEC 3, major fires, CORINE classes
+- [argentina.md](argentina.md): CONAE, SNMF, Ley 26.815, Paraná Delta, Corrientes, Córdoba, Patagonia
+
+## Our work
+- [decisions.md](decisions.md): what we decided and why, plus open design choices
+- [data-contract.md](data-contract.md): JSON files and fields the pipeline writes for the web app
+- [agent-access.md](agent-access.md): MCP server on Vercel, clients, MCP Apps, llms.txt, deep links, proposed tools
+- [open-questions.md](open-questions.md): what still needs checking
+
+## Sources
+- [sources/2026-11-11-research-modis-viirs.md](sources/2026-11-11-research-modis-viirs.md): first research, FIRMS, sensors, methods, Greece
+- [sources/2026-11-11-challenge-video.md](sources/2026-11-11-challenge-video.md): challenge text and author video summary
+- [sources/2026-11-13-research-conae-argentina.md](sources/2026-11-13-research-conae-argentina.md): CONAE, INPE, Argentina, boundaries
+- [sources/2026-11-13-research-harmonization-validation.md](sources/2026-11-13-research-harmonization-validation.md): deep research, count harmonization methods, validation, orbit drift, seasonality, claim checks
+- [sources/2026-11-13-research-agent-access.md](sources/2026-11-13-research-agent-access.md): MCP spec, mcp-handler on Vercel, clients, MCP Apps, geo MCP precedents, security
+- [sources/2026-11-13-research-how-to-win.md](sources/2026-11-13-research-how-to-win.md): 2026 judging and submission guides, past winners, pitch and execution advice
+- [sources/2026-11-13-research-anomalies-rules.md](sources/2026-11-13-research-anomalies-rules.md): NOAA-20, anomalies, harmonization options, Space Apps rules

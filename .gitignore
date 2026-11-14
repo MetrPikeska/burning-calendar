@@ -1,0 +1,7 @@
+data/
+output/
+.venv/
+__pycache__/
+.env
+node_modules/
+.vercel/

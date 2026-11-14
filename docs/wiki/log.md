@@ -1,0 +1,17 @@
+# Log
+
+Append-only. Format: `YYYY-MM-DD op: what changed`.
+
+- 2026-11-11 ingest: first research report (FIRMS, sensors, methods, Greece) and the Greece ratio check from `scripts/ratio_check.py`.
+- 2026-11-11 ingest: challenge short text and the author video summary (CONAE).
+- 2026-11-13 ingest: research report A (CONAE, INPE, Argentina, boundaries) and report B (NOAA-20, anomalies, harmonization options, Space Apps rules).
+- 2026-11-13 create: wiki structure, 13 topic pages, index. `docs/research/` and `docs/challenge.md` moved into `sources/`.
+- 2026-11-13 ingest: deep research on count harmonization and validation (`sources/2026-11-13-research-harmonization-validation.md`). Updated harmonization (methods, orbit drift, validation protocol, splice), sensors (drift dates, end dates, S-NPP 15:40 UTC), calendar-and-anomalies (Freeborn 10/90, Giglio, Magi has no onset rule, effect of month-varying factors), related-tools (INPE has not switched), argentina (Paraná 2020 ratio), decisions (INPE wording, findings on reference scale), open-questions.
+- 2026-11-13 verify: spot check. Jethva 2022 coefficients confirmed in full text, but the 2017-2021 held-out errors belong to its NDVI model, not the VIIRS conversion (source report wrong, harmonization.md corrected). NOAA-21 beta review counts 430815 / 425479 / 395301 confirmed from the PDF. Freeborn 2014 not checked (MDPI 403).
+- 2026-11-13 decide: grilling session settled reference scale (VIIRS-equivalent, fit window rule, chained Terra-only factor, relative fallback), region units (fit NUTS2/provinces, display one level down) and the JSON contract. Updated decisions, harmonization, boundaries; new page data-contract.md.
+- 2026-11-13 ingest: research on agent access (`sources/2026-11-13-research-agent-access.md`). New page agent-access.md; decisions (Open: MCP function vs no backend). Verified mcp-handler 2.4.0 and optional `next` peer on npm, MCP current revision 2026-07-28, MCP Apps client matrix (Claude Code not listed).
+- 2026-11-13 decide: Argentina is must-have next to Greece (provinces + Paraná 2020 minimum). Argentina FIRMS country CSVs downloaded to data/raw/firms/.
+- 2026-11-13 ingest: research on winning Space Apps (`sources/2026-11-13-research-how-to-win.md`). space-apps-rules.md rewritten from the 2026 guides and the Thessaloniki page (most UNVERIFIED markers removed; local 15:00 vs global 23:59 deadline listed as open). New page past-winners.md. Team guide in `docs/notes/2026-11-13-jak-vyhrat.md`.
+- 2026-11-13 decide: grilling round 1 on agent access. Must-have after core, "no backend" amended to one read-only function, static agent layer must-have, TS + mcp-handler, smoke test Sat after 09:00, owners. space-apps-rules Eligibility: added FAQ / team guide quotes forbidding work before 14 Nov 09:00 (conflicts with the legal-terms reading). open-questions: preparation grey area.
+- 2026-11-13 decide: start from scratch on 14 Nov after 09:00 in a new repo; this repo is a private archive. Removed the preparation question from open-questions.
+- 2026-11-14 import: wiki and notes copied into the new repo burning-calendar at the start of the event. findings-greece.md left out (numbers from pre-event code); see docs/prep-log.md.
