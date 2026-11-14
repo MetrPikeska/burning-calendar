@@ -11,6 +11,22 @@ Audit date: 14 Nov 2026, 15:00 EET (feature freeze Sun 15 Nov 12:00). Checked ag
 - Web: "VIIRS saw fire on N of M days" in the month card, Hotspots CSV for Greek regions (burncal-fd6), Markdown region report, and a "Now" line from FIRMS NRT via `GET /api/recent` (hidden on failure).
 - Tests: 82 pytest, 147 vitest, typecheck and build pass.
 
+## Second outside review (ChatGPT after the connector refresh, 15 Nov)
+
+Seven priorities. What the code showed and what changed (branches pipeline-mcp, web-features, docs):
+
+| # | Review point | Finding | Change |
+|---|---|---|---|
+| 1 | Units and metadata | Real bug: relative regions 02, 94, EL62 said "VIIRS-equivalent" in the data files and in `get_region_series`, values are raw MODIS. Other tools gave numbers without a unit; `anom_pct` reads like a percent | `units` by mode in `pipeline/export.py`; a `units` map in every MCP answer with numbers; methodology topic `units` |
+| 2 | Live vs history | Real bug: `ratio_to_median_per_day` was 0 when the NOAA-20 source failed, came from the incomplete current day for `days=1`, and swung on medians under 1 per day | null rate and ratio with `ratio_unavailable`, `low_baseline` under 20 detections, `per_sensor_per_day`, `comparison` |
+| 3 | Custom AOI polygon | Not before the freeze: no calibration for arbitrary areas | Next steps slide |
+| 4 | AI Fire Investigator | ChatGPT and Claude chain the tools already; one call was missing | MCP tool `investigate_month` |
+| 5 | Seasons and anomalies | Season windows differ per region (stated since 14 Nov); before 2012 the baseline holds later years (burncal-te4) | `year_total` (one Jan-Dec window), `baseline_kind` per month |
+| 6 | Integration tests | Missing across tools | `web/test/consistency.test.ts` (40 tests), smoke test covers the new tool and units |
+| 7 | Web audit | UX test and critique done 14 Nov; three open findings were cheap | burncal-0kc (median sentence), -5od (series note), -m2s (corner wedge on anomaly cells, checked in grayscale) |
+
+Tests after the round: 122 pytest, 200 vitest, typecheck and build pass; the smoke test against a local server passed all 24 checks (FIRMS without key: warning).
+
 ## Next steps (slide, no code before the freeze)
 
 1. NOAA-20/21 splice to continue after S-NPP (2 Nov 2026), with its own fit and validation.
@@ -35,7 +51,7 @@ Arbitrary AOI analysis (review P0.2) and an in-app "AI Fire Investigator" (revie
 | Pipeline | Python 3 (uv), pandas; FIRMS archive CSV download, filters (type 0, static sources on a 0.01° grid with 16+ detection days per year), region assignment, harmonization, validation, calendar metrics, JSON/CSV export | `pipeline/*.py`, 69 pytest tests in `tests/` |
 | Data contract | Static JSON + CSV, JSON Schema, generated and committed | `web/public/data/v1/{gr,ar}/`, `web/public/data/v1/schema/`, [wiki/data-contract.md](wiki/data-contract.md) |
 | Web | Vite + TypeScript, no framework, MapLibre GL 6.18, Observable Plot 0.6.19, URL state deep links | `web/src/` |
-| MCP | One stateless read-only Vercel function, mcp-handler 2.4.0, Streamable HTTP, 15 tools, MCP Apps widget, Origin allowlist (report-only) | `web/api/mcp.ts`, `web/api/_lib/` |
+| MCP | One stateless read-only Vercel function, mcp-handler 2.4.0, Streamable HTTP, 16 tools (15 before 15 Nov), MCP Apps widget, Origin allowlist (report-only) | `web/api/mcp.ts`, `web/api/_lib/` |
 | Live context | Fixed host allowlist (GDACS, Copernicus EMS, Open-Meteo, Meteostat, FIRMS NRT), 4 s timeout, per-instance cache, `upstream_error` instead of exceptions | `web/api/_lib/live/` |
 | Hosting | Vercel, Git auto-deploy from `main` (every push to `main` is production), `maxDuration` 10 s | `web/vercel.json` |
 | Tests | 130 vitest tests in 11 files (contract, tools, live core, alerts, widget, origin) | `cd web && npx vitest run` |

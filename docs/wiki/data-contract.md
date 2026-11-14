@@ -41,7 +41,7 @@ One region entry:
 
 ## `regions/{id}.json`
 
-Header: `schema_version`, `generated_at`, `units`, `id`, `name`, `level`, `parent`, `mode`, `area_km2`, `summary` (same climatology fields as the index entry), `months`, `years`, `factors`, `band`, `validation` (same object as in `validation.json`).
+Header: `schema_version`, `generated_at`, `units` ("VIIRS-equivalent ..." in harmonized mode, "raw MODIS Collection 6.1 ...; not VIIRS-equivalent" in relative mode, since 15 Nov), `id`, `name`, `level`, `parent`, `mode`, `area_km2`, `summary` (same climatology fields as the index entry), `months`, `years`, `factors`, `band`, `validation` (same object as in `validation.json`).
 
 Monthly record (`months`, 312 entries, Nov 2000 to Oct 2026):
 
