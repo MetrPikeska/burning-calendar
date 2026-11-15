@@ -82,3 +82,4 @@ Append-only. Format: `YYYY-MM-DD op: what changed`.
 - 2026-11-15 README: demo video link (YouTube) with a thumbnail from the Evia 2021 scene, docs/img/demo-video-thumbnail.jpg.
 - 2026-11-15 project page and README use "SI" (Space Apps term) instead of "AI"; SI section names docs/si-use.md and states no NASA logos; Freeborn 2014 and Giglio 2006 DOIs added to Other References.
 - 2026-11-15 Thessaloniki pitch form submitted before 15:00 (forms.gle/UFEASnMGkVDvW5dm8, from the organiser email); NASA portal Submit for Judging still open until 23:59.
+- 2026-11-15 README gets a References section and the project page Other References lists the method literature with DOIs (Chen 2026 and 2023, Vadrevu & Lasko 2018, Jethva 2022, Csiszar 2014, Fu 2020, Li 2018, Giglio 2006 and 2016, Freeborn 2014, Schroeder 2014).

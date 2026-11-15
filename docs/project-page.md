@@ -90,4 +90,13 @@ Code (open source):
 - MCP: mcp-handler (Vercel), @modelcontextprotocol/server, Zod
 - Demo video: HyperFrames (Apache-2.0)
 
-Literature on season metrics and harmonization: Freeborn et al. 2014, doi:10.3390/rs6054061 (season onset and end), Giglio et al. 2006, doi:10.1029/2005JG000142 (peak month), and the method papers above.
+Literature that shaped the method:
+- Chen et al. 2026, GFED5NRT, Earth System Science Data 18:7535 (VIIRS counts scaled to the MODIS era per region and land cover; closest operational analogue)
+- Vadrevu & Lasko 2018, doi:10.3390/rs10070978 (VIIRS 4.8-6.5× MODIS in Punjab; monthly overlap regression as a back-cast)
+- Jethva 2022, doi:10.3389/feart.2022.1047278 (seasonal regression with intercept; our regression challenger)
+- Csiszar et al. 2014, doi:10.1002/2013JD020453 (scan angle effect on VIIRS vs MODIS counts)
+- Fu et al. 2020, doi:10.3390/rs12182870 (MODIS omission of VIIRS fire pixels)
+- Li et al. 2018, doi:10.1029/2017JD027823 (MODIS vs VIIRS fire radiative power)
+- Chen et al. 2023, GFED5, Earth System Science Data 15:5227 (MODIS confidence and scan filters)
+- Giglio et al. 2006, doi:10.1029/2005JG000142 (peak month); Freeborn et al. 2014, doi:10.3390/rs6054061 (season onset and end)
+- Giglio et al. 2016, doi:10.1016/j.rse.2016.02.054 (MODIS C6 active fire product); Schroeder et al. 2014, doi:10.1016/j.rse.2013.12.008 (VIIRS 375 m product, day vs night)

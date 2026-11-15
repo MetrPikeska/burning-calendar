@@ -94,6 +94,20 @@ npm test                                              # MCP tool tests
 
 The web app reads only the static JSON in `web/public/data/v1/`; the data contract is in [data-contract.md](docs/wiki/data-contract.md). Every push to `main` deploys to Vercel.
 
+## References
+
+- Chen et al. 2026, GFED5NRT, Earth System Science Data 18:7535 (VIIRS counts scaled to the MODIS era per region and land cover; closest operational analogue)
+- Vadrevu & Lasko 2018, https://doi.org/10.3390/rs10070978 (VIIRS 4.8-6.5× MODIS in Punjab; monthly overlap regression as a back-cast)
+- Jethva 2022, https://doi.org/10.3389/feart.2022.1047278 (seasonal regression with intercept; our regression challenger)
+- Csiszar et al. 2014, https://doi.org/10.1002/2013JD020453 (scan angle effect on VIIRS vs MODIS counts)
+- Fu et al. 2020, https://doi.org/10.3390/rs12182870 (MODIS omission of VIIRS fire pixels)
+- Li et al. 2018, https://doi.org/10.1029/2017JD027823 (MODIS vs VIIRS fire radiative power)
+- Chen et al. 2023, GFED5, Earth System Science Data 15:5227 (MODIS confidence and scan filters)
+- Giglio et al. 2006, https://doi.org/10.1029/2005JG000142 (peak month); Freeborn et al. 2014, https://doi.org/10.3390/rs6054061 (season onset and end)
+- Giglio et al. 2016, https://doi.org/10.1016/j.rse.2016.02.054 (MODIS C6 active fire product); Schroeder et al. 2014, https://doi.org/10.1016/j.rse.2013.12.008 (VIIRS 375 m product, day vs night)
+
+Full notes with quotes and our numbers: [docs/wiki/harmonization.md](docs/wiki/harmonization.md) and [docs/wiki/calendar-and-anomalies.md](docs/wiki/calendar-and-anomalies.md).
+
 ## Licence and how to cite
 
 Code: MIT ([LICENSE](LICENSE)). Harmonized data in `web/public/data/v1/`: CC BY 4.0. Region polygons keep their source terms, see [DATA_LICENSE.md](DATA_LICENSE.md) for FIRMS, GISCO and IGN.
