@@ -8,7 +8,7 @@ A web app and an MCP server that join MODIS (from Nov 2000) and VIIRS (from 2012
 
 - Demo video (30 s): https://youtu.be/JJj9WWZIaNc
 - Web app: https://burning-calendar.vercel.app
-- MCP server for AI agents: `https://burning-calendar.vercel.app/api/mcp`
+- MCP server for SI agents: `https://burning-calendar.vercel.app/api/mcp`
 - Research and design notes: [docs/wiki/index.md](docs/wiki/index.md)
 
 ## Problem
@@ -62,7 +62,7 @@ Leave-one-year-out (LOYO) over 2012-2019: fit on seven years, predict the eighth
 - **Data end in Oct 2026.** Jan-Oct 2026 come from the FIRMS area API, not the yearly country files. Aug-Oct 2026 use near real-time data and are marked provisional; near real-time rows have no `type` field, so a cell mask from the standard record removes static sources. S-NPP production stopped on 2 Nov 2026 and had 14 days without data in Mar-Jul 2026; the NOAA-20 splice is on the roadmap below.
 - **Outages:** `data/outages.csv` lists Terra, Aqua and S-NPP gaps of 3 or more days from 2001 to 2026; months with one are flagged.
 
-## AI agents (MCP)
+## SI agents (MCP)
 
 The MCP server is read-only and asks clients for no key or login. It answers questions such as "which province had the most detections per km²" or "was August 2021 abnormal in Attica" with numbers, caveats and a link back to the map. After the first call an agent can ask for caveat codes instead of full texts to save tokens.
 

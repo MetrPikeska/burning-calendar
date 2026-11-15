@@ -24,7 +24,7 @@ Burning Calendar
 
 ## High-Level Project Summary
 
-Burning Calendar joins 26 years of NASA fire detections into one consistent monthly record. MODIS has watched fires since 2000; VIIRS, since 2012, records three to six times more detections of the same fires because its pixels are smaller, so stitching the two creates a fake jump in 2012. We fitted VIIRS/MODIS ratios per region, calendar month and day/night on 2012-2019 and back-cast the MODIS years onto the VIIRS scale, each modelled month with a likely range. Left-out years show a median annual error of 5.4 % for Greece and 1.5 % for Argentina; on the unseen years 2020-2025 it is 7.1 % and 6.7 %. The web app shows, for 13 Greek regions and 24 Argentine provinces or for an area the user draws, when the burning season starts, peaks and ends, and flags months above the 90th percentile of the preceding ten years. An MCP server lets AI assistants answer the same questions with numbers, caveats and a link back to the map.
+Burning Calendar joins 26 years of NASA fire detections into one consistent monthly record. MODIS has watched fires since 2000; VIIRS, since 2012, records three to six times more detections of the same fires because its pixels are smaller, so stitching the two creates a fake jump in 2012. We fitted VIIRS/MODIS ratios per region, calendar month and day/night on 2012-2019 and back-cast the MODIS years onto the VIIRS scale, each modelled month with a likely range. Left-out years show a median annual error of 5.4 % for Greece and 1.5 % for Argentina; on the unseen years 2020-2025 it is 7.1 % and 6.7 %. The web app shows, for 13 Greek regions and 24 Argentine provinces or for an area the user draws, when the burning season starts, peaks and ends, and flags months above the 90th percentile of the preceding ten years. An MCP server lets SI assistants answer the same questions with numbers, caveats and a link back to the map.
 
 ## Link to Project Demo
 
@@ -36,7 +36,7 @@ https://burning-calendar.vercel.app
 
 https://github.com/MetrPikeska/burning-calendar
 
-(The web app and the code with data, pipeline and wiki. The MCP endpoint answers POST requests from AI clients, so opened in a browser it shows an error; it is named in the description instead.)
+(The web app and the code with data, pipeline and wiki. The MCP endpoint answers POST requests from SI clients, so opened in a browser it shows an error; it is named in the description instead.)
 
 ## Detailed Project Description
 
@@ -51,7 +51,7 @@ https://github.com/MetrPikeska/burning-calendar
 4. Validation. Leave-one-year-out on 2012-2019: median annual error 5.4 % (Greece) and 1.5 % (Argentina); the harmonized series hits the VIIRS peak month in 6 of 7 held-out Greek seasons, against 4 of 7 for raw MODIS (Argentina 7 of 7 against 6 of 7). Time split (fit 2012-2019, test 2020-2025): 7.1 % and 6.7 %. We also publish where the method is weaker: a single constant VIIRS/MODIS ratio does as well or better on 2020-2025 in many regions (Greece as a whole 6.0 % against our 7.1 %), and the back-cast range held the observed count in 60-61 % of held-out national months, so the app calls it a likely range, not an 80 % interval.
 5. Regions that fail validation (Ionian Islands, Buenos Aires city, Tierra del Fuego) are shown in a relative mode built on MODIS alone, so the app never presents an unreliable number as harmonized. Regions that pass but miss a held-out year by more than 50 %, or have a 2020-2025 error above 25 %, carry a "with limits" note.
 
-**AI agent access.** A read-only MCP server at `https://burning-calendar.vercel.app/api/mcp` exposes 16 tools: region search, series, season calendars, anomalies, rankings by count or density, aggregation, validation per region and year, point lookup, methodology, a calendar widget for chat apps, and live context (NASA FIRMS near-real-time detections, GDACS and Copernicus EMS alerts, Open-Meteo weather, Meteostat stations). `investigate_month` answers "what happened in this region in this month" in one call. Each answer carries its units and caveats (back-cast range, relative mode, detections are not fires) and a deep link to the map view.
+**SI agent access.** A read-only MCP server at `https://burning-calendar.vercel.app/api/mcp` exposes 16 tools: region search, series, season calendars, anomalies, rankings by count or density, aggregation, validation per region and year, point lookup, methodology, a calendar widget for chat apps, and live context (NASA FIRMS near-real-time detections, GDACS and Copernicus EMS alerts, Open-Meteo weather, Meteostat stations). `investigate_month` answers "what happened in this region in this month" in one call. Each answer carries its units and caveats (back-cast range, relative mode, detections are not fires) and a deep link to the map view.
 
 **Benefits.** One series instead of two incompatible ones, a season calendar per administrative region that agencies already report on, open data under CC BY 4.0, and stated uncertainty: every modelled value comes with a range, and every answer says what the numbers are and are not. They count satellite detections, not fires or burned area.
 
@@ -61,7 +61,7 @@ https://github.com/MetrPikeska/burning-calendar
 
 ## Use of Super Intelligence (SI)
 
-The team chose the challenge, the users and the method: the VIIRS reference scale, region × month × day/night factors, the 2012-2019 fit window, leave-one-year-out validation, the static-source filter and the relative-mode rule. Claude (Anthropic) did literature research. During the event Claude Code (Claude Opus 5.5) wrote most of the pipeline, web and MCP code to the team's specification, ran the pipeline, wrote tests and drafted documentation; outside AI reviews (ChatGPT, and audit reports written with AI) were checked against the code before anything changed. The team reviewed the results and the numbers. Every SI task is logged with time, tool and files in the project's SI log. Claude Code built the 30 s demo video in HyperFrames (HTML rendered to video) from our data, our charts and a screen recording of the real app; it contains no generated images or footage. The voice-over is a recording of team member Vít Kadlec; no generated speech or music.
+Yes. The team chose the challenge, the users and the method: the VIIRS reference scale, region × month × day/night factors, the 2012-2019 fit window, leave-one-year-out validation, the static-source filter and the relative-mode rule. Claude (Anthropic) did literature research. During the event Claude Code (Claude Opus 5.5) wrote most of the pipeline, web and MCP code to the team's specification, ran the pipeline, wrote tests and drafted documentation; outside SI reviews (ChatGPT, and audit reports written with SI) were checked against the code before anything changed. The team reviewed the results and the numbers. Every SI task is logged with time, tool and files in the project's SI log (docs/si-use.md in the repository). Claude Code built the 30 s demo video in HyperFrames (HTML rendered to video) from our data, our charts and a screen recording of the real app; it contains no generated images or footage and no NASA logos. The voice-over is a recording of team member Vít Kadlec; no generated speech or music.
 
 ## NASA Data
 
@@ -90,4 +90,4 @@ Code (open source):
 - MCP: mcp-handler (Vercel), @modelcontextprotocol/server, Zod
 - Demo video: HyperFrames (Apache-2.0)
 
-Literature on season metrics and harmonization: Freeborn et al. 2014 (season onset and end), Giglio et al. 2006 (peak month), and the method papers above.
+Literature on season metrics and harmonization: Freeborn et al. 2014, doi:10.3390/rs6054061 (season onset and end), Giglio et al. 2006, doi:10.1029/2005JG000142 (peak month), and the method papers above.
