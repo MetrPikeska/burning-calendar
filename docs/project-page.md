@@ -11,7 +11,7 @@ Text for the 2026 project page fields ([space-apps-rules.md](wiki/space-apps-rul
 
 ## Before you press Submit for Judging
 
-- [ ] Demo video uploaded (YouTube Unlisted, or Google Drive "Anyone with the link can view"), opened in a private window without login. File: `burning-calendar-wt/video/video/out/burning-calendar-v7-silent.mp4` (30.0 s). The v7 with sound only if you know where the sound comes from (see SI section).
+- [ ] Demo video uploaded (YouTube Unlisted, or Google Drive "Anyone with the link can view"), opened in a private window without login. File: `burning-calendar-wt/video/video/out/burning-calendar-v8-voice.mp4` (30.0 s, voice-over by Vít Kadlec); watch it once with sound before uploading.
 - [ ] https://burning-calendar.vercel.app opens in a private window.
 - [ ] No link to github.com/MetrPikeska/burning-calendar anywhere: the repository is private and judges cannot open it.
 - [ ] All team members on the Members tab, registered for Thessaloniki, none waitlisted.
@@ -59,9 +59,7 @@ https://burning-calendar.vercel.app
 
 ## Use of Super Intelligence (SI)
 
-The team chose the challenge, the users and the method: the VIIRS reference scale, region × month × day/night factors, the 2012-2019 fit window, leave-one-year-out validation, the static-source filter and the relative-mode rule. Claude (Anthropic) did literature research. During the event Claude Code (Claude Opus 5.5) wrote most of the pipeline, web and MCP code to the team's specification, ran the pipeline, wrote tests and drafted documentation; outside AI reviews (ChatGPT, and audit reports written with AI) were checked against the code before anything changed. The team reviewed the results and the numbers. Every SI task is logged with time, tool and files in the project's SI log. Claude Code built the 30 s demo video in HyperFrames (HTML rendered to video) from our data, our charts and a screen recording of the real app; it contains no generated images or footage and no speech.
-
-(If you upload the v7 video with sound: add one sentence naming the source of the sound, and "SI-generated" if a generator made it.)
+The team chose the challenge, the users and the method: the VIIRS reference scale, region × month × day/night factors, the 2012-2019 fit window, leave-one-year-out validation, the static-source filter and the relative-mode rule. Claude (Anthropic) did literature research. During the event Claude Code (Claude Opus 5.5) wrote most of the pipeline, web and MCP code to the team's specification, ran the pipeline, wrote tests and drafted documentation; outside AI reviews (ChatGPT, and audit reports written with AI) were checked against the code before anything changed. The team reviewed the results and the numbers. Every SI task is logged with time, tool and files in the project's SI log. Claude Code built the 30 s demo video in HyperFrames (HTML rendered to video) from our data, our charts and a screen recording of the real app; it contains no generated images or footage. The voice-over is a recording of team member Vít Kadlec; no generated speech or music.
 
 ## NASA Data
 

@@ -1,6 +1,6 @@
 # Burning calendar: harmonized MODIS + VIIRS fire hotspots
 
-NASA Space Apps Challenge 2026, Thessaloniki. Challenge: "Harmonization of MODIS and VIIRS Hot Spots" (CONAE). Team Spearow: Petr, Vita.
+NASA Space Apps Challenge 2026, Thessaloniki. Challenge: "Harmonization of MODIS and VIIRS Hot Spots" (CONAE). Team Spearow: Petr Mikeska, Vít Kadlec.
 
 A web app and an MCP server that join MODIS (from Nov 2000) and VIIRS (from 2012) active fire detections from NASA FIRMS into one burning activity calendar per region, for Greece and Argentina, Nov 2000 to Oct 2026.
 
@@ -29,7 +29,7 @@ The reference scale is VIIRS S-NPP. From February 2012 the series is VIIRS as ob
 2. Detections assigned to GISCO NUTS 2024 regions (Greece) and IGN provinces (Argentina).
 3. VIIRS/MODIS ratios fitted on 2012-2019 per region × calendar month × day/night. Thin strata (under 5 MODIS detections a year or 30 over the window) fall back to season, then region, then national level.
 4. Terra-only months (Nov 2000 to Jun 2002) get a chained factor: (Terra + Aqua)/Terra fitted on 2003-2011, then VIIRS/MODIS.
-5. Every back-cast month carries an interval (`harm_lo`..`harm_hi`), the 10th-90th percentile of leave-one-year-out errors by season.
+5. Every back-cast month carries a likely range (`harm_lo`..`harm_hi`) from the 10th-90th percentile of leave-one-year-out errors by season. On held-out national months the range held the observed count in 60-61 % of cases, so it is a likely range, not an 80 % interval.
 6. A region whose back-cast fails validation is shown in `relative` mode: calendar and anomalies from MODIS alone, VIIRS next to it, no harmonized counts.
 
 The fit window ends in 2019 because Terra and Aqua drift from their nominal orbits after 2020. Method version: `v1-region-month-dn-loyo`.
@@ -43,7 +43,7 @@ Leave-one-year-out (LOYO) over 2012-2019: fit on seven years, predict the eighth
 | Annual totals, median absolute error | 5.4 % | 1.5 % |
 | Monthly correlation r | 0.985 | 0.986 |
 | Peak month hit, harmonized vs raw MODIS | 86 % vs 57 % | 100 % vs 86 % |
-| Time split, fit 2012-2019, test 2020-2025 | 7.1 % | 7.0 % |
+| Time split, fit 2012-2019, test 2020-2025 | 7.1 % | 6.7 % |
 
 - Regions: 12 of 13 Greek regions and 22 of 24 Argentine provinces are `harmonized`. Ionia Nisia, Ciudad de Buenos Aires and Tierra del Fuego are `relative`.
 - Mode rule: `relative` when the LOYO error of annual totals exceeds 25 %, or when the harmonized series misses the VIIRS peak month in more season years than raw MODIS, with one year of tolerance. We added that tolerance on 14 Nov after seeing the results: with 7-8 held-out years, one year moves the hit rate by 13-14 points.
@@ -52,7 +52,7 @@ Leave-one-year-out (LOYO) over 2012-2019: fit on seven years, predict the eighth
 ## Limits
 
 - **Detections, not fires.** One large fire gives many detections, a small burn under cloud gives none. The counts say nothing about burned area.
-- **Back-cast is a model.** Before 2012 the values are predicted from MODIS with an interval; quote the interval.
+- **Back-cast is a model.** Before 2012 the values are predicted from MODIS with a likely range; quote the range.
 - **Orbit drift.** In Greece the time-split error grows after 2022 (2023 +22.9 %, 2025 +17.9 %), and the night ratio falls 3.3 % a year from 2012 to 2025. Argentina shows no such trend.
 - **The 25 % threshold** for `relative` mode is our own choice, with no literature anchor.
 - **Monthly resolution** only; one month is the smallest shift in onset or peak that the calendar can show. Dates are UTC, so some night detections in Argentina fall on the next day.

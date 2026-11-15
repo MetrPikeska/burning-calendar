@@ -1,7 +1,7 @@
 ---
 title: Thessaloniki organiser emails, FAQ and Presentation Guide
 updated: 2026-11-14
-verified_by: Gmail (ppetridis@grnss.org, 11, 13 and 14 Nov 2026); PDFs downloaded from https://gr.nss.org/nsac-faq and https://gr.nss.org/presentation-guide (Google Drive) on 14 Nov 2026, text via pdftotext
+verified_by: Gmail (Thessaloniki organiser emails, 11, 13 and 14 Nov 2026); PDFs downloaded from https://gr.nss.org/nsac-faq and https://gr.nss.org/presentation-guide (Google Drive) on 14 Nov 2026, text via pdftotext
 sources: [https://gr.nss.org/nsac-faq, https://gr.nss.org/presentation-guide]
 ---
 
