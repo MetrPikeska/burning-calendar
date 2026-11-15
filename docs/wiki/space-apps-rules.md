@@ -21,7 +21,7 @@ Both guides are dated 12 Nov 2026. Quotes are exact.
 | Global Finalists, Honorable Mentions | 17 Dec 2026 | Judging Guide 2026 |
 | Global Winners | 26 Jan 2027 | Judging Guide 2026 |
 
-The Thessaloniki FAQ resolves the two Sunday deadlines: the project goes to the local judges by 15:00, the NASA project page stays editable until 23:59. The FAQ says to send the project "to [email]"; the address is a placeholder in the PDF, so where to send it is UNVERIFIED (ask on Discord or at registration). Judges see the last saved version; anything saved after the deadline is not judged.
+The Thessaloniki FAQ resolves the two Sunday deadlines: the project goes to the local judges by 15:00, the NASA project page stays editable until 23:59. The FAQ says to send the project "to [email]"; the organiser email of 15 Nov 2026 (10:54 UTC) resolves it: a Google Form, https://forms.gle/UFEASnMGkVDvW5dm8 (team name, challenge, one demo link, final project link, optional description fields). One member per team submits it; it does not replace Submit for Judging on the NASA portal. Judges see the last saved version; anything saved after the deadline is not judged.
 
 ## Thessaloniki event
 

@@ -81,3 +81,4 @@ Append-only. Format: `YYYY-MM-DD op: what changed`.
 - 2026-11-15 repository made public by Petr; project page now links https://github.com/MetrPikeska/burning-calendar in Link to Final Project and the Thessaloniki form.
 - 2026-11-15 README: demo video link (YouTube) with a thumbnail from the Evia 2021 scene, docs/img/demo-video-thumbnail.jpg.
 - 2026-11-15 project page and README use "SI" (Space Apps term) instead of "AI"; SI section names docs/si-use.md and states no NASA logos; Freeborn 2014 and Giglio 2006 DOIs added to Other References.
+- 2026-11-15 Thessaloniki pitch form submitted before 15:00 (forms.gle/UFEASnMGkVDvW5dm8, from the organiser email); NASA portal Submit for Judging still open until 23:59.
