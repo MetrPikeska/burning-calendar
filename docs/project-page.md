@@ -7,13 +7,13 @@ Text for the 2026 project page fields ([space-apps-rules.md](wiki/space-apps-rul
 - Team Name: Spearow (as on the video title card; check the exact spelling on the NASA team page, e.g. "Team Spearow")
 - Selected Challenge: Harmonization of MODIS and VIIRS Hot Spots
 - Link to Project Demo: the public video link (see Link to Project Demo below)
-- Link to Final Project: https://burning-calendar.vercel.app
+- Link to Final Project: https://burning-calendar.vercel.app (code: https://github.com/MetrPikeska/burning-calendar)
 
 ## Before you press Submit for Judging
 
 - [ ] Demo video uploaded (YouTube Unlisted, or Google Drive "Anyone with the link can view"), opened in a private window without login. File: `burning-calendar-wt/video/video/out/burning-calendar-v8-voice.mp4` (30.0 s, voice-over by Vít Kadlec); watch it once with sound before uploading.
 - [ ] https://burning-calendar.vercel.app opens in a private window.
-- [ ] No link to github.com/MetrPikeska/burning-calendar anywhere: the repository is private and judges cannot open it.
+- [ ] https://github.com/MetrPikeska/burning-calendar opens in a private window (public since 15 Nov).
 - [ ] All team members on the Members tab, registered for Thessaloniki, none waitlisted.
 - [ ] SI drop-down: code and text generated with SI; images and video: none generated (see SI section).
 - [ ] Project Submission Verification: tick the terms and conditions and "confirm all work is original", then Submit for Judging. The banner and the participant certificate confirm it.
@@ -34,7 +34,9 @@ PASTE the public video link here (30 s video; no password, permission or registr
 
 https://burning-calendar.vercel.app
 
-(Only this link in the field: the MCP endpoint answers POST requests from AI clients, so opened in a browser it shows an error. It is named in the description instead.)
+https://github.com/MetrPikeska/burning-calendar
+
+(The web app and the code with data, pipeline and wiki. The MCP endpoint answers POST requests from AI clients, so opened in a browser it shows an error; it is named in the description instead.)
 
 ## Detailed Project Description
 
