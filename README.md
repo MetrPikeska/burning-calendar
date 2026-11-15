@@ -4,6 +4,9 @@ NASA Space Apps Challenge 2026, Thessaloniki. Challenge: "Harmonization of MODIS
 
 A web app and an MCP server that join MODIS (from Nov 2000) and VIIRS (from 2012) active fire detections from NASA FIRMS into one burning activity calendar per region, for Greece and Argentina, Nov 2000 to Oct 2026.
 
+[![Demo video, 30 s: Greece, summer 2021, every dot a fire detection](docs/img/demo-video-thumbnail.jpg)](https://youtu.be/JJj9WWZIaNc)
+
+- Demo video (30 s): https://youtu.be/JJj9WWZIaNc
 - Web app: https://burning-calendar.vercel.app
 - MCP server for AI agents: `https://burning-calendar.vercel.app/api/mcp`
 - Research and design notes: [docs/wiki/index.md](docs/wiki/index.md)

@@ -79,3 +79,4 @@ Append-only. Format: `YYYY-MM-DD op: what changed`.
 - 2026-11-15 submission: docs/project-page.md updated for the portal and the Thessaloniki form: data to Oct 2026, time split 6.7 % for Argentina, relative regions EL62, 02, 94 (Neuquén harmonized since 15 Nov), custom areas, 16 MCP tools, ablation and band coverage stated, no link to the private GitHub repository, a pre-submit checklist. Demo link still to paste after the video upload.
 - 2026-11-15 repo check: README (team names, AR time split 6.7 %, likely range wording), organiser email removed from the Thessaloniki source, project page points to the voiced video v8.
 - 2026-11-15 repository made public by Petr; project page now links https://github.com/MetrPikeska/burning-calendar in Link to Final Project and the Thessaloniki form.
+- 2026-11-15 README: demo video link (YouTube) with a thumbnail from the Evia 2021 scene, docs/img/demo-video-thumbnail.jpg.
